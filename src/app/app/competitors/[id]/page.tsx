@@ -69,7 +69,7 @@ export default async function CompetitorPage({
         <p className="mt-5 rounded-xl border border-line bg-accent-soft px-4 py-3 text-sm">
           <span className="font-semibold">{competitor.name} added.</span>{" "}
           {foundCount > 0
-            ? `Riposte found ${foundCount} ${foundCount === 1 ? "page" : "pages"} to watch. Check them below and fix anything that looks wrong.`
+            ? `Riposte found ${foundCount} ${foundCount === 1 ? "page" : "pages"} on its own. Check them below, and add any it missed.`
             : "Add the pages you want watched below."}
         </p>
       )}
@@ -77,7 +77,12 @@ export default async function CompetitorPage({
 
       <section className={`${card} mt-6`}>
         <div className="border-b border-line px-5 py-4">
-          <h2 className="font-display text-xl font-bold">Pages Riposte watches</h2>
+          <h2 className="font-display text-xl font-bold">Pages Riposte watches ({sources.length})</h2>
+          {sources.length > 0 && (
+            <p className="mt-0.5 text-sm text-muted">
+              {foundCount} found automatically · {sources.length - foundCount} added by you
+            </p>
+          )}
         </div>
         {sources.length === 0 ? (
           <p className="px-5 py-6 text-sm text-muted">No pages yet. Add one below.</p>

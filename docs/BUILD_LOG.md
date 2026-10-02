@@ -68,5 +68,5 @@ This is the honest record behind the project, kept as we go.
 - Adding a page by hand works and is labelled "Added by you".
 
 **What broke / fixed:**
-- **The "found N pages" message counted pages the user added by hand.** After adding one page manually, the banner said Riposte had found 5 pages instead of 4. Fixed: it now counts only pages found automatically.
+- **The "found N pages" message counted pages the user added by hand.** After adding one page manually, the banner said Riposte had found 5 pages instead of 4. Fixed: the message now counts only pages found automatically, and the list heading shows the full picture: total watched, how many were found automatically, and how many were added by hand.
 - **The check-frequency dropdown stretched across the whole screen.** A shared style forced full width. Fixed with a compact dropdown.
