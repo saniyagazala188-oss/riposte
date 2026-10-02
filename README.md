@@ -2,13 +2,13 @@
 
 Competitive intelligence for marketers. Riposte tracks competitors' launches, content and pricing, explains what changed and what to do about it, and shows who wins the answers in AI search.
 
-Built in public by Saniya Gazala.
+Built in public by Saniya Gazala. Live at https://riposte-eta.vercel.app
 
 ## Status
 
 | Phase | What it adds | Status |
 | --- | --- | --- |
-| 1 | Login, database, landing page with waitlist, live deploy | In progress |
+| 1 | Login, database, landing page with waitlist, live deploy | Done |
 | 2 | Product profile, competitors added by domain, page auto-discovery | Planned |
 | 3 | The fetcher: page reading, main-content comparison, noise filter | Planned |
 | 4 | AI signals with before/after view, Slack and email alerts, weekly digest | Planned |
