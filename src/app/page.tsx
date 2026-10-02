@@ -1,0 +1,153 @@
+import Link from "next/link";
+import { Logo } from "@/components/Logo";
+import { WaitlistForm } from "@/components/WaitlistForm";
+
+const problems = [
+  {
+    title: "Repetitive",
+    body: "Export each competitor from your SEO tool, compare it with last week's sheet, paste what's new. Every week, for every competitor.",
+  },
+  {
+    title: "Inconsistent",
+    body: "Which competitors get checked depends on the week, and a page that reappears is assumed to be \"optimized\" without anyone seeing what changed.",
+  },
+  {
+    title: "Reactive",
+    body: "Shifts in search intent and trending topics show up late, as interruptions that push half-finished work back.",
+  },
+];
+
+const steps = [
+  { title: "Add a competitor by domain", body: "Riposte finds their release notes, blog feed and pricing page for you." },
+  { title: "It checks every day", body: "Each page is compared with the last check. Timestamps, banners and other noise are ignored." },
+  { title: "It explains the change", body: "What changed, what it means for your product, and how much it matters." },
+  { title: "It tells you what to make", body: "The assets to create, where each one goes, and who owns it, with first drafts ready." },
+];
+
+const features = [
+  ["Signal feed and alerts", "Real changes only, with a before/after view. High-impact moves go to Slack or email."],
+  ["Action kit", "A response plan for every signal: comparison page updates, sales talking points, campaigns."],
+  ["Content intelligence", "Competitors' publishing pace, topic clusters, intent changes and trending topics."],
+  ["Prompt Studio and AI visibility", "Commercial-intent AEO prompts, and which competitor pages ChatGPT and Perplexity cite."],
+  ["Leadership digest", "A weekly summary that writes itself, ready to share or export."],
+];
+
+function ExampleSignal() {
+  return (
+    <div className="w-full rounded-2xl border border-line bg-surface p-5 shadow-sm" aria-label="Example signal">
+      <div className="flex flex-wrap items-center gap-2 text-xs">
+        <span className="font-semibold uppercase tracking-wider text-muted">Example signal</span>
+        <span className="rounded-full border border-current px-2 py-0.5 font-semibold text-signal">High impact</span>
+        <span className="font-mono text-muted">Pricing · 2 days ago</span>
+      </div>
+      <p className="mt-3 font-display text-lg font-bold leading-snug">
+        Pipewise removed its free plan and raised Starter from $9 to $12 per seat.
+      </p>
+      <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+        <div className="rounded-lg bg-bg p-3">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted">So what</p>
+          <p className="mt-1">Small teams that started on their free plan now have no free option. That opens your entry segment.</p>
+        </div>
+        <div className="rounded-lg bg-signal-soft p-3">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted">What to make</p>
+          <p className="mt-1">Update your comparison page, brief sales, and launch a switch offer this week.</p>
+        </div>
+      </div>
+      <p className="mt-3 text-xs text-muted">Pipewise is a fictional company used for illustration.</p>
+    </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <div className="min-h-dvh">
+      <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+        <Logo />
+        <Link href="/login" className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium hover:border-muted">
+          Log in
+        </Link>
+      </header>
+
+      <main>
+        <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 pt-10 pb-16 lg:grid-cols-[1.1fr_1fr] lg:pt-16">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold uppercase tracking-widest text-accent">Competitive intelligence for marketers</p>
+            <h1 className="mt-3 font-display text-4xl leading-[1.05] font-extrabold tracking-tight sm:text-5xl">
+              Every competitor move deserves a sharp reply.
+            </h1>
+            <p className="mt-5 max-w-xl text-lg text-muted">
+              Riposte watches your competitors&apos; launches, content and pricing every day. It tells you what changed,
+              what it means for you, and what to do about it, and shows who wins the answers in AI search.
+            </p>
+            <div className="mt-7">
+              <WaitlistForm id="hero-email" />
+              <p className="mt-2 text-sm text-muted">Early access is free for the first teams. No sales call.</p>
+            </div>
+          </div>
+          <ExampleSignal />
+        </section>
+
+        <section className="border-y border-line bg-surface">
+          <div className="mx-auto max-w-6xl px-4 py-14">
+            <h2 className="max-w-2xl font-display text-3xl font-bold">
+              Competitor research quietly eats a product marketer&apos;s week.
+            </h2>
+            <p className="mt-3 max-w-2xl text-muted">
+              It pulls time away from the real job: positioning, stakeholder conversations, and being visible in Google
+              and AI answers.
+            </p>
+            <div className="mt-8 grid gap-6 md:grid-cols-3">
+              {problems.map((p) => (
+                <div key={p.title} className="border-t-2 border-ink pt-4">
+                  <h3 className="font-display text-xl font-bold">{p.title}</h3>
+                  <p className="mt-2 text-muted">{p.body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-6xl px-4 py-14">
+          <h2 className="font-display text-3xl font-bold">How Riposte works</h2>
+          <ol className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {steps.map((s, i) => (
+              <li key={s.title} className="flex flex-col gap-2">
+                <span className="font-mono text-sm text-accent">0{i + 1}</span>
+                <h3 className="font-display text-lg font-bold">{s.title}</h3>
+                <p className="text-sm text-muted">{s.body}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section className="mx-auto max-w-6xl px-4 pb-14">
+          <h2 className="font-display text-3xl font-bold">What you get</h2>
+          <dl className="mt-6 divide-y divide-line border-y border-line">
+            {features.map(([name, body]) => (
+              <div key={name} className="grid gap-1 py-4 sm:grid-cols-[16rem_1fr] sm:gap-6">
+                <dt className="font-semibold">{name}</dt>
+                <dd className="text-muted">{body}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        <section className="bg-accent-soft">
+          <div className="mx-auto flex max-w-6xl flex-col items-start gap-4 px-4 py-14">
+            <h2 className="font-display text-3xl font-bold">Get early access</h2>
+            <p className="max-w-xl text-muted">
+              Riposte is being built in public. Join the waitlist and be one of the first teams to try it on your own
+              competitors.
+            </p>
+            <WaitlistForm id="footer-email" />
+          </div>
+        </section>
+      </main>
+
+      <footer className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-6 text-sm text-muted">
+        <span>© {new Date().getFullYear()} Riposte</span>
+        <span>Built by Saniya Gazala</span>
+      </footer>
+    </div>
+  );
+}
