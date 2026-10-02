@@ -146,7 +146,7 @@ export default function Home() {
 
       <footer className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-6 text-sm text-muted">
         <span>© {new Date().getFullYear()} Riposte</span>
-        <span>Founded by Saniya Gazala · Built with Claude 🤝</span>
+        <span>Founded by Saniya Gazala with ❤️ · Built with Claude 🤝</span>
       </footer>
     </div>
   );

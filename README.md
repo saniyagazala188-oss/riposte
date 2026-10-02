@@ -2,7 +2,7 @@
 
 Competitive intelligence for marketers. Riposte tracks competitors' launches, content and pricing, explains what changed and what to do about it, and shows who wins the answers in AI search.
 
-Founded by Saniya Gazala, built with Claude 🤝 Built in public. Live at https://riposte-eta.vercel.app
+Founded by Saniya Gazala with ❤️ · Built with Claude 🤝 Built in public. Live at https://riposte-eta.vercel.app
 
 ## Status
 
