@@ -9,7 +9,7 @@ Built in public by Saniya Gazala. Live at https://riposte-eta.vercel.app
 | Phase | What it adds | Status |
 | --- | --- | --- |
 | 1 | Login, database, landing page with waitlist, live deploy | Done |
-| 2 | Product profile, competitors added by domain, page auto-discovery | Planned |
+| 2 | Product profile, competitors added by domain, page auto-discovery | Built, testing |
 | 3 | The fetcher: page reading, main-content comparison, noise filter | Planned |
 | 4 | AI signals with before/after view, Slack and email alerts, weekly digest | Planned |
 | 5 | Action kit: what to create, where it goes, who owns it | Planned |

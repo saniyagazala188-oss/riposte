@@ -1,0 +1,153 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { requireUser } from "@/lib/auth";
+import { SOURCE_LABELS, type SourceType } from "@/lib/discovery/parse";
+import { deleteCompetitor, rediscover, removeSource, updateFrequency } from "@/app/app/actions";
+import { ConfirmSubmit, SubmitButton } from "@/components/FormButtons";
+import { card, eyebrow, inputClass, secondaryButton } from "@/components/styles";
+import { AddSourceForm } from "./AddSourceForm";
+
+export const maxDuration = 30;
+
+const ORDER: SourceType[] = ["changelog", "blog", "feed", "pricing", "sitemap", "other"];
+const HINTS: Partial<Record<SourceType, string>> = {
+  changelog: "Catches feature launches and product updates.",
+  blog: "Shows what they publish and which topics they're building.",
+  feed: "Lists every new post with its date, the most reliable way to catch new content.",
+  pricing: "Catches price, plan and limit changes.",
+  sitemap: "Lists all their pages, used for content intelligence later.",
+};
+
+type Source = { id: string; type: SourceType; url: string; discovered: boolean };
+
+export default async function CompetitorPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ added?: string }>;
+}) {
+  const { id } = await params;
+  const { added } = await searchParams;
+  const { supabase } = await requireUser();
+
+  const { data: competitor } = await supabase
+    .from("competitors")
+    .select("id, name, domain, check_frequency, discovery_note")
+    .eq("id", id)
+    .maybeSingle();
+  if (!competitor) notFound();
+
+  const { data: sourceRows } = await supabase
+    .from("sources")
+    .select("id, type, url, discovered")
+    .eq("competitor_id", id);
+  const sources = ((sourceRows ?? []) as Source[]).sort((a, b) => ORDER.indexOf(a.type) - ORDER.indexOf(b.type));
+  const missing = ORDER.filter((t) => t !== "other" && !sources.some((s) => s.type === t));
+
+  return (
+    <div>
+      <Link href="/app/competitors" className="text-sm text-muted hover:text-ink">
+        ← All competitors
+      </Link>
+      <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
+        <div className="min-w-0">
+          <p className={eyebrow}>Competitor</p>
+          <h1 className="mt-1 font-display text-3xl font-bold">{competitor.name}</h1>
+          <a href={`https://${competitor.domain}`} target="_blank" rel="noopener noreferrer" className="font-mono text-sm text-muted hover:text-ink">
+            {competitor.domain} ↗
+          </a>
+        </div>
+        <form action={rediscover}>
+          <input type="hidden" name="competitor_id" value={competitor.id} />
+          <SubmitButton pendingLabel="Looking…">Find pages again</SubmitButton>
+        </form>
+      </div>
+
+      {added && (
+        <p className="mt-5 rounded-xl border border-line bg-accent-soft px-4 py-3 text-sm">
+          <span className="font-semibold">{competitor.name} added.</span>{" "}
+          {sources.length > 0
+            ? `Riposte found ${sources.length} ${sources.length === 1 ? "page" : "pages"} to watch. Check them below and fix anything that looks wrong.`
+            : "Add the pages you want watched below."}
+        </p>
+      )}
+      {competitor.discovery_note && <p className="mt-3 text-sm text-signal">{competitor.discovery_note}</p>}
+
+      <section className={`${card} mt-6`}>
+        <div className="border-b border-line px-5 py-4">
+          <h2 className="font-display text-xl font-bold">Pages Riposte watches</h2>
+        </div>
+        {sources.length === 0 ? (
+          <p className="px-5 py-6 text-sm text-muted">No pages yet. Add one below.</p>
+        ) : (
+          <ul className="divide-y divide-line">
+            {sources.map((s) => (
+              <li key={s.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold">{SOURCE_LABELS[s.type]}</p>
+                  <a href={s.url} target="_blank" rel="noopener noreferrer" className="block truncate font-mono text-sm text-accent hover:underline">
+                    {s.url}
+                  </a>
+                  <p className="mt-0.5 text-xs text-muted">{s.discovered ? "Found automatically" : "Added by you"}</p>
+                </div>
+                <form action={removeSource}>
+                  <input type="hidden" name="source_id" value={s.id} />
+                  <input type="hidden" name="competitor_id" value={competitor.id} />
+                  <SubmitButton pendingLabel="Removing…">Remove</SubmitButton>
+                </form>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {missing.length > 0 && (
+          <div className="border-t border-line bg-bg px-5 py-4 text-sm">
+            <p className="font-semibold">Not found yet</p>
+            <ul className="mt-2 flex flex-col gap-1 text-muted">
+              {missing.map((t) => (
+                <li key={t}>
+                  <span className="text-ink">{SOURCE_LABELS[t]}:</span> {HINTS[t]}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-2 text-muted">If they have one, add it below.</p>
+          </div>
+        )}
+
+        <div className="border-t border-line px-5 py-5">
+          <AddSourceForm competitorId={competitor.id} />
+        </div>
+      </section>
+
+      <section className={`${card} mt-6 p-5`}>
+        <h2 className="font-display text-xl font-bold">How often to check</h2>
+        <p className="mt-1 text-sm text-muted">Daily for close rivals, weekly for the rest. Automatic checks start in phase 3.</p>
+        <form action={updateFrequency} className="mt-4 flex flex-wrap items-center gap-3">
+          <input type="hidden" name="competitor_id" value={competitor.id} />
+          <label htmlFor="check_frequency" className="sr-only">
+            Check frequency
+          </label>
+          <select id="check_frequency" name="check_frequency" defaultValue={competitor.check_frequency} className={`${inputClass} w-auto`}>
+            <option value="daily">Every day</option>
+            <option value="weekly">Every week</option>
+          </select>
+          <SubmitButton pendingLabel="Saving…" className={secondaryButton}>
+            Save
+          </SubmitButton>
+        </form>
+      </section>
+
+      <section className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line p-5">
+        <div>
+          <h2 className="font-semibold">Stop tracking {competitor.name}</h2>
+          <p className="text-sm text-muted">Removes this competitor and all its pages.</p>
+        </div>
+        <form action={deleteCompetitor}>
+          <input type="hidden" name="competitor_id" value={competitor.id} />
+          <ConfirmSubmit label="Remove competitor" confirmLabel={`Yes, remove ${competitor.name}`} />
+        </form>
+      </section>
+    </div>
+  );
+}

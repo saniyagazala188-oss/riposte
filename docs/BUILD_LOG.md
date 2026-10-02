@@ -41,3 +41,24 @@ This is the honest record behind the project, kept as we go.
 - Login by email link works, and lands in the workspace.
 
 **Still rough:** the first login email is Supabase's generic "Confirm your email address" message. A branded email and our own email sender come with the alerts in phase 4.
+
+## Phase 2 · Your product and competitors
+
+**Goal:** a user describes their product and adds competitors by typing a domain. Riposte finds the pages worth watching on its own.
+
+**Built:**
+- **Your product** page: product name, one-line pitch, who you sell to. Every signal will be judged against this.
+- **Competitors** page: add a competitor by website (for example `acme.com`). The name is filled in automatically if left empty. Up to 10 competitors for now, to keep AI costs predictable.
+- **Automatic page discovery**, in two passes:
+  1. Read the homepage and look for links to pricing, changelog or release notes, and the blog, plus any blog feed (RSS) the site declares.
+  2. For anything still missing, try common addresses (`/pricing`, `/changelog`, `/blog`, `/feed`, `/rss.xml`, `/sitemap.xml`).
+- **Competitor page**: shows every page being watched, marks which were found automatically and which were added by hand, lists what's still missing and why it matters, and lets the user add, remove or re-find pages, set daily or weekly checks, or remove the competitor.
+- Setup checklist on the home screen.
+- New tables `competitors` and `sources`, each row owned by one user, with Row Level Security.
+
+**Decisions:**
+- A feed or sitemap only counts if the response really is a feed or sitemap. Many sites answer every address with a normal "page not found" page that still returns success, which would otherwise be saved as a fake feed.
+- Every request has a 6-second time limit and a size limit, and identifies itself as RiposteBot, so one slow site can't hang the app.
+- Links to other websites are ignored during discovery, but users can add any page by hand (some companies host their changelog elsewhere).
+
+**What broke / fixed:** _to fill in after testing._
