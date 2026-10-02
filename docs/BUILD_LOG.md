@@ -61,4 +61,12 @@ This is the honest record behind the project, kept as we go.
 - Every request has a 6-second time limit and a size limit, and identifies itself as RiposteBot, so one slow site can't hang the app.
 - Links to other websites are ignored during discovery, but users can add any page by hand (some companies host their changelog elsewhere).
 
-**What broke / fixed:** _to fill in after testing._
+**Tested on the live site, 3 Oct 2026** (using Riposte itself as the product, and its real competitors):
+- Saving the product profile works.
+- **visualping.io:** found the blog, pricing page and sitemap. Correctly reported no changelog and no blog feed.
+- **crayon.co:** found the blog, the blog feed, the pricing page and the sitemap. Crayon has no public prices, so its `/pricing` address leads to a "pricing inquiry" form; Riposte followed that redirect, which is the right page to watch for when public pricing appears.
+- Adding a page by hand works and is labelled "Added by you".
+
+**What broke / fixed:**
+- **The "found N pages" message counted pages the user added by hand.** After adding one page manually, the banner said Riposte had found 5 pages instead of 4. Fixed: it now counts only pages found automatically.
+- **The check-frequency dropdown stretched across the whole screen.** A shared style forced full width. Fixed with a compact dropdown.

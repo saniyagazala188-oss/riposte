@@ -4,7 +4,7 @@ import { requireUser } from "@/lib/auth";
 import { SOURCE_LABELS, type SourceType } from "@/lib/discovery/parse";
 import { deleteCompetitor, rediscover, removeSource, updateFrequency } from "@/app/app/actions";
 import { ConfirmSubmit, SubmitButton } from "@/components/FormButtons";
-import { card, eyebrow, inputClass, secondaryButton } from "@/components/styles";
+import { card, eyebrow, secondaryButton } from "@/components/styles";
 import { AddSourceForm } from "./AddSourceForm";
 
 export const maxDuration = 30;
@@ -43,6 +43,7 @@ export default async function CompetitorPage({
     .select("id, type, url, discovered")
     .eq("competitor_id", id);
   const sources = ((sourceRows ?? []) as Source[]).sort((a, b) => ORDER.indexOf(a.type) - ORDER.indexOf(b.type));
+  const foundCount = sources.filter((s) => s.discovered).length;
   const missing = ORDER.filter((t) => t !== "other" && !sources.some((s) => s.type === t));
 
   return (
@@ -67,8 +68,8 @@ export default async function CompetitorPage({
       {added && (
         <p className="mt-5 rounded-xl border border-line bg-accent-soft px-4 py-3 text-sm">
           <span className="font-semibold">{competitor.name} added.</span>{" "}
-          {sources.length > 0
-            ? `Riposte found ${sources.length} ${sources.length === 1 ? "page" : "pages"} to watch. Check them below and fix anything that looks wrong.`
+          {foundCount > 0
+            ? `Riposte found ${foundCount} ${foundCount === 1 ? "page" : "pages"} to watch. Check them below and fix anything that looks wrong.`
             : "Add the pages you want watched below."}
         </p>
       )}
@@ -128,7 +129,7 @@ export default async function CompetitorPage({
           <label htmlFor="check_frequency" className="sr-only">
             Check frequency
           </label>
-          <select id="check_frequency" name="check_frequency" defaultValue={competitor.check_frequency} className={`${inputClass} w-auto`}>
+          <select id="check_frequency" name="check_frequency" defaultValue={competitor.check_frequency} className="rounded-lg border border-line bg-bg px-3 py-2.5 text-base outline-none focus:border-accent">
             <option value="daily">Every day</option>
             <option value="weekly">Every week</option>
           </select>
