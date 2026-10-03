@@ -1,6 +1,6 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { generateJson, geminiConfigured, RateLimited } from "@/lib/ai/gemini";
+import { generateJson, geminiConfigured, Overloaded, RateLimited } from "@/lib/ai/gemini";
 import { SOURCE_LABELS, type SourceType } from "@/lib/discovery/parse";
 import { buildSignalPrompt, cleanDraft, SIGNAL_SCHEMA, type Profile } from "./prompt";
 
@@ -76,8 +76,8 @@ export async function processChanges(
       await db.from("changes").update({ processed: true }).eq("id", change.id);
       written++;
     } catch (e) {
-      if (e instanceof RateLimited) {
-        stop = true; // try the rest next time, without counting this as a failed attempt
+      if (e instanceof RateLimited || e instanceof Overloaded) {
+        stop = true; // AI busy: try the rest next time, without counting this as a failed attempt
         return;
       }
       failed++;

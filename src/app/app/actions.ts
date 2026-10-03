@@ -8,7 +8,7 @@ import { discoverSources } from "@/lib/discovery";
 import { checkSources, type SourceRow } from "@/lib/fetcher/check";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { processChanges } from "@/lib/signals/process";
-import { generateJson, geminiConfigured, RateLimited } from "@/lib/ai/gemini";
+import { generateJson, geminiConfigured, Overloaded, RateLimited } from "@/lib/ai/gemini";
 import { buildKitPrompt, cleanKit, KIT_SCHEMA } from "@/lib/actions/prompt";
 import { SOURCE_LABELS as PAGE_LABELS, type SourceType as PageType } from "@/lib/discovery/parse";
 import { sendAlerts, sendDigests } from "@/lib/notify/alerts";
@@ -341,7 +341,8 @@ export async function buildActionKit(_prev: CheckState, formData: FormData): Pro
   try {
     items = cleanKit(await generateJson(prompt, KIT_SCHEMA, { timeoutMs: 55000 }));
   } catch (e) {
-    if (e instanceof RateLimited) return { status: "error", message: "The AI is busy right now. Try again in a minute." };
+    if (e instanceof RateLimited || e instanceof Overloaded)
+      return { status: "error", message: "Google's AI is overloaded right now (this happens at busy times). Try again in a minute." };
     const detail = (e as Error).name === "AbortError" ? "the AI took longer than 55 seconds" : (e as Error).message.slice(0, 200);
     console.error("buildActionKit failed:", e);
     return { status: "error", message: `Couldn't build the kit this time (${detail}). Please try again.` };

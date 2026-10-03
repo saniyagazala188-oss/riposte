@@ -172,3 +172,6 @@ This is the honest record behind the project, kept as we go.
 **Tested before deploying** (sample data): the prompt carries the evidence and a clean comparison-page address; unknown asset types, owners and priorities fall back to safe defaults; empty items are dropped; a kit is capped at 4 actions.
 
 **Setup:** one new database migration, `0005_phase5_action_kit.sql`. No new keys.
+
+**What broke / fixed:**
+- **"Build action kit" failed on the first live try.** The first error message was too vague ("Couldn't build the kit"), so it was changed to show the real reason. The real reason: Google answered *503, "This model is currently experiencing high demand"*. Gemini's servers were overloaded; nothing was wrong in Riposte. Fixed in the AI client for every AI call: when Google is overloaded, Riposte waits a moment and tries again, then tries once more on a lighter Gemini model (Flash-Lite). In the morning job, an overloaded moment no longer counts as a failed attempt; the change is simply explained on the next run. If it's still busy, the message now says so in plain words.
