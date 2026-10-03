@@ -175,3 +175,10 @@ This is the honest record behind the project, kept as we go.
 
 **What broke / fixed:**
 - **"Build action kit" failed on the first live try.** The first error message was too vague ("Couldn't build the kit"), so it was changed to show the real reason. The real reason: Google answered *503, "This model is currently experiencing high demand"*. Gemini's servers were overloaded; nothing was wrong in Riposte. Fixed in the AI client for every AI call: when Google is overloaded, Riposte waits a moment and tries again, then tries once more on a lighter Gemini model (Flash-Lite). In the morning job, an overloaded moment no longer counts as a failed attempt; the change is simply explained on the next run. If it's still busy, the message now says so in plain words.
+
+**Tested on the live site, 3 Oct 2026:** after the retry fix, "Build action kit" on the Acme price-drop signal returned 3 actions:
+1. *Today · Battlecard update · Owner: PMM · Battlecard in the sales wiki.* Accurate bullets: $59 → $49, trial 7 → 14 days with no card, Enterprise tier and its features removed.
+2. *Today · Sales talk track · Owner: Sales · #sales Slack.* When to use it, acknowledge the price, pivot to value, one objection ("Acme is cheaper and gives me 14 days") with an answer.
+3. *This week · Internal update · Owner: PMM · #product-updates Slack.* A ready-to-paste heads-up that points the team to the updated battlecard.
+
+**Review of the drafts:** every fact matched the evidence, nothing was invented, and owners, channels and urgency were sensible. Weak spot: the "pivot to value" lines are generic ("review what you need for your workflow"), because the AI only knows a one-line pitch about the product and has no list of its real strengths, so it had nothing specific to pivot to.
