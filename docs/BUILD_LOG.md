@@ -70,3 +70,27 @@ This is the honest record behind the project, kept as we go.
 **What broke / fixed:**
 - **The "found N pages" message counted pages the user added by hand.** After adding one page manually, the banner said Riposte had found 5 pages instead of 4. Fixed: the message now counts only pages found automatically, and the list heading shows the full picture: total watched, how many were found automatically, and how many were added by hand.
 - **The check-frequency dropdown stretched across the whole screen.** A shared style forced full width. Fixed with a compact dropdown.
+
+## Phase 3 · The fetcher
+
+**Goal:** Riposte reads every watched page on a schedule, compares it with the last check, ignores noise, and keeps only what really changed.
+
+**Built:**
+- **Daily automatic check** at around 7am India time (Vercel Cron). Daily competitors are checked every day, weekly ones every 7 days.
+- **Check now** button on each competitor, with a 5-minute cooldown so a site isn't hit repeatedly.
+- **First check right after adding a competitor**, running in the background, so the starting point is saved straight away.
+- **Three kinds of reading:**
+  - *Web pages* (blog, changelog, pricing, other): main content only.
+  - *Blog feeds:* every post with its title, link and date. A change = new posts.
+  - *Sitemaps:* every page on the site (content sitemaps first). A change = new pages.
+- **Noise filter:** removes menus, footers, cookie and consent banners, popups, newsletter boxes, chat widgets and share buttons; strips "3 hours ago", view counts, "5 min read" and copyright lines; ignores lines that only moved position.
+- **Change detection:** compares the lines (or posts, or page addresses) of the new check with the last one, and records what was added and what was removed.
+- **Fallback for pages built by JavaScript or blocked:** if a page returns almost no text, Riposte tries a page-reading service (r.jina.ai). A switch in reading method starts a fresh baseline instead of creating a fake change.
+- **Respects robots.txt:** pages a site asks bots not to read are skipped and flagged.
+- **Status on every page:** "Checked 3 hours ago · last changed 2 days ago", or a plain-language reason when a page couldn't be read.
+- **Recent changes** on each competitor page and **Latest changes** on the home screen, shown as Before / Now.
+- New tables `snapshots` (last 5 checks per page are kept) and `changes`.
+
+**Tested before deploying** (sample pages): a price change from $9 to $12 was detected; a change in only "3 hours ago" / "2 days ago", view counts and read time was correctly ignored. RSS, Atom, sitemap and sitemap-index parsing and robots.txt rules all worked.
+
+**What broke / fixed:** _to fill in after testing._

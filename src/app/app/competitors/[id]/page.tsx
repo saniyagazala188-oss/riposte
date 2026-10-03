@@ -5,9 +5,12 @@ import { SOURCE_LABELS, type SourceType } from "@/lib/discovery/parse";
 import { deleteCompetitor, rediscover, removeSource, updateFrequency } from "@/app/app/actions";
 import { ConfirmSubmit, SubmitButton } from "@/components/FormButtons";
 import { card, eyebrow, secondaryButton } from "@/components/styles";
+import { CheckNowButton } from "@/components/CheckNowButton";
+import { ChangeList, CHANGE_SELECT, type ChangeRow } from "@/components/ChangeList";
+import { timeAgo } from "@/lib/time";
 import { AddSourceForm } from "./AddSourceForm";
 
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 const ORDER: SourceType[] = ["changelog", "blog", "feed", "pricing", "sitemap", "other"];
 const HINTS: Partial<Record<SourceType, string>> = {
@@ -18,7 +21,35 @@ const HINTS: Partial<Record<SourceType, string>> = {
   sitemap: "Lists all their pages, used for content intelligence later.",
 };
 
-type Source = { id: string; type: SourceType; url: string; discovered: boolean };
+type Source = {
+  id: string;
+  type: SourceType;
+  url: string;
+  discovered: boolean;
+  last_checked_at: string | null;
+  last_status: string | null;
+  last_error: string | null;
+  last_changed_at: string | null;
+};
+
+const PROBLEM_STATUSES = ["blocked", "not_found", "robots", "empty", "error"];
+
+function SourceStatus({ s }: { s: Source }) {
+  if (!s.last_checked_at) return <p className="mt-0.5 text-xs text-muted">Waiting for the first check</p>;
+  if (s.last_status && PROBLEM_STATUSES.includes(s.last_status)) {
+    return (
+      <p className="mt-0.5 text-xs text-signal">
+        Couldn&apos;t read this page {timeAgo(s.last_checked_at)}. {s.last_error}
+      </p>
+    );
+  }
+  return (
+    <p className="mt-0.5 text-xs text-muted">
+      Checked {timeAgo(s.last_checked_at)}
+      {s.last_changed_at ? ` · last changed ${timeAgo(s.last_changed_at)}` : " · no changes yet"}
+    </p>
+  );
+}
 
 export default async function CompetitorPage({
   params,
@@ -40,10 +71,18 @@ export default async function CompetitorPage({
 
   const { data: sourceRows } = await supabase
     .from("sources")
-    .select("id, type, url, discovered")
+    .select("id, type, url, discovered, last_checked_at, last_status, last_error, last_changed_at")
     .eq("competitor_id", id);
+  const { data: changeRows } = await supabase
+    .from("changes")
+    .select(CHANGE_SELECT)
+    .eq("competitor_id", id)
+    .order("detected_at", { ascending: false })
+    .limit(15);
+  const changes = (changeRows ?? []) as unknown as ChangeRow[];
   const sources = ((sourceRows ?? []) as Source[]).sort((a, b) => ORDER.indexOf(a.type) - ORDER.indexOf(b.type));
   const foundCount = sources.filter((s) => s.discovered).length;
+  const neverChecked = sources.length > 0 && sources.every((s) => !s.last_checked_at);
   const missing = ORDER.filter((t) => t !== "other" && !sources.some((s) => s.type === t));
 
   return (
@@ -59,17 +98,20 @@ export default async function CompetitorPage({
             {competitor.domain} ↗
           </a>
         </div>
-        <form action={rediscover}>
-          <input type="hidden" name="competitor_id" value={competitor.id} />
-          <SubmitButton pendingLabel="Looking…">Find pages again</SubmitButton>
-        </form>
+        <div className="flex flex-wrap items-start gap-3">
+          <form action={rediscover}>
+            <input type="hidden" name="competitor_id" value={competitor.id} />
+            <SubmitButton pendingLabel="Looking…">Find pages again</SubmitButton>
+          </form>
+          <CheckNowButton competitorId={competitor.id} />
+        </div>
       </div>
 
       {added && (
         <p className="mt-5 rounded-xl border border-line bg-accent-soft px-4 py-3 text-sm">
           <span className="font-semibold">{competitor.name} added.</span>{" "}
           {foundCount > 0
-            ? `Riposte found ${foundCount} ${foundCount === 1 ? "page" : "pages"} on its own. Check them below, and add any it missed.`
+            ? `Riposte found ${foundCount} ${foundCount === 1 ? "page" : "pages"} on its own and is running the first check now. Check the list below, and add any it missed.`
             : "Add the pages you want watched below."}
         </p>
       )}
@@ -96,6 +138,7 @@ export default async function CompetitorPage({
                     {s.url}
                   </a>
                   <p className="mt-0.5 text-xs text-muted">{s.discovered ? "Found automatically" : "Added by you"}</p>
+                  <SourceStatus s={s} />
                 </div>
                 <form action={removeSource}>
                   <input type="hidden" name="source_id" value={s.id} />
@@ -126,9 +169,31 @@ export default async function CompetitorPage({
         </div>
       </section>
 
+      <section className={`${card} mt-6`}>
+        <div className="border-b border-line px-5 py-4">
+          <h2 className="font-display text-xl font-bold">Recent changes</h2>
+          <p className="mt-0.5 text-sm text-muted">
+            Real changes only: dates, view counts, cookie banners and menus are ignored. From phase 4, each change comes
+            with what it means for you and what to do.
+          </p>
+        </div>
+        {changes.length ? (
+          <ChangeList changes={changes} />
+        ) : (
+          <p className="px-5 py-6 text-sm text-muted">
+            {neverChecked
+              ? "The first check saves each page as a starting point. Changes appear here from the next check onwards."
+              : "No changes yet. The first check saves each page as a starting point, and every later check is compared with it."}
+          </p>
+        )}
+      </section>
+
       <section className={`${card} mt-6 p-5`}>
         <h2 className="font-display text-xl font-bold">How often to check</h2>
-        <p className="mt-1 text-sm text-muted">Daily for close rivals, weekly for the rest. Automatic checks start in phase 3.</p>
+        <p className="mt-1 text-sm text-muted">
+          Riposte checks automatically every morning (around 7am India time). Daily suits close rivals; weekly suits the
+          rest.
+        </p>
         <form action={updateFrequency} className="mt-4 flex flex-wrap items-center gap-3">
           <input type="hidden" name="competitor_id" value={competitor.id} />
           <label htmlFor="check_frequency" className="sr-only">

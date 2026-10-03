@@ -10,7 +10,7 @@ Founded by Saniya Gazala with ❤️ · Built with Claude 🤝 Built in public. 
 | --- | --- | --- |
 | 1 | Login, database, landing page with waitlist, live deploy | Done |
 | 2 | Product profile, competitors added by domain, page auto-discovery | Done |
-| 3 | The fetcher: page reading, main-content comparison, noise filter | Planned |
+| 3 | The fetcher: page reading, main-content comparison, noise filter | Built, testing |
 | 4 | AI signals with before/after view, Slack and email alerts, weekly digest | Planned |
 | 5 | Action kit: what to create, where it goes, who owns it | Planned |
 | 6 | Content intelligence, linked signals, intent-change and trend alerts | Planned |

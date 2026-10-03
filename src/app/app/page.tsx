@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { card, eyebrow, primaryButton } from "@/components/styles";
+import { ChangeList, CHANGE_SELECT, type ChangeRow } from "@/components/ChangeList";
 
 export const metadata = { title: "Feed · Riposte" };
 
@@ -8,11 +9,15 @@ export const metadata = { title: "Feed · Riposte" };
 export default async function AppHome() {
   const { supabase, user } = await requireUser();
 
-  const [{ data: profile }, { count: competitorCount }, { count: sourceCount }] = await Promise.all([
-    supabase.from("profiles").select("product_name").eq("id", user.id).maybeSingle(),
-    supabase.from("competitors").select("id", { count: "exact", head: true }),
-    supabase.from("sources").select("id", { count: "exact", head: true }),
-  ]);
+  const [{ data: profile }, { count: competitorCount }, { count: sourceCount }, { count: checkedCount }, { data: changeRows }] =
+    await Promise.all([
+      supabase.from("profiles").select("product_name").eq("id", user.id).maybeSingle(),
+      supabase.from("competitors").select("id", { count: "exact", head: true }),
+      supabase.from("sources").select("id", { count: "exact", head: true }),
+      supabase.from("sources").select("id", { count: "exact", head: true }).not("last_checked_at", "is", null),
+      supabase.from("changes").select(CHANGE_SELECT).order("detected_at", { ascending: false }).limit(20),
+    ]);
+  const changes = (changeRows ?? []) as unknown as ChangeRow[];
 
   const steps = [
     {
@@ -30,9 +35,9 @@ export default async function AppHome() {
       cta: "Add competitors",
     },
     {
-      done: false,
-      title: "Get your first signals",
-      body: "Daily checks and AI-written signals arrive in the next phases.",
+      done: (checkedCount ?? 0) > 0,
+      title: "First check",
+      body: "Riposte reads every page once and saves it as a starting point. After that, it checks every morning.",
       href: null,
       cta: null,
     },
@@ -80,13 +85,27 @@ export default async function AppHome() {
         ))}
       </ol>
 
-      <div className="mt-6 rounded-2xl border border-dashed border-line bg-surface p-8 text-center">
-        <p className="font-semibold">Your signal feed will appear here.</p>
-        <p className="mx-auto mt-1 max-w-md text-sm text-muted">
-          Once checks are running, every real change from your competitors shows up here with what it means and what to
-          do.
-        </p>
-      </div>
+      {changes.length ? (
+        <section className={`${card} mt-6`}>
+          <div className="border-b border-line px-5 py-4">
+            <h2 className="font-display text-xl font-bold">Latest changes</h2>
+            <p className="mt-0.5 text-sm text-muted">
+              What your competitors changed, newest first. From phase 4, each change comes with what it means and what to
+              do.
+            </p>
+          </div>
+          <ChangeList changes={changes} showCompetitor />
+        </section>
+      ) : (
+        <div className="mt-6 rounded-2xl border border-dashed border-line bg-surface p-8 text-center">
+          <p className="font-semibold">Your feed will appear here.</p>
+          <p className="mx-auto mt-1 max-w-md text-sm text-muted">
+            {(checkedCount ?? 0) > 0
+              ? "Riposte has saved a starting point for each page. When a competitor changes something, it shows up here."
+              : "Once the first check runs, every real change from your competitors shows up here."}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

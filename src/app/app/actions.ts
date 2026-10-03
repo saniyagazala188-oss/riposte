@@ -2,8 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { requireUser } from "@/lib/auth";
 import { discoverSources } from "@/lib/discovery";
+import { checkSources, type SourceRow } from "@/lib/fetcher/check";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { nameFromDomain, normalizeDomain, type SourceType } from "@/lib/discovery/parse";
 
 export type FormState = { status: "idle" | "saved" | "error"; message?: string };
@@ -60,6 +63,18 @@ export async function addCompetitor(_prev: FormState, formData: FormData): Promi
       .insert(found.map((f) => ({ competitor_id: competitor.id, type: f.type, url: f.url, discovered: true })));
   }
   if (note) await supabase.from("competitors").update({ discovery_note: note }).eq("id", competitor.id);
+
+  // Run the first check in the background, so the feed isn't empty after setup.
+  const competitorId = competitor.id;
+  after(async () => {
+    const admin = createAdminClient();
+    if (!admin) return;
+    const { data } = await admin
+      .from("sources")
+      .select("id, user_id, competitor_id, type, url")
+      .eq("competitor_id", competitorId);
+    if (data?.length) await checkSources(admin, data as SourceRow[], { concurrency: 4, budgetMs: 50000 });
+  });
 
   revalidatePath("/app", "layout");
   redirect(`/app/competitors/${competitor.id}?added=1`);
@@ -132,4 +147,44 @@ export async function removeSource(formData: FormData) {
   const competitor_id = String(formData.get("competitor_id") ?? "");
   await supabase.from("sources").delete().eq("id", id);
   revalidatePath(`/app/competitors/${competitor_id}`);
+}
+
+// ---------- Checks ----------
+
+export type CheckState = { status: "idle" | "done" | "error"; message?: string };
+
+const CHECK_COOLDOWN_MS = 5 * 60 * 1000;
+
+export async function checkNow(_prev: CheckState, formData: FormData): Promise<CheckState> {
+  const { supabase } = await requireUser();
+  const competitorId = String(formData.get("competitor_id") ?? "");
+  const { data } = await supabase
+    .from("sources")
+    .select("id, user_id, competitor_id, type, url, last_checked_at")
+    .eq("competitor_id", competitorId);
+  const sources = data ?? [];
+  if (!sources.length) return { status: "error", message: "Add a page to watch first." };
+
+  const fresh = sources.every(
+    (s) => s.last_checked_at && Date.now() - new Date(s.last_checked_at).getTime() < CHECK_COOLDOWN_MS,
+  );
+  if (fresh) return { status: "error", message: "These pages were checked a few minutes ago. Try again in 5 minutes." };
+
+  const results = await checkSources(supabase, sources as SourceRow[], { concurrency: 4, budgetMs: 50000 });
+  revalidatePath("/app", "layout");
+
+  const changed = results.filter((r) => r.status === "changed").length;
+  const baseline = results.filter((r) => r.status === "baseline").length;
+  const problems = results.filter((r) => !["changed", "baseline", "unchanged"].includes(r.status)).length;
+  const skipped = sources.length - results.length;
+
+  const parts = [
+    `Checked ${results.length} ${results.length === 1 ? "page" : "pages"}.`,
+    changed ? `${changed} changed.` : "",
+    baseline ? `${baseline} saved as a starting point for future comparisons.` : "",
+    !changed && !baseline && !problems ? "No changes since the last check." : "",
+    problems ? `${problems} couldn't be read; see the notes below.` : "",
+    skipped ? `${skipped} will be checked next time.` : "",
+  ];
+  return { status: "done", message: parts.filter(Boolean).join(" ") };
 }
