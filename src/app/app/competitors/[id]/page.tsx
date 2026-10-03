@@ -9,6 +9,8 @@ import { CheckNowButton } from "@/components/CheckNowButton";
 import { ChangeList, CHANGE_SELECT, type ChangeRow } from "@/components/ChangeList";
 import { SignalList, SIGNAL_SELECT, type SignalRow } from "@/components/SignalList";
 import { timeAgo } from "@/lib/time";
+import { ContentPanel, type TopicsRow } from "@/components/ContentPanel";
+import { loadContent } from "@/lib/content/load";
 import { AddSourceForm } from "./AddSourceForm";
 
 export const maxDuration = 90;
@@ -91,6 +93,10 @@ export default async function CompetitorPage({
       .limit(15),
   ]);
   const changes = (changeRows ?? []) as unknown as ChangeRow[];
+  const [content, { data: topicsRow }] = await Promise.all([
+    loadContent(supabase, [id]).then((m) => m.get(id)!),
+    supabase.from("content_topics").select("generated_at, source_count, summary, topics").eq("competitor_id", id).maybeSingle(),
+  ]);
   const signals = (signalRows ?? []) as unknown as SignalRow[];
   const sources = ((sourceRows ?? []) as Source[]).sort((a, b) => ORDER.indexOf(a.type) - ORDER.indexOf(b.type));
   const foundCount = sources.filter((s) => s.discovered).length;
@@ -202,6 +208,23 @@ export default async function CompetitorPage({
               : "No changes yet. The first check saves each page as a starting point, and every later check is compared with it."}
           </p>
         )}
+      </section>
+
+      <section id="content" className={`${card} mt-6 scroll-mt-6`}>
+        <div className="border-b border-line px-5 py-4">
+          <h2 className="font-display text-xl font-bold">Their content</h2>
+          <p className="mt-0.5 text-sm text-muted">How often they publish, what kind of pages they have, and the topics they build.</p>
+        </div>
+        <div className="p-5">
+          <ContentPanel
+            competitorId={competitor.id}
+            feed={content.feed}
+            urls={content.urls}
+            hasFeed={content.hasFeed}
+            hasSitemap={content.hasSitemap}
+            topics={(topicsRow as TopicsRow) ?? null}
+          />
+        </div>
       </section>
 
       <section className={`${card} mt-6 p-5`}>

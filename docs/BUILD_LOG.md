@@ -197,3 +197,33 @@ This is the honest record behind the project, kept as we go.
   - **Group by** as a two-option switch (Urgency | Competitor) on the right of the panel.
   - **Clear filters** appears only when a filter is on.
   The filters still live in the page address, so a filtered view can be bookmarked or shared.
+
+## Phase 6 · Content intelligence, linked signals, intent-change and trend alerts
+
+Phase 6 is split into three parts, built one at a time:
+- **6a · Content intelligence:** publishing pace, page mix, topics. *(this part)*
+- **6b · Linked signals and trend alerts:** related moves by one competitor joined into one story; a topic flagged when several competitors start writing about it.
+- **6c · Intent-change alerts:** when a competitor rewrites an existing page.
+
+### 6a · Content intelligence
+
+**Goal:** replace the weekly Ahrefs-export-and-compare routine. See at a glance how much each competitor publishes, what kind of pages they have, and which topics they're building.
+
+**Built:**
+- **Content page** (new tab): one card per competitor with posts in the last 90 days, total pages on their site, number of comparison pages, when they last posted, and their top 3 topics. Busiest publishers first.
+- **Their content** section on each competitor page:
+  - *Publishing pace:* posts in the last 30 and 90 days, and posts per month for the last 6 months, from the dates in their blog feed.
+  - *Latest posts* with dates and links.
+  - *What kind of pages they have:* their sitemap sorted into comparison & alternatives pages, blog posts, guides & learning, customer stories, product & features, and release notes, recognised from the page addresses.
+  - *Topics they're building:* "Find their topics" sends up to 120 post titles (and blog page addresses turned into readable titles) to the AI, which groups them into 4–8 topics with counts, share, the angle they take, and real example titles, plus a 1–2 sentence summary of their content strategy and what it means for your product.
+- No extra fetching: everything comes from the feed and sitemap Riposte already reads each morning.
+
+**Decisions:**
+- **Comparison pages are counted first**, before blog posts, because "acme-vs-you" and "alternatives" pages are the ones a PMM must answer.
+- **The pace is honest about its limits:** most feeds list only the latest 10–50 posts, so the page says so; competitors without a feed show "–" with the reason instead of a misleading zero.
+- **Topics on demand, not every day:** topics change slowly, and on-demand keeps AI use low. The age of the analysis is always shown.
+- **AI uses only real titles:** examples must be copied from the list, and the text from the website is marked as data, not instructions.
+
+**Tested before deploying** (sample data): dates in RSS, ISO and plain formats are read and bad dates skipped; posts land in the right month; 30/90-day counts are right; comparison pages win over blog posts ("/blog/acme-vs-x" counts as comparison); page addresses become readable titles; AI topic answers are tidied (counts capped, empty names dropped, examples limited, largest topic first).
+
+**Setup:** migration `0008_phase6_content_topics.sql`. No new keys.

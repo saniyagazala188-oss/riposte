@@ -14,6 +14,9 @@ import { SOURCE_LABELS as PAGE_LABELS, type SourceType as PageType } from "@/lib
 import { sendAlerts, sendDigests } from "@/lib/notify/alerts";
 import { emailConfigured, sendEmail, sendSlack } from "@/lib/notify/send";
 import { SITE_URL } from "@/lib/notify/templates";
+import { loadContent } from "@/lib/content/load";
+import { titlesForTopics } from "@/lib/content/stats";
+import { buildTopicPrompt, cleanTopics, TOPIC_SCHEMA } from "@/lib/content/topics";
 import { nameFromDomain, normalizeDomain, type SourceType } from "@/lib/discovery/parse";
 
 export type FormState = { status: "idle" | "saved" | "error"; message?: string };
@@ -381,4 +384,58 @@ export async function setActionStatus(formData: FormData) {
     if (count === 0) await supabase.from("signals").update({ status: "reviewed" }).eq("id", item.signal_id).eq("status", "new");
   }
   revalidatePath("/app", "layout");
+}
+
+// ---------- Content intelligence ----------
+
+export async function analyseTopics(_prev: CheckState, formData: FormData): Promise<CheckState> {
+  const { supabase, user } = await requireUser();
+  if (!geminiConfigured()) return { status: "error", message: "AI isn't set up yet: the GEMINI_API_KEY setting is missing." };
+  const competitorId = String(formData.get("competitor_id") ?? "");
+  const [{ data: competitor }, { data: profile }] = await Promise.all([
+    supabase.from("competitors").select("id, name").eq("id", competitorId).maybeSingle(),
+    supabase.from("profiles").select("product_name, product_pitch, ideal_customer").eq("id", user.id).maybeSingle(),
+  ]);
+  if (!competitor) return { status: "error", message: "Competitor not found." };
+
+  const content = (await loadContent(supabase, [competitor.id])).get(competitor.id)!;
+  const titles = titlesForTopics(content.feed, content.urls);
+  if (titles.length < 5) {
+    return {
+      status: "error",
+      message: "Not enough content to find topics yet. Riposte needs this competitor's blog feed or sitemap, checked at least once.",
+    };
+  }
+
+  let result;
+  try {
+    result = cleanTopics(
+      await generateJson(
+        buildTopicPrompt(competitor.name, titles, profile ?? { product_name: null, product_pitch: null, ideal_customer: null }),
+        TOPIC_SCHEMA,
+        { timeoutMs: 50000 },
+      ),
+      titles.length,
+    );
+  } catch (e) {
+    if (e instanceof RateLimited || e instanceof Overloaded)
+      return { status: "error", message: "Google's AI is overloaded right now. Try again in a minute." };
+    return { status: "error", message: `Couldn't find topics this time (${(e as Error).message.slice(0, 160)}).` };
+  }
+  if (!result) return { status: "error", message: "The AI's answer wasn't usable. Please try again." };
+
+  const { error } = await supabase.from("content_topics").upsert(
+    {
+      user_id: user.id,
+      competitor_id: competitor.id,
+      generated_at: new Date().toISOString(),
+      source_count: titles.length,
+      summary: result.summary,
+      topics: result.topics,
+    },
+    { onConflict: "competitor_id" },
+  );
+  if (error) return { status: "error", message: "Couldn't save the topics. Please try again." };
+  revalidatePath("/app", "layout");
+  return { status: "done", message: `Found ${result.topics.length} topics in ${titles.length} titles.` };
 }
