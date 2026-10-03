@@ -151,18 +151,25 @@ export function parseFeed(body: string): FeedItem[] | null {
 
 export type SitemapResult = { urls: string[]; children: string[] };
 
+// Reads page addresses from a sitemap. Uses pattern matching instead of a full XML parse,
+// so a very large sitemap that was cut off part-way still gives every complete entry.
 export function parseSitemap(body: string): SitemapResult | null {
-  let doc: Record<string, unknown>;
-  try {
-    doc = xml.parse(body);
-  } catch {
-    return null;
-  }
-  const urlset = doc.urlset as { url?: unknown } | undefined;
-  const index = doc.sitemapindex as { sitemap?: unknown } | undefined;
-  if (!urlset && !index) return null;
-  const urls = asArray(urlset?.url as Record<string, unknown>[]).map((u) => text(u.loc)).filter(Boolean);
-  const children = asArray(index?.sitemap as Record<string, unknown>[]).map((s) => text(s.loc)).filter(Boolean);
+  const head = body.slice(0, 5000);
+  const isUrlset = /<(?:[\w-]+:)?urlset\b/i.test(head);
+  const isIndex = /<(?:[\w-]+:)?sitemapindex\b/i.test(head);
+  if (!isUrlset && !isIndex) return null;
+  const decode = (v: string) => v.trim().replace(/^<!\[CDATA\[|\]\]>$/g, "").replace(/&amp;/g, "&");
+  const collect = (block: RegExp) => {
+    const out: string[] = [];
+    for (const m of body.matchAll(block)) {
+      const loc = m[1].match(/<loc>([\s\S]*?)<\/loc>/i);
+      if (loc) out.push(decode(loc[1]));
+    }
+    return out.filter((u) => /^https?:\/\//i.test(u));
+  };
+  // A page entry's own <loc> is plain; image and video entries use <image:loc> and similar.
+  const urls = isUrlset ? collect(/<url\b[^>]*>([\s\S]*?)<\/url>/gi) : [];
+  const children = isIndex ? collect(/<sitemap\b[^>]*>([\s\S]*?)<\/sitemap>/gi) : [];
   return { urls, children };
 }
 

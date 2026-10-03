@@ -4,13 +4,15 @@ import { fallbackCandidates, isSameSite, parseHomepage, type Found, type SourceT
 export const USER_AGENT = "RiposteBot/0.1 (+https://riposte-eta.vercel.app)";
 const TIMEOUT_MS = 6000;
 const MAX_BYTES = 1_500_000;
+const MAX_BYTES_XML = 8_000_000; // sitemaps with image and video entries can be several MB
 
 type FetchResult = { ok: boolean; status: number; url: string; contentType: string; text: string };
 
 // Fetches a public page with a time limit and a size limit.
-export async function fetchPage(url: string, { readBody = true } = {}): Promise<FetchResult> {
+export async function fetchPage(url: string, { readBody = true, large = false } = {}): Promise<FetchResult> {
+  const limit = large ? MAX_BYTES_XML : MAX_BYTES;
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  const timer = setTimeout(() => controller.abort(), large ? TIMEOUT_MS * 2.5 : TIMEOUT_MS);
   try {
     const res = await fetch(url, {
       redirect: "follow",
@@ -24,15 +26,20 @@ export async function fetchPage(url: string, { readBody = true } = {}): Promise<
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let size = 0;
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        size += value.byteLength;
-        text += decoder.decode(value, { stream: true });
-        if (size > MAX_BYTES) {
-          await reader.cancel();
-          break;
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          size += value.byteLength;
+          text += decoder.decode(value, { stream: true });
+          if (size > limit) {
+            await reader.cancel();
+            break;
+          }
         }
+      } catch {
+        // Ran out of time part-way through a long file: keep what arrived.
+        if (!text) throw new Error("No content received in time");
       }
     }
     return { ok: res.ok, status: res.status, url: res.url || url, contentType, text };

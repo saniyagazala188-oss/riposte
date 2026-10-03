@@ -93,4 +93,9 @@ This is the honest record behind the project, kept as we go.
 
 **Tested before deploying** (sample pages): a price change from $9 to $12 was detected; a change in only "3 hours ago" / "2 days ago", view counts and read time was correctly ignored. RSS, Atom, sitemap and sitemap-index parsing and robots.txt rules all worked.
 
-**What broke / fixed:** _to fill in after testing._
+**Setup:** two new private settings in Vercel: `SUPABASE_SERVICE_ROLE_KEY` (lets the daily check run with nobody logged in) and `CRON_SECRET` (so only Vercel can start it), both stored as Secret.
+
+**Tested on the live site, 3 Oct 2026:** Check now on Crayon read 5 pages. The blog, blog feed, pricing page and the hand-added page were saved as starting points.
+
+**What broke / fixed:**
+- **Crayon's sitemap couldn't be read.** It lists every image and video as well as every page, which makes it several megabytes. Riposte stopped reading at 1.5 MB, so the file was cut off part-way and the XML reader rejected it. Fixed in three ways: sitemaps and feeds may now be up to 8 MB with a longer time limit; a file that runs out of time keeps what already arrived; and sitemaps are now read entry by entry, so even a cut-off file gives every complete page address. Image and video addresses inside the sitemap are ignored, since they aren't pages.

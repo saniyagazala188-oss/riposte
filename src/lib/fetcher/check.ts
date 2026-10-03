@@ -81,7 +81,7 @@ async function capture(source: SourceRow): Promise<Captured | CheckOutcome> {
 
   let res;
   try {
-    res = await fetchPage(source.url);
+    res = await fetchPage(source.url, { large: source.type === "sitemap" || source.type === "feed" });
   } catch {
     res = null;
   }
@@ -102,7 +102,7 @@ async function capture(source: SourceRow): Promise<Captured | CheckOutcome> {
     const urls = [...parsed.urls];
     for (const child of pickChildSitemaps(parsed.children)) {
       try {
-        const sub = await fetchPage(child);
+        const sub = await fetchPage(child, { large: true });
         const inner = sub.ok ? parseSitemap(sub.text) : null;
         if (inner) urls.push(...inner.urls);
       } catch {
