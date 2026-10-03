@@ -175,6 +175,7 @@ export async function checkNow(_prev: CheckState, formData: FormData): Promise<C
 
   const changed = results.filter((r) => r.status === "changed").length;
   const baseline = results.filter((r) => r.status === "baseline").length;
+  const unchanged = results.filter((r) => r.status === "unchanged").length;
   const problems = results.filter((r) => !["changed", "baseline", "unchanged"].includes(r.status)).length;
   const skipped = sources.length - results.length;
 
@@ -182,7 +183,7 @@ export async function checkNow(_prev: CheckState, formData: FormData): Promise<C
     `Checked ${results.length} ${results.length === 1 ? "page" : "pages"}.`,
     changed ? `${changed} changed.` : "",
     baseline ? `${baseline} saved as a starting point for future comparisons.` : "",
-    !changed && !baseline && !problems ? "No changes since the last check." : "",
+    unchanged ? `${unchanged} unchanged since the last check.` : "",
     problems ? `${problems} couldn't be read; see the notes below.` : "",
     skipped ? `${skipped} will be checked next time.` : "",
   ];
