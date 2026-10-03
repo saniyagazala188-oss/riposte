@@ -61,7 +61,26 @@ export function alertEmail(signals: SignalForMessage[]) {
   return { subject, html, text: plainText(signals) };
 }
 
-export function digestEmail(signals: SignalForMessage[], { competitors, weekOf }: { competitors: number; weekOf: string }) {
+export type ShippedSummary = { done: { title: string; competitor: string }[]; open: number };
+
+function shippedBlock(s: ShippedSummary) {
+  if (!s.done.length && !s.open) return "";
+  const n = s.done.length;
+  const lines = s.done
+    .slice(0, 6)
+    .map((d) => `<li style="margin:0 0 4px">${esc(d.title)} <span style="color:${MUTED}">· ${esc(d.competitor)}</span></li>`)
+    .join("");
+  return `<tr><td style="padding:16px 24px;border-top:1px solid ${LINE}">
+<p style="margin:0;font-size:16px;font-weight:700">${n ? `Your team shipped ${n} ${n === 1 ? "response" : "responses"} to competitor moves this week` : "No responses shipped this week yet"}</p>
+${lines ? `<ul style="margin:8px 0 0;padding-left:18px;font-size:14px;line-height:1.5">${lines}</ul>` : ""}
+${s.open ? `<p style="margin:8px 0 0;font-size:14px;color:${MUTED}">${s.open} still open. <a href="${SITE_URL}/app/actions" style="color:${ACCENT}">See the Actions board</a></p>` : ""}
+</td></tr>`;
+}
+
+export function digestEmail(
+  signals: SignalForMessage[],
+  { competitors, weekOf, shipped = { done: [], open: 0 } }: { competitors: number; weekOf: string; shipped?: ShippedSummary },
+) {
   const high = signals.filter((s) => s.impact === "high");
   const rest = signals.filter((s) => s.impact !== "high");
   const subject = signals.length
@@ -73,11 +92,15 @@ export function digestEmail(signals: SignalForMessage[], { competitors, weekOf }
   const shown = [...high, ...rest].slice(0, 12);
   const more = signals.length - shown.length;
   const body =
+    shippedBlock(shipped) +
     shown.map(signalBlock).join("") +
     (more > 0
       ? `<tr><td style="padding:12px 24px;border-top:1px solid ${LINE};font-size:14px"><a href="${SITE_URL}/app" style="color:${ACCENT}">See ${more} more in your feed</a></td></tr>`
       : "");
-  return { subject, html: layout("Your weekly competitor digest", intro, body), text: plainText(shown) || intro };
+  const shippedText = shipped.done.length
+    ? `Your team shipped ${shipped.done.length} responses to competitor moves this week.\n\n`
+    : "";
+  return { subject, html: layout("Your weekly competitor digest", intro, body), text: shippedText + (plainText(shown) || intro) };
 }
 
 function plainText(signals: SignalForMessage[]) {

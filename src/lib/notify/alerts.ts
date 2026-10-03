@@ -119,10 +119,29 @@ export async function sendDigests(db: SupabaseClient, { userId, force = false }:
       .map(toMessage)
       .sort((a, b) => order[a.impact] - order[b.impact]);
 
+    const [{ data: doneRows }, { count: openCount }] = await Promise.all([
+      db
+        .from("action_items")
+        .select("title, competitors(name)")
+        .eq("user_id", p.id)
+        .eq("status", "done")
+        .gte("done_at", since.toISOString())
+        .order("done_at", { ascending: false })
+        .limit(50),
+      db.from("action_items").select("id", { count: "exact", head: true }).eq("user_id", p.id).eq("status", "open"),
+    ]);
+    const shipped = {
+      done: ((doneRows ?? []) as unknown as { title: string; competitors: { name: string } | null }[]).map((d) => ({
+        title: d.title,
+        competitor: d.competitors?.name ?? "",
+      })),
+      open: openCount ?? 0,
+    };
+
     let delivered = false;
     if (p.email && emailConfigured()) {
       try {
-        await sendEmail(p.email, digestEmail(signals, { competitors, weekOf }));
+        await sendEmail(p.email, digestEmail(signals, { competitors, weekOf, shipped }));
         delivered = true;
       } catch (e) {
         errors.push(`email: ${(e as Error).message}`);

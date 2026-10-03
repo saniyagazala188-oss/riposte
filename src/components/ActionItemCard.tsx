@@ -37,6 +37,14 @@ export function ActionItemCard({
   return (
     <div className={`rounded-xl border border-line bg-surface p-4 ${done ? "opacity-60" : ""}`}>
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+        {context && (
+          <Link
+            href={`/app/competitors/${context.competitorId}`}
+            className="rounded-full border border-line px-2 py-0.5 font-semibold text-ink hover:border-muted"
+          >
+            {context.competitor}
+          </Link>
+        )}
         <span className={`rounded-full px-2 py-0.5 font-semibold ${PRIORITY_STYLE[item.priority]}`}>
           {PRIORITY_LABELS[item.priority]}
         </span>
@@ -45,15 +53,7 @@ export function ActionItemCard({
         {item.channel && <span className="text-muted">Share in: {item.channel}</span>}
       </div>
       <p className={`mt-2 font-semibold ${done ? "line-through" : ""}`}>{item.title}</p>
-      {context && (
-        <p className="mt-0.5 text-xs text-muted">
-          From{" "}
-          <Link href={`/app/competitors/${context.competitorId}`} className="hover:underline">
-            {context.competitor}
-          </Link>
-          : {context.signalTitle}
-        </p>
-      )}
+      {context && <p className="mt-0.5 text-xs text-muted">Responds to: {context.signalTitle}</p>}
       {item.why && <p className="mt-1 text-sm text-muted">{item.why}</p>}
       <details className="mt-3">
         <summary className="cursor-pointer select-none text-sm text-accent hover:underline">See the first draft</summary>

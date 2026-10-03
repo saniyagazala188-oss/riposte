@@ -364,6 +364,21 @@ export async function setActionStatus(formData: FormData) {
   const { supabase } = await requireUser();
   const id = String(formData.get("action_id") ?? "");
   const status = formData.get("status") === "done" ? "done" : "open";
-  await supabase.from("action_items").update({ status }).eq("id", id);
+  const { data: item } = await supabase
+    .from("action_items")
+    .update({ status, done_at: status === "done" ? new Date().toISOString() : null })
+    .eq("id", id)
+    .select("signal_id")
+    .maybeSingle();
+
+  // When the last open action of a kit is done, the signal no longer needs review.
+  if (item && status === "done") {
+    const { count } = await supabase
+      .from("action_items")
+      .select("id", { count: "exact", head: true })
+      .eq("signal_id", item.signal_id)
+      .eq("status", "open");
+    if (count === 0) await supabase.from("signals").update({ status: "reviewed" }).eq("id", item.signal_id).eq("status", "new");
+  }
   revalidatePath("/app", "layout");
 }
