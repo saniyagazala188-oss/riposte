@@ -28,11 +28,12 @@ export async function saveProduct(_prev: FormState, formData: FormData): Promise
   const product_name = String(formData.get("product_name") ?? "").trim().slice(0, 80);
   const product_pitch = String(formData.get("product_pitch") ?? "").trim().slice(0, 200);
   const ideal_customer = String(formData.get("ideal_customer") ?? "").trim().slice(0, 200);
+  const differentiators = String(formData.get("differentiators") ?? "").trim().slice(0, 600);
   if (!product_name) return { status: "error", message: "Add your product's name." };
 
   const { error } = await supabase
     .from("profiles")
-    .update({ product_name, product_pitch, ideal_customer })
+    .update({ product_name, product_pitch, ideal_customer, differentiators: differentiators || null })
     .eq("id", user.id);
   if (error) return { status: "error", message: "Couldn't save. Please try again." };
 
@@ -319,7 +320,7 @@ export async function buildActionKit(_prev: CheckState, formData: FormData): Pro
       .select("id, competitor_id, title, what_changed, so_what, action, impact, category, competitors(name), changes(kind, added, removed, sources(type, url))")
       .eq("id", signalId)
       .maybeSingle(),
-    supabase.from("profiles").select("product_name, product_pitch, ideal_customer").eq("id", user.id).maybeSingle(),
+    supabase.from("profiles").select("product_name, product_pitch, ideal_customer, differentiators").eq("id", user.id).maybeSingle(),
   ]);
   if (!signal) return { status: "error", message: "Signal not found." };
   const s = signal as unknown as KitSignal;

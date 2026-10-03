@@ -8,7 +8,7 @@ export default async function ProductPage() {
   const { supabase, user } = await requireUser();
   const { data: profile } = await supabase
     .from("profiles")
-    .select("product_name, product_pitch, ideal_customer")
+    .select("product_name, product_pitch, ideal_customer, differentiators")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -25,6 +25,7 @@ export default async function ProductPage() {
           product_name={profile?.product_name ?? ""}
           product_pitch={profile?.product_pitch ?? ""}
           ideal_customer={profile?.ideal_customer ?? ""}
+          differentiators={profile?.differentiators ?? ""}
         />
       </div>
     </div>

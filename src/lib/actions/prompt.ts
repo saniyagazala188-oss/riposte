@@ -82,6 +82,7 @@ THE MARKETER'S COMPANY
 Product: ${profile.product_name || "(not given)"}
 What it does: ${profile.product_pitch || "(not given)"}
 Who it sells to: ${profile.ideal_customer || "(not given)"}
+What makes it different: ${profile.differentiators || "(not given)"}
 
 THE SIGNAL (already analysed)
 Competitor: ${s.competitorName}
@@ -109,6 +110,7 @@ Return JSON with "items": 2 to 4 actions, most important first. Pick only what t
 
 Rules:
 - Use only facts from the signal and the evidence. Never invent numbers, customers, quotes or features. Where the marketer must add a fact (their own price, a customer name, a link), write a placeholder in square brackets like [your Pro price].
+- When a draft pivots to value (talk tracks, battlecards, posts, comparison pages), build it on the "What makes it different" points above, applied to this specific move. If none are given, write a placeholder like [your key differentiator] instead of generic lines such as "review what you need".
 - Be fair to the competitor: no claims that can't be checked, no mocking. Public assets (blog, LinkedIn, website) focus on the marketer's own strengths; they don't need to name the competitor.
 - Write in simple, direct English. No hype words like "game-changer", no emojis.`;
 }

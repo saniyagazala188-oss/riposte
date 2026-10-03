@@ -1,7 +1,12 @@
 // Builds the prompt that turns one detected change into a signal, and checks the answer.
 // Pure functions, no network, so they can be tested.
 
-export type Profile = { product_name: string | null; product_pitch: string | null; ideal_customer: string | null };
+export type Profile = {
+  product_name: string | null;
+  product_pitch: string | null;
+  ideal_customer: string | null;
+  differentiators?: string | null;
+};
 
 export type ChangeInput = {
   kind: "content" | "new_posts" | "new_pages";
@@ -81,6 +86,7 @@ export function buildSignalPrompt(profile: Profile, change: ChangeInput): string
     `Product: ${profile.product_name || "(not given)"}`,
     `What it does: ${profile.product_pitch || "(not given)"}`,
     `Who it sells to: ${profile.ideal_customer || "(not given)"}`,
+    `What makes it different: ${profile.differentiators || "(not given)"}`,
   ].join("\n");
 
   return `You are a product marketing analyst. A competitor's website changed. Explain the change to a busy marketer at the company below, judged against THEIR product and buyers.
