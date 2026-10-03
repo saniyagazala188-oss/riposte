@@ -3,6 +3,7 @@ import { requireUser } from "@/lib/auth";
 import { card, eyebrow } from "@/components/styles";
 import { ActionItemCard, ACTION_FIELDS, type ActionItemRow } from "@/components/ActionItemCard";
 import { OWNERS, PRIORITIES, PRIORITY_LABELS } from "@/lib/actions/prompt";
+import { ActionFilters } from "./ActionFilters";
 
 export const metadata = { title: "Actions · Riposte" };
 
@@ -40,6 +41,7 @@ export default async function ActionsPage({ searchParams }: { searchParams: Prom
     supabase.from("action_items").select("competitor_id").eq("status", "open"),
   ]);
   const items = (data ?? []) as unknown as Row[];
+  const openTotal = (openRows ?? []).length;
   const openPer = new Map<string, number>();
   for (const r of openRows ?? []) openPer.set(r.competitor_id, (openPer.get(r.competitor_id) ?? 0) + 1);
 
@@ -57,8 +59,6 @@ export default async function ActionsPage({ searchParams }: { searchParams: Prom
     const q = p.toString();
     return q ? `/app/actions?${q}` : "/app/actions";
   };
-  const pill = (active: boolean) =>
-    `rounded-lg px-3 py-1.5 font-medium whitespace-nowrap ${active ? "bg-accent-soft text-ink" : "text-muted hover:text-ink"}`;
   const ctx = (i: Row) => ({ competitor: i.competitors?.name ?? "", competitorId: i.competitor_id, signalTitle: i.signals?.title ?? "" });
 
   const groups: { key: string; label: string; rows: Row[] }[] = showDone
@@ -79,55 +79,34 @@ export default async function ActionsPage({ searchParams }: { searchParams: Prom
         Every action from every action kit. Copy the draft, share it where it says, and tick it off.
       </p>
 
-      <div className="mt-5 flex flex-col gap-2 text-sm">
-        <div className="flex flex-wrap items-center gap-1">
-          <span className="w-24 shrink-0 text-xs font-semibold uppercase tracking-wider text-muted">Competitor</span>
-          <Link href={link({ competitor: undefined })} className={pill(!competitor)}>
-            All
+      <nav className="mt-6 flex gap-6 border-b border-line" aria-label="Open or done">
+        {[
+          { label: "Open", count: openTotal, active: !showDone, href: link({ show: undefined }) },
+          { label: "Done", count: doneCount ?? 0, active: showDone, href: link({ show: "done", group: undefined }) },
+        ].map((t) => (
+          <Link
+            key={t.label}
+            href={t.href}
+            aria-current={t.active ? "page" : undefined}
+            className={`-mb-px border-b-2 pb-2 text-base font-semibold ${
+              t.active ? "border-accent text-ink" : "border-transparent text-muted hover:text-ink"
+            }`}
+          >
+            {t.label} <span className="ml-1 rounded-full bg-bg px-2 py-0.5 text-sm font-medium text-muted">{t.count}</span>
           </Link>
-          {competitors.map((c) => (
-            <Link key={c.id} href={link({ competitor: c.id })} className={pill(competitor?.id === c.id)}>
-              {c.name}
-              {openPer.get(c.id) ? ` (${openPer.get(c.id)})` : ""}
-            </Link>
-          ))}
-        </div>
-        <div className="flex flex-wrap items-center gap-1">
-          <span className="w-24 shrink-0 text-xs font-semibold uppercase tracking-wider text-muted">Owner</span>
-          <Link href={link({ owner: undefined })} className={pill(!owner)}>
-            Everyone
-          </Link>
-          {OWNERS.map((o) => (
-            <Link key={o} href={link({ owner: o })} className={pill(owner === o)}>
-              {o}
-            </Link>
-          ))}
-        </div>
-        {!showDone && (
-          <div className="flex flex-wrap items-center gap-1">
-            <span className="w-24 shrink-0 text-xs font-semibold uppercase tracking-wider text-muted">Group by</span>
-            <Link href={link({ group: undefined })} className={pill(!byCompetitor)}>
-              Urgency
-            </Link>
-            <Link href={link({ group: "competitor" })} className={pill(byCompetitor)}>
-              Competitor
-            </Link>
-          </div>
-        )}
+        ))}
+      </nav>
+
+      <div className="mt-5">
+        <ActionFilters
+          competitors={competitors.map((c) => ({
+            value: c.id,
+            label: openPer.get(c.id) ? `${c.name} (${openPer.get(c.id)} open)` : c.name,
+          }))}
+          owners={OWNERS.map((o) => ({ value: o, label: o }))}
+          showGroup={!showDone}
+        />
       </div>
-      <p className="mt-3 text-sm">
-        {showDone ? (
-          <Link href={link({ show: undefined })} className="text-accent hover:underline">
-            ← Back to open actions
-          </Link>
-        ) : (
-          (doneCount ?? 0) > 0 && (
-            <Link href={link({ show: "done", group: undefined })} className="text-accent hover:underline">
-              See {doneCount} done
-            </Link>
-          )
-        )}
-      </p>
 
       {items.length === 0 ? (
         <div className="mt-6 rounded-2xl border border-dashed border-line bg-surface p-8 text-center">
