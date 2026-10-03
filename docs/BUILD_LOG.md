@@ -151,3 +151,4 @@ This is the honest record behind the project, kept as we go.
 - **High-impact email alert arrived** within seconds of the signal: subject is the signal title, and the body has the impact, competitor, what changed, why it matters and what to do, plus links to the feed and alert settings. Still in spam (shared test sender); a Gmail filter on `onboarding@resend.dev` set to "Never send it to Spam" works around it until the domain is set up.
 
 **Phase 4 status:** working on the live site, from change to AI signal to feed to email alert, plus the weekly digest. Not yet tested: Slack (optional, needs a Slack workspace) and the signal step inside the automatic morning check.
+- **Setup checklist stayed on the home screen after setup was finished**, with every step crossed out, pushing the signals down. Fixed: the checklist now hides once all steps are done, so the feed starts with signals.

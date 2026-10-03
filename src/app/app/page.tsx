@@ -84,6 +84,7 @@ export default async function AppHome({ searchParams }: { searchParams: Promise<
           : "Set up your workspace in two steps."}
       </p>
 
+      {steps.some((s) => !s.done) && (
       <ol className={`${card} mt-6 divide-y divide-line`}>
         {steps.map((s, i) => (
           <li key={s.title} className="flex flex-wrap items-start gap-4 px-5 py-4">
@@ -112,6 +113,7 @@ export default async function AppHome({ searchParams }: { searchParams: Promise<
           </li>
         ))}
       </ol>
+      )}
 
       {pending.length > 0 && (
         <section className={`${card} mt-6`}>
