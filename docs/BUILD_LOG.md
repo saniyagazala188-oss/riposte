@@ -232,3 +232,5 @@ Phase 6 is split into three parts, built one at a time:
 
 **What broke / fixed:**
 - **Visualping showed "–" for pages even though Riposte watches its sitemap.** The card said nothing about why, so it looked like missing data. Visualping has no blog feed (correct), but its sitemap is watched; the dash means its sitemap hasn't been read successfully yet. Fixed: the dashes now carry the reason: "No sitemap" (not watched), "Not checked yet", or "Couldn't be read" (with details on the competitor page).
+
+**Decision: checking stays daily plus on demand, not "real time" (4 Oct 2026).** Question raised: what blocks real-time data? Answer: websites don't announce changes, so every monitoring tool works by checking again on a schedule; Vercel's free plan runs the automatic job once a day; checking very often risks being blocked; and competitors change pricing, launches and content over days, not minutes. An hourly option (scheduled for free through GitHub) was offered and **declined**. The current design (daily automatic check, Check now on demand, first check on adding a competitor) stays as it is. Demo line: "Riposte monitors competitors daily and on demand."
