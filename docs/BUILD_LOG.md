@@ -144,3 +144,6 @@ This is the honest record behind the project, kept as we go.
 **Tested on the live site, 3 Oct 2026:**
 - Alert settings save correctly.
 - The test email arrived at the founder's Gmail from "Riposte <onboarding@resend.dev>", but **in spam**. Gmail distrusts the shared Resend test sender. For now: "Report as not spam" once. Lasting fix: the same own-domain step as the login email (a verified domain lets Gmail trust the sender).
+- The weekly digest ("Send this week's digest now") arrived, correctly reporting a quiet week across 2 competitors. Also in spam, same cause.
+
+**Demo page for testing:** real competitors may not change for days, so `/demo/pricing` is a pricing page for a fictional company, Acme Insights, that switches between two versions every 10 minutes (Pro goes from $49 to $59 with AI battlecards added, an Enterprise plan appears, the free trial drops from 14 to 7 days). Watching it and pressing Check now 10 minutes apart produces a real change, which tests the whole chain: change → AI signal → feed → email alert. It is hidden from search engines.
