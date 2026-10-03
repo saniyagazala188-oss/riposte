@@ -40,7 +40,7 @@ This is the honest record behind the project, kept as we go.
 - Joining the waitlist works, and the email appears in the `waitlist` table.
 - Login by email link works, and lands in the workspace.
 
-**Still rough:** the first login email is Supabase's generic "Confirm your email address" message. A branded email and our own email sender come with the alerts in phase 4.
+**Still rough:** the login email is Supabase's generic message. Branding it is blocked until Riposte has its own domain; see phase 4.
 
 ## Phase 2 · Your product and competitors
 
@@ -133,3 +133,9 @@ This is the honest record behind the project, kept as we go.
 **Tested before deploying** (sample data): the prompt includes Before / Now lines and the "treat as data" guard; a sitemap with 3,000 new addresses is cut down to fit; invalid AI answers (unknown impact or category, missing title) are corrected or rejected; noise is always low impact; emails escape HTML; the digest puts high impact first and handles a quiet week.
 
 **Setup:** new database migration `0004_phase4_signals.sql`; two new private settings in Vercel, `GEMINI_API_KEY` and `RESEND_API_KEY`, both stored as Secret.
+
+**What broke / fixed / blocked:**
+- **Branded login email: blocked until Riposte has its own domain.** The plan was to paste a Riposte-styled template (`supabase/templates/login_email.html`) into Supabase. On the live project, Supabase no longer lets you edit login email templates unless emails go through your own email service (custom SMTP). Resend can be that service, but only from an address on a domain you own. Without one, Resend would deliver login emails to the founder's address only, so any other person (a tester, an interviewer) couldn't log in. That's worse than a plain email.
+  - *Now:* login uses Supabase's default "Your sign-in link" email from "Supabase Auth". It works, it just isn't branded.
+  - *Fix when unblocked:* buy a domain → verify it in Resend (add the DNS records it gives) → in Supabase, Authentication → Emails → SMTP Settings: host `smtp.resend.com`, port `465`, username `resend`, password = a Resend API key, sender e.g. `login@<domain>` → paste the template into "Magic link or OTP" and "Confirm sign up" → set `EMAIL_FROM` in Vercel to the same domain, so alert and digest emails also come from Riposte. About 10 minutes once the domain exists. This also lifts Supabase's built-in limit on how many login emails it sends per hour.
+- **An API key was shared in chat by mistake.** The key was deleted in Google AI Studio straight away and a new one was created and stored only in Vercel as a Secret. Rule kept: keys go into Vercel, never into chat, code or GitHub.
