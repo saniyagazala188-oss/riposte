@@ -7,6 +7,7 @@ const links = [
   { href: "/app", label: "Feed" },
   { href: "/app/competitors", label: "Competitors" },
   { href: "/app/product", label: "Your product" },
+  { href: "/app/settings", label: "Alerts" },
 ];
 
 export function AppNav() {

@@ -2,22 +2,50 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { card, eyebrow, primaryButton } from "@/components/styles";
 import { ChangeList, CHANGE_SELECT, type ChangeRow } from "@/components/ChangeList";
+import { SignalList, SIGNAL_SELECT, type SignalRow } from "@/components/SignalList";
+import { ExplainPendingButton } from "@/components/ActionButtons";
 
 export const metadata = { title: "Feed · Riposte" };
+export const maxDuration = 60;
 
-// The signed-in home. Shows setup progress until the signal feed arrives in phase 4.
-export default async function AppHome() {
+const FILTERS = [
+  { key: "new", label: "To review" },
+  { key: "all", label: "All" },
+  { key: "noise", label: "Noise" },
+] as const;
+
+// The signed-in home: setup progress, then the signal feed.
+export default async function AppHome({ searchParams }: { searchParams: Promise<{ show?: string }> }) {
+  const { show: showParam } = await searchParams;
+  const show = FILTERS.some((f) => f.key === showParam) ? (showParam as (typeof FILTERS)[number]["key"]) : "new";
   const { supabase, user } = await requireUser();
 
-  const [{ data: profile }, { count: competitorCount }, { count: sourceCount }, { count: checkedCount }, { data: changeRows }] =
-    await Promise.all([
-      supabase.from("profiles").select("product_name").eq("id", user.id).maybeSingle(),
-      supabase.from("competitors").select("id", { count: "exact", head: true }),
-      supabase.from("sources").select("id", { count: "exact", head: true }),
-      supabase.from("sources").select("id", { count: "exact", head: true }).not("last_checked_at", "is", null),
-      supabase.from("changes").select(CHANGE_SELECT).order("detected_at", { ascending: false }).limit(20),
-    ]);
-  const changes = (changeRows ?? []) as unknown as ChangeRow[];
+  let signalQuery = supabase.from("signals").select(SIGNAL_SELECT).order("created_at", { ascending: false }).limit(40);
+  if (show === "new") signalQuery = signalQuery.eq("status", "new").eq("noise", false);
+  if (show === "all") signalQuery = signalQuery.eq("noise", false);
+  if (show === "noise") signalQuery = signalQuery.eq("noise", true);
+
+  const [
+    { data: profile },
+    { count: competitorCount },
+    { count: sourceCount },
+    { count: checkedCount },
+    { data: pendingRows },
+    { data: signalRows },
+    { count: signalTotal },
+    { count: toReview },
+  ] = await Promise.all([
+    supabase.from("profiles").select("product_name").eq("id", user.id).maybeSingle(),
+    supabase.from("competitors").select("id", { count: "exact", head: true }),
+    supabase.from("sources").select("id", { count: "exact", head: true }),
+    supabase.from("sources").select("id", { count: "exact", head: true }).not("last_checked_at", "is", null),
+    supabase.from("changes").select(CHANGE_SELECT).eq("processed", false).order("detected_at", { ascending: false }).limit(20),
+    signalQuery,
+    supabase.from("signals").select("id", { count: "exact", head: true }),
+    supabase.from("signals").select("id", { count: "exact", head: true }).eq("status", "new").eq("noise", false),
+  ]);
+  const pending = (pendingRows ?? []) as unknown as ChangeRow[];
+  const signals = (signalRows ?? []) as unknown as SignalRow[];
 
   const steps = [
     {
@@ -85,26 +113,67 @@ export default async function AppHome() {
         ))}
       </ol>
 
-      {changes.length ? (
+      {pending.length > 0 && (
+        <section className={`${card} mt-6`}>
+          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-line px-5 py-4">
+            <div className="min-w-0">
+              <h2 className="font-display text-xl font-bold">
+                {pending.length} {pending.length === 1 ? "change" : "changes"} waiting to be explained
+              </h2>
+              <p className="mt-0.5 text-sm text-muted">
+                Riposte spotted these. The AI explains them on the next check, or now.
+              </p>
+            </div>
+            <ExplainPendingButton />
+          </div>
+          <ChangeList changes={pending} showCompetitor />
+        </section>
+      )}
+
+      {(signalTotal ?? 0) > 0 ? (
         <section className={`${card} mt-6`}>
           <div className="border-b border-line px-5 py-4">
-            <h2 className="font-display text-xl font-bold">Latest changes</h2>
+            <h2 className="font-display text-xl font-bold">Signals</h2>
             <p className="mt-0.5 text-sm text-muted">
-              What your competitors changed, newest first. From phase 4, each change comes with what it means and what to
-              do.
+              Each competitor change, explained for your product: what changed, why it matters, and what to do.
             </p>
+            <nav className="mt-3 flex flex-wrap gap-1 text-sm" aria-label="Filter signals">
+              {FILTERS.map((f) => (
+                <Link
+                  key={f.key}
+                  href={f.key === "new" ? "/app" : `/app?show=${f.key}`}
+                  aria-current={show === f.key ? "page" : undefined}
+                  className={`rounded-lg px-3 py-1.5 font-medium ${show === f.key ? "bg-accent-soft text-ink" : "text-muted hover:text-ink"}`}
+                >
+                  {f.label}
+                  {f.key === "new" && toReview ? ` (${toReview})` : ""}
+                </Link>
+              ))}
+            </nav>
           </div>
-          <ChangeList changes={changes} showCompetitor />
+          {signals.length ? (
+            <SignalList signals={signals} showCompetitor />
+          ) : (
+            <p className="px-5 py-6 text-sm text-muted">
+              {show === "new"
+                ? "You're up to date. Nothing new to review."
+                : show === "noise"
+                  ? "Nothing filed as noise. Changes the AI judges meaningless (typos, dates, reshuffles) land here."
+                  : "No signals yet."}
+            </p>
+          )}
         </section>
       ) : (
-        <div className="mt-6 rounded-2xl border border-dashed border-line bg-surface p-8 text-center">
-          <p className="font-semibold">Your feed will appear here.</p>
-          <p className="mx-auto mt-1 max-w-md text-sm text-muted">
-            {(checkedCount ?? 0) > 0
-              ? "Riposte has saved a starting point for each page. When a competitor changes something, it shows up here."
-              : "Once the first check runs, every real change from your competitors shows up here."}
-          </p>
-        </div>
+        pending.length === 0 && (
+          <div className="mt-6 rounded-2xl border border-dashed border-line bg-surface p-8 text-center">
+            <p className="font-semibold">Your feed will appear here.</p>
+            <p className="mx-auto mt-1 max-w-md text-sm text-muted">
+              {(checkedCount ?? 0) > 0
+                ? "Riposte has saved a starting point for each page. When a competitor changes something, it shows up here, explained."
+                : "Once the first check runs, every real change from your competitors shows up here, explained."}
+            </p>
+          </div>
+        )
       )}
     </div>
   );

@@ -7,6 +7,11 @@ import { requireUser } from "@/lib/auth";
 import { discoverSources } from "@/lib/discovery";
 import { checkSources, type SourceRow } from "@/lib/fetcher/check";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { processChanges } from "@/lib/signals/process";
+import { geminiConfigured } from "@/lib/ai/gemini";
+import { sendAlerts, sendDigests } from "@/lib/notify/alerts";
+import { emailConfigured, sendEmail, sendSlack } from "@/lib/notify/send";
+import { SITE_URL } from "@/lib/notify/templates";
 import { nameFromDomain, normalizeDomain, type SourceType } from "@/lib/discovery/parse";
 
 export type FormState = { status: "idle" | "saved" | "error"; message?: string };
@@ -156,7 +161,7 @@ export type CheckState = { status: "idle" | "done" | "error"; message?: string }
 const CHECK_COOLDOWN_MS = 5 * 60 * 1000;
 
 export async function checkNow(_prev: CheckState, formData: FormData): Promise<CheckState> {
-  const { supabase } = await requireUser();
+  const { supabase, user } = await requireUser();
   const competitorId = String(formData.get("competitor_id") ?? "");
   const { data } = await supabase
     .from("sources")
@@ -170,7 +175,8 @@ export async function checkNow(_prev: CheckState, formData: FormData): Promise<C
   );
   if (fresh) return { status: "error", message: "These pages were checked a few minutes ago. Try again in 5 minutes." };
 
-  const results = await checkSources(supabase, sources as SourceRow[], { concurrency: 4, budgetMs: 50000 });
+  const results = await checkSources(supabase, sources as SourceRow[], { concurrency: 4, budgetMs: 40000 });
+  const ai = await explainAndAlert(user.id, supabase);
   revalidatePath("/app", "layout");
 
   const changed = results.filter((r) => r.status === "changed").length;
@@ -186,6 +192,100 @@ export async function checkNow(_prev: CheckState, formData: FormData): Promise<C
     unchanged ? `${unchanged} unchanged since the last check.` : "",
     problems ? `${problems} couldn't be read; see the notes below.` : "",
     skipped ? `${skipped} will be checked next time.` : "",
+    ai.written ? `${ai.written} new ${ai.written === 1 ? "signal" : "signals"} explained.` : "",
+    ai.waiting ? `${ai.waiting} ${ai.waiting === 1 ? "change is" : "changes are"} waiting to be explained.` : "",
   ];
   return { status: "done", message: parts.filter(Boolean).join(" ") };
+}
+
+// Explains this user's new changes with AI, then sends alerts in the background.
+async function explainAndAlert(userId: string, userClient: Awaited<ReturnType<typeof requireUser>>["supabase"]) {
+  const admin = createAdminClient();
+  const ai = await processChanges(admin ?? userClient, { userId, limit: 15, concurrency: 3, budgetMs: 25000 });
+  if (admin && ai.written) after(() => sendAlerts(admin, { userId }).then(() => undefined));
+  return ai;
+}
+
+export async function explainPending(): Promise<CheckState> {
+  const { supabase, user } = await requireUser();
+  if (!geminiConfigured()) return { status: "error", message: "AI isn't set up yet: the GEMINI_API_KEY setting is missing." };
+  const ai = await explainAndAlert(user.id, supabase);
+  revalidatePath("/app", "layout");
+  if (!ai.written && !ai.failed && !ai.waiting) return { status: "done", message: "Nothing waiting. Every change is explained." };
+  const parts = [
+    ai.written ? `${ai.written} explained.` : "",
+    ai.failed ? `${ai.failed} couldn't be explained this time; Riposte will retry.` : "",
+    ai.waiting ? `${ai.waiting} still waiting (the AI is busy); try again in a minute.` : "",
+  ];
+  return { status: "done", message: parts.filter(Boolean).join(" ") };
+}
+
+// ---------- Signals ----------
+
+export async function setSignalStatus(formData: FormData) {
+  const { supabase } = await requireUser();
+  const id = String(formData.get("signal_id") ?? "");
+  const status = String(formData.get("status") ?? "");
+  if (!["new", "reviewed", "dismissed"].includes(status)) return;
+  await supabase.from("signals").update({ status }).eq("id", id);
+  revalidatePath("/app", "layout");
+}
+
+// ---------- Alert settings ----------
+
+export async function saveAlertSettings(_prev: FormState, formData: FormData): Promise<FormState> {
+  const { supabase, user } = await requireUser();
+  const slack = String(formData.get("slack_webhook_url") ?? "").trim();
+  if (slack && !/^https:\/\/hooks\.slack\.com\/services\/[\w/-]+$/.test(slack)) {
+    return { status: "error", message: "That doesn't look like a Slack webhook. It starts with https://hooks.slack.com/services/" };
+  }
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      email_alerts: formData.get("email_alerts") === "on",
+      weekly_digest: formData.get("weekly_digest") === "on",
+      slack_webhook_url: slack || null,
+    })
+    .eq("id", user.id);
+  if (error) return { status: "error", message: "Couldn't save. Please try again." };
+  revalidatePath("/app/settings");
+  return { status: "saved" };
+}
+
+export async function sendTest(_prev: CheckState, formData: FormData): Promise<CheckState> {
+  const { supabase, user } = await requireUser();
+  const what = String(formData.get("what") ?? "");
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("email, slack_webhook_url")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  try {
+    if (what === "slack") {
+      if (!profile?.slack_webhook_url) return { status: "error", message: "Save a Slack webhook first." };
+      await sendSlack(profile.slack_webhook_url, {
+        text: `*Riposte is connected.* High-impact competitor changes and the weekly digest will be posted here. <${SITE_URL}/app|Open your feed>`,
+      });
+      return { status: "done", message: "Sent. Check your Slack channel." };
+    }
+    if (!emailConfigured()) return { status: "error", message: "Email isn't set up yet: the RESEND_API_KEY setting is missing." };
+    if (!profile?.email) return { status: "error", message: "No email address on your account." };
+    if (what === "digest") {
+      const admin = createAdminClient();
+      if (!admin) return { status: "error", message: "The SUPABASE_SERVICE_ROLE_KEY setting is missing." };
+      const result = await sendDigests(admin, { userId: user.id, force: true });
+      if (result.errors.length) throw new Error(result.errors[0]);
+      if (!result.sent) return { status: "error", message: "Turn on the weekly digest and add a competitor first." };
+      return { status: "done", message: `This week's digest is on its way to ${profile.email}.` };
+    }
+    await sendEmail(profile.email, {
+      subject: "Riposte email alerts are working",
+      html: `<p>This is a test from Riposte. High-impact competitor changes will arrive at this address.</p><p><a href="${SITE_URL}/app">Open your feed</a></p>`,
+      text: `This is a test from Riposte. High-impact competitor changes will arrive at this address. ${SITE_URL}/app`,
+    });
+    return { status: "done", message: `Sent to ${profile.email}. Check your inbox (and spam, the first time).` };
+  } catch (e) {
+    return { status: "error", message: `Couldn't send: ${(e as Error).message}` };
+  }
 }

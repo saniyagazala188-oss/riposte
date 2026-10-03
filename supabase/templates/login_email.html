@@ -1,0 +1,19 @@
+<!-- Riposte login email. Paste into Supabase → Authentication → Emails,
+     for both "Magic link" and "Confirm signup". Subject: Your Riposte login link -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f5;padding:24px 12px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#12171c">
+  <tr><td align="center">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border:1px solid #dce1e3;border-radius:16px">
+      <tr><td style="padding:28px 28px 8px">
+        <p style="margin:0;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0e6b66">Riposte</p>
+        <h1 style="margin:10px 0 6px;font-size:22px">Your login link</h1>
+        <p style="margin:0;font-size:15px;line-height:1.5;color:#5a6470">Click the button to log in to Riposte. The link works once and expires in an hour.</p>
+      </td></tr>
+      <tr><td style="padding:20px 28px">
+        <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#0e6b66;color:#ffffff;font-weight:600;font-size:15px;text-decoration:none;padding:12px 20px;border-radius:10px">Log in to Riposte</a>
+      </td></tr>
+      <tr><td style="padding:8px 28px 28px;font-size:13px;line-height:1.5;color:#5a6470">
+        Didn't ask for this? You can ignore this email; nobody can log in without the link.
+      </td></tr>
+    </table>
+  </td></tr>
+</table>

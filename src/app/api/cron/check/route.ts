@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { checkSources, type SourceRow } from "@/lib/fetcher/check";
+import { processChanges } from "@/lib/signals/process";
+import { sendAlerts, sendDigests } from "@/lib/notify/alerts";
 
-// Runs every morning (see vercel.json). Checks every page that is due:
-// daily competitors after ~20 hours, weekly competitors after ~6.5 days.
+// Runs every morning (see vercel.json):
+// 1. checks every page that is due (daily competitors after ~20 hours, weekly after ~6.5 days),
+// 2. turns new changes into AI signals,
+// 3. sends alerts for high-impact signals,
+// 4. on Mondays, sends the weekly digest.
 export const maxDuration = 300;
 export const dynamic = "force-dynamic";
 
@@ -33,11 +38,19 @@ export async function GET(request: Request) {
     return now - new Date(s.last_checked_at).getTime() >= gap;
   }) as SourceRow[];
 
-  const results = await checkSources(db, due, { concurrency: 6, budgetMs: 250000 });
+  const results = await checkSources(db, due, { concurrency: 6, budgetMs: 170000 });
   const summary = results.reduce<Record<string, number>>((acc, r) => {
     acc[r.status] = (acc[r.status] ?? 0) + 1;
     return acc;
   }, {});
 
-  return NextResponse.json({ due: due.length, checked: results.length, summary });
+  const signals = await processChanges(db, { limit: 60, concurrency: 2, budgetMs: 80000 });
+  const alerts = await sendAlerts(db);
+  const url = new URL(request.url);
+  const digest =
+    new Date().getUTCDay() === 1 || url.searchParams.get("digest") === "1"
+      ? await sendDigests(db, { force: url.searchParams.get("digest") === "1" })
+      : null;
+
+  return NextResponse.json({ due: due.length, checked: results.length, summary, signals, alerts, digest });
 }

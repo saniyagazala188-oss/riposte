@@ -7,10 +7,11 @@ import { ConfirmSubmit, SubmitButton } from "@/components/FormButtons";
 import { card, eyebrow, secondaryButton } from "@/components/styles";
 import { CheckNowButton } from "@/components/CheckNowButton";
 import { ChangeList, CHANGE_SELECT, type ChangeRow } from "@/components/ChangeList";
+import { SignalList, SIGNAL_SELECT, type SignalRow } from "@/components/SignalList";
 import { timeAgo } from "@/lib/time";
 import { AddSourceForm } from "./AddSourceForm";
 
-export const maxDuration = 60;
+export const maxDuration = 90;
 
 const ORDER: SourceType[] = ["changelog", "blog", "feed", "pricing", "sitemap", "other"];
 const HINTS: Partial<Record<SourceType, string>> = {
@@ -73,13 +74,24 @@ export default async function CompetitorPage({
     .from("sources")
     .select("id, type, url, discovered, last_checked_at, last_status, last_error, last_changed_at")
     .eq("competitor_id", id);
-  const { data: changeRows } = await supabase
-    .from("changes")
-    .select(CHANGE_SELECT)
-    .eq("competitor_id", id)
-    .order("detected_at", { ascending: false })
-    .limit(15);
+  const [{ data: changeRows }, { data: signalRows }] = await Promise.all([
+    supabase
+      .from("changes")
+      .select(CHANGE_SELECT)
+      .eq("competitor_id", id)
+      .eq("processed", false)
+      .order("detected_at", { ascending: false })
+      .limit(15),
+    supabase
+      .from("signals")
+      .select(SIGNAL_SELECT)
+      .eq("competitor_id", id)
+      .eq("noise", false)
+      .order("created_at", { ascending: false })
+      .limit(15),
+  ]);
   const changes = (changeRows ?? []) as unknown as ChangeRow[];
+  const signals = (signalRows ?? []) as unknown as SignalRow[];
   const sources = ((sourceRows ?? []) as Source[]).sort((a, b) => ORDER.indexOf(a.type) - ORDER.indexOf(b.type));
   const foundCount = sources.filter((s) => s.discovered).length;
   const neverChecked = sources.length > 0 && sources.every((s) => !s.last_checked_at);
@@ -171,15 +183,19 @@ export default async function CompetitorPage({
 
       <section className={`${card} mt-6`}>
         <div className="border-b border-line px-5 py-4">
-          <h2 className="font-display text-xl font-bold">Recent changes</h2>
+          <h2 className="font-display text-xl font-bold">Recent signals</h2>
           <p className="mt-0.5 text-sm text-muted">
-            Real changes only: dates, view counts, cookie banners and menus are ignored. From phase 4, each change comes
-            with what it means for you and what to do.
+            Real changes only (dates, view counts, cookie banners and menus are ignored), each explained for your product.
           </p>
         </div>
-        {changes.length ? (
-          <ChangeList changes={changes} />
-        ) : (
+        {signals.length > 0 && <SignalList signals={signals} />}
+        {changes.length > 0 && (
+          <div className={signals.length ? "border-t border-line" : ""}>
+            <p className="px-5 pt-4 text-sm font-semibold">Waiting to be explained</p>
+            <ChangeList changes={changes} />
+          </div>
+        )}
+        {!signals.length && !changes.length && (
           <p className="px-5 py-6 text-sm text-muted">
             {neverChecked
               ? "The first check saves each page as a starting point. Changes appear here from the next check onwards."

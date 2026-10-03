@@ -104,3 +104,32 @@ This is the honest record behind the project, kept as we go.
 **Proof the noise filter works on real pages:** Crayon's blog, blog feed, pricing page and AI toolkit page were each read twice, about 7 minutes apart, and none was reported as changed, even though live pages carry rotating elements and timestamps.
 
 **Still to confirm:** the first automatic morning check (7am India time on 4 Oct), and a real competitor change appearing as Before / Now.
+
+## Phase 4 · AI signals and alerts
+
+**Goal:** every real change arrives explained for your product (what changed, why it matters, what to do), and the important ones reach you by email or Slack without opening the app.
+
+**Built:**
+- **AI signal writer (Gemini).** Each detected change is sent to Gemini together with your product profile. It returns a title, what changed (with exact numbers and names from the page), why it matters to *your* product and buyers, one concrete next step, an impact level (high / worth knowing / low) and a category (pricing, product, content, positioning).
+- **Noise check.** The AI also flags changes that mean nothing (typos, reshuffled lists, rotating logos). These go to a separate Noise tab instead of the feed, so a second filter sits on top of the phase 3 noise filter.
+- **Signal feed** on the home screen with three tabs: To review, All, Noise. Each signal has Mark reviewed and Dismiss, and "See exactly what changed" opens the Before / Now evidence.
+- **Changes waiting to be explained** are shown raw with an "Explain them now" button, so nothing is hidden if the AI is busy or not set up.
+- **Competitor page** now shows that competitor's signals.
+- **When it runs:** after every Check now, and in the daily morning job after the pages are checked.
+- **Email alerts** for high-impact signals, one email per morning listing all of them (sent through Resend).
+- **Weekly digest** every Monday morning: the week's signals, high impact first. A quiet week gets a short "nothing to do" email.
+- **Slack:** paste an incoming webhook to get the same alerts and digest in a channel.
+- **Alerts page** to switch email alerts and the digest on or off, add Slack, and send yourself a test email, test Slack message or this week's digest.
+- **Branded login email** template, ready to paste into Supabase.
+
+**Decisions:**
+- The text copied from a competitor's page is marked as data in the prompt, and the AI is told to ignore any instructions inside it. A competitor page can't steer the AI.
+- The AI must quote numbers and names from the evidence and must not invent anything; when the evidence is thin it says so.
+- If the AI service is busy (rate limit), Riposte stops and tries the rest on the next run, without counting it as a failure. A change that fails 3 times is left as a raw change in the feed.
+- Each alert is sent once. Alerts only cover the last 3 days, so switching email on later doesn't flood the inbox with old changes.
+- The digest runs inside the existing daily job on Mondays, so no second scheduled job is needed.
+- Gemini and Resend are called directly over HTTPS, so no extra packages. The keys stay on the server.
+
+**Tested before deploying** (sample data): the prompt includes Before / Now lines and the "treat as data" guard; a sitemap with 3,000 new addresses is cut down to fit; invalid AI answers (unknown impact or category, missing title) are corrected or rejected; noise is always low impact; emails escape HTML; the digest puts high impact first and handles a quiet week.
+
+**Setup:** new database migration `0004_phase4_signals.sql`; two new private settings in Vercel, `GEMINI_API_KEY` and `RESEND_API_KEY`, both stored as Secret.
