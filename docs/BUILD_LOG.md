@@ -227,3 +227,8 @@ Phase 6 is split into three parts, built one at a time:
 **Tested before deploying** (sample data): dates in RSS, ISO and plain formats are read and bad dates skipped; posts land in the right month; 30/90-day counts are right; comparison pages win over blog posts ("/blog/acme-vs-x" counts as comparison); page addresses become readable titles; AI topic answers are tidied (counts capped, empty names dropped, examples limited, largest topic first).
 
 **Setup:** migration `0008_phase6_content_topics.sql`. No new keys.
+
+**Tested on the live site, 4 Oct 2026:** the Content page loaded with one card per competitor. **Crayon:** 4 posts in the last 90 days, last post 2 days ago, 627 pages in its sitemap, **34 comparison pages**. Acme (the demo page) correctly shows no feed or sitemap.
+
+**What broke / fixed:**
+- **Visualping showed "–" for pages even though Riposte watches its sitemap.** The card said nothing about why, so it looked like missing data. Visualping has no blog feed (correct), but its sitemap is watched; the dash means its sitemap hasn't been read successfully yet. Fixed: the dashes now carry the reason: "No sitemap" (not watched), "Not checked yet", or "Couldn't be read" (with details on the competitor page).

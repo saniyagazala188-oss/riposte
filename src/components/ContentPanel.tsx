@@ -22,8 +22,12 @@ export function ContentPanel({
   urls,
   hasFeed,
   hasSitemap,
+  sitemapNote = "No sitemap",
+  feedNote = "No blog feed",
   topics,
 }: {
+  sitemapNote?: string | null;
+  feedNote?: string | null;
   competitorId: string;
   feed: FeedItem[];
   urls: string[];
@@ -38,10 +42,10 @@ export function ContentPanel({
   return (
     <div className="flex flex-col gap-5">
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Stat label="Posts, last 30 days" value={hasFeed ? pace.last30 : "–"} hint={hasFeed ? `${pace.last90} in 90 days` : "No blog feed"} />
-        <Stat label="Last post" value={pace.newest ? timeAgo(pace.newest) : "–"} hint={hasFeed ? undefined : "No blog feed"} />
-        <Stat label="Pages on their site" value={hasSitemap ? mix.total : "–"} hint={hasSitemap ? "from their sitemap" : "No sitemap"} />
-        <Stat label="Comparison pages" value={hasSitemap ? compare : "–"} hint={hasSitemap ? "vs, alternatives, compare" : "No sitemap"} />
+        <Stat label="Posts, last 30 days" value={hasFeed ? pace.last30 : "–"} hint={hasFeed ? `${pace.last90} in 90 days` : feedNote ?? "No blog feed"} />
+        <Stat label="Last post" value={pace.newest ? timeAgo(pace.newest) : "–"} hint={hasFeed ? undefined : feedNote ?? "No blog feed"} />
+        <Stat label="Pages on their site" value={hasSitemap ? mix.total : "–"} hint={hasSitemap ? "from their sitemap" : sitemapNote ?? "No sitemap"} />
+        <Stat label="Comparison pages" value={hasSitemap ? compare : "–"} hint={hasSitemap ? "vs, alternatives, compare" : sitemapNote ?? "No sitemap"} />
       </div>
 
       {hasFeed && pace.dated > 0 && (

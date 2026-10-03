@@ -222,6 +222,8 @@ export default async function CompetitorPage({
             urls={content.urls}
             hasFeed={content.hasFeed}
             hasSitemap={content.hasSitemap}
+            feedNote={content.feedNote}
+            sitemapNote={content.sitemapNote}
             topics={(topicsRow as TopicsRow) ?? null}
           />
         </div>

@@ -71,6 +71,7 @@ export default async function ContentPage() {
                 <div className="rounded-lg bg-bg p-2">
                   <dt className="text-xs text-muted">Pages</dt>
                   <dd className="font-display text-xl font-bold">{r.data.hasSitemap ? r.mix.total : "–"}</dd>
+                  {!r.data.hasSitemap && <dd className="text-xs text-muted">{r.data.sitemapNote ?? "No sitemap"}</dd>}
                 </div>
                 <div className="rounded-lg bg-bg p-2">
                   <dt className="text-xs text-muted">Comparison pages</dt>
@@ -78,7 +79,11 @@ export default async function ContentPage() {
                 </div>
               </dl>
               <p className="mt-3 text-sm text-muted">
-                {r.pace.newest ? `Last post ${timeAgo(r.pace.newest)}.` : r.data.hasFeed ? "No dated posts in their feed." : "No blog feed, so publishing pace is unknown."}
+                {r.pace.newest ? `Last post ${timeAgo(r.pace.newest)}.` : r.data.hasFeed
+                    ? "No dated posts in their feed."
+                    : r.data.feedNote === "No blog feed"
+                      ? "No blog feed, so publishing pace is unknown."
+                      : `Blog feed: ${(r.data.feedNote ?? "").toLowerCase()}.`}
               </p>
               <div className="mt-3 flex-1">
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted">Top topics</p>
