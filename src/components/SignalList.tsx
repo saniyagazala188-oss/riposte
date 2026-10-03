@@ -4,6 +4,8 @@ import { setSignalStatus } from "@/app/app/actions";
 import { SubmitButton } from "@/components/FormButtons";
 import { ChangeBody, type ChangeRow } from "@/components/ChangeList";
 import { timeAgo } from "@/lib/time";
+import { ActionItemCard, ACTION_FIELDS, type ActionItemRow } from "@/components/ActionItemCard";
+import { BuildKitButton } from "@/components/KitButtons";
 
 export type SignalRow = {
   id: string;
@@ -18,13 +20,13 @@ export type SignalRow = {
   status: "new" | "reviewed" | "dismissed";
   competitor_id: string;
   competitors: { name: string } | null;
+  action_items?: ActionItemRow[];
   changes:
     | (Pick<ChangeRow, "kind" | "added" | "removed" | "detected_at"> & { sources: { type: SourceType; url: string } | null })
     | null;
 };
 
-export const SIGNAL_SELECT =
-  "id, created_at, title, what_changed, so_what, action, impact, category, noise, status, competitor_id, competitors(name), changes(kind, added, removed, detected_at, sources(type, url))";
+export const SIGNAL_SELECT = `id, created_at, title, what_changed, so_what, action, impact, category, noise, status, competitor_id, competitors(name), changes(kind, added, removed, detected_at, sources(type, url)), action_items(${ACTION_FIELDS})`;
 
 const IMPACT = {
   high: { label: "High impact", className: "bg-signal-soft text-signal" },
@@ -107,6 +109,8 @@ export function SignalList({ signals, showCompetitor = false }: { signals: Signa
               </details>
             )}
 
+            {!s.noise && <ActionKit signalId={s.id} items={s.action_items ?? []} />}
+
             <div className="mt-3 flex flex-wrap gap-2">
               {s.status === "new" ? (
                 <>
@@ -121,5 +125,40 @@ export function SignalList({ signals, showCompetitor = false }: { signals: Signa
         );
       })}
     </ul>
+  );
+}
+
+function ActionKit({ signalId, items }: { signalId: string; items: ActionItemRow[] }) {
+  if (!items.length) {
+    return (
+      <div className="mt-4 rounded-xl border border-dashed border-line p-4">
+        <p className="text-sm font-semibold">Action kit</p>
+        <p className="mb-3 mt-0.5 text-sm text-muted">
+          What to create in response, who owns it, where to share it, with first drafts ready to edit.
+        </p>
+        <BuildKitButton signalId={signalId} />
+      </div>
+    );
+  }
+  const sorted = [...items].sort((a, b) => a.position - b.position);
+  const open = sorted.filter((i) => i.status === "open").length;
+  return (
+    <div className="mt-4">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <p className="text-sm font-semibold">
+          Action kit · {open ? `${open} open` : "all done ✓"}
+        </p>
+      </div>
+      <div className="mt-2 flex flex-col gap-3">
+        {sorted.map((item) => (
+          <ActionItemCard key={item.id} item={item} />
+        ))}
+      </div>
+      {open > 0 && (
+        <div className="mt-3">
+          <BuildKitButton signalId={signalId} redo />
+        </div>
+      )}
+    </div>
   );
 }

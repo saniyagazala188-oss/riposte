@@ -152,3 +152,23 @@ This is the honest record behind the project, kept as we go.
 
 **Phase 4 status:** working on the live site, from change to AI signal to feed to email alert, plus the weekly digest. Not yet tested: Slack (optional, needs a Slack workspace) and the signal step inside the automatic morning check.
 - **Setup checklist stayed on the home screen after setup was finished**, with every step crossed out, pushing the signals down. Fixed: the checklist now hides once all steps are done, so the feed starts with signals.
+
+## Phase 5 · Action kit
+
+**Goal:** go from "what changed" to a finished response in minutes. For each signal, Riposte lists what to create, who owns it, where to share it, and writes the first draft of each.
+
+**Built:**
+- **Build action kit** button on every signal (in the feed and on the competitor page). The AI gets the product profile, the signal and the Before / Now evidence, and returns 2–4 actions, most important first.
+- **Each action has:** the type of asset (battlecard update, sales talk track, comparison page update, blog post, LinkedIn post, customer email, internal Slack update, website copy), a one-line title, why it's needed now, where to share it (for example "#sales Slack channel" or "Battlecard in the sales wiki"), the owner (PMM, Sales, Content & SEO, Product, Leadership, Customer success), how soon (Today, This week, Later), and a **first draft** ready to edit.
+- **Copy draft** and **Mark done** on every action. **Rebuild open actions** asks the AI again and keeps the ones already done.
+- **Actions page** (new tab): every open action across all signals, grouped into Today / This week / Later, filterable by owner, with a list of what's done. This is the team's to-do list for competitor responses.
+
+**Decisions:**
+- Built on demand, not automatically: drafts are long, so writing them only for signals someone cares about keeps AI use (and cost) low.
+- The AI may use only facts from the signal and the evidence. Anything the marketer has to supply (their own price, a customer name, a link) appears as a placeholder in [square brackets], so a draft never contains invented numbers or quotes.
+- Public assets (blog, LinkedIn, website) focus on your own strengths and don't need to name the competitor. No unverifiable claims, no mocking. Sales assets can name the competitor.
+- Owners are fixed roles for now, not named people; naming people can come with team accounts.
+
+**Tested before deploying** (sample data): the prompt carries the evidence and a clean comparison-page address; unknown asset types, owners and priorities fall back to safe defaults; empty items are dropped; a kit is capped at 4 actions.
+
+**Setup:** one new database migration, `0005_phase5_action_kit.sql`. No new keys.

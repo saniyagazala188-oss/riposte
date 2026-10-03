@@ -8,7 +8,9 @@ import { discoverSources } from "@/lib/discovery";
 import { checkSources, type SourceRow } from "@/lib/fetcher/check";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { processChanges } from "@/lib/signals/process";
-import { geminiConfigured } from "@/lib/ai/gemini";
+import { generateJson, geminiConfigured, RateLimited } from "@/lib/ai/gemini";
+import { buildKitPrompt, cleanKit, KIT_SCHEMA } from "@/lib/actions/prompt";
+import { SOURCE_LABELS as PAGE_LABELS, type SourceType as PageType } from "@/lib/discovery/parse";
 import { sendAlerts, sendDigests } from "@/lib/notify/alerts";
 import { emailConfigured, sendEmail, sendSlack } from "@/lib/notify/send";
 import { SITE_URL } from "@/lib/notify/templates";
@@ -288,4 +290,76 @@ export async function sendTest(_prev: CheckState, formData: FormData): Promise<C
   } catch (e) {
     return { status: "error", message: `Couldn't send: ${(e as Error).message}` };
   }
+}
+
+// ---------- Action kit ----------
+
+type KitSignal = {
+  id: string;
+  competitor_id: string;
+  title: string;
+  what_changed: string;
+  so_what: string;
+  action: string;
+  impact: string;
+  category: string;
+  competitors: { name: string } | null;
+  changes: { kind: "content" | "new_posts" | "new_pages"; added: unknown[]; removed: unknown[]; sources: { type: PageType; url: string } | null } | null;
+};
+
+export async function buildActionKit(_prev: CheckState, formData: FormData): Promise<CheckState> {
+  const { supabase, user } = await requireUser();
+  if (!geminiConfigured()) return { status: "error", message: "AI isn't set up yet: the GEMINI_API_KEY setting is missing." };
+  const signalId = String(formData.get("signal_id") ?? "");
+  const redo = formData.get("redo") === "1";
+
+  const [{ data: signal }, { data: profile }] = await Promise.all([
+    supabase
+      .from("signals")
+      .select("id, competitor_id, title, what_changed, so_what, action, impact, category, competitors(name), changes(kind, added, removed, sources(type, url))")
+      .eq("id", signalId)
+      .maybeSingle(),
+    supabase.from("profiles").select("product_name, product_pitch, ideal_customer").eq("id", user.id).maybeSingle(),
+  ]);
+  if (!signal) return { status: "error", message: "Signal not found." };
+  const s = signal as unknown as KitSignal;
+
+  const prompt = buildKitPrompt(profile ?? { product_name: null, product_pitch: null, ideal_customer: null }, {
+    title: s.title,
+    what_changed: s.what_changed,
+    so_what: s.so_what,
+    action: s.action,
+    impact: s.impact,
+    category: s.category,
+    competitorName: s.competitors?.name ?? "the competitor",
+    pageType: s.changes?.sources ? PAGE_LABELS[s.changes.sources.type] : "Page",
+    pageUrl: s.changes?.sources?.url ?? "",
+    change: s.changes ? { kind: s.changes.kind, added: s.changes.added ?? [], removed: s.changes.removed ?? [] } : null,
+  });
+
+  let items;
+  try {
+    items = cleanKit(await generateJson(prompt, KIT_SCHEMA, { timeoutMs: 55000 }));
+  } catch (e) {
+    if (e instanceof RateLimited) return { status: "error", message: "The AI is busy right now. Try again in a minute." };
+    return { status: "error", message: "Couldn't build the kit this time. Please try again." };
+  }
+  if (!items.length) return { status: "error", message: "The AI's answer wasn't usable. Please try again." };
+
+  if (redo) await supabase.from("action_items").delete().eq("signal_id", s.id).eq("status", "open");
+  const { error } = await supabase.from("action_items").insert(
+    items.map((it, i) => ({ ...it, position: i, user_id: user.id, signal_id: s.id, competitor_id: s.competitor_id })),
+  );
+  if (error) return { status: "error", message: "Couldn't save the kit. Please try again." };
+
+  revalidatePath("/app", "layout");
+  return { status: "done", message: `${items.length} actions ready.` };
+}
+
+export async function setActionStatus(formData: FormData) {
+  const { supabase } = await requireUser();
+  const id = String(formData.get("action_id") ?? "");
+  const status = formData.get("status") === "done" ? "done" : "open";
+  await supabase.from("action_items").update({ status }).eq("id", id);
+  revalidatePath("/app", "layout");
 }

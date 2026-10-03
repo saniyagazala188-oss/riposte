@@ -6,7 +6,7 @@ import { SignalList, SIGNAL_SELECT, type SignalRow } from "@/components/SignalLi
 import { ExplainPendingButton } from "@/components/ActionButtons";
 
 export const metadata = { title: "Feed · Riposte" };
-export const maxDuration = 60;
+export const maxDuration = 90;
 
 const FILTERS = [
   { key: "new", label: "To review" },
