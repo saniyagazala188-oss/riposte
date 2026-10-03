@@ -342,7 +342,9 @@ export async function buildActionKit(_prev: CheckState, formData: FormData): Pro
     items = cleanKit(await generateJson(prompt, KIT_SCHEMA, { timeoutMs: 55000 }));
   } catch (e) {
     if (e instanceof RateLimited) return { status: "error", message: "The AI is busy right now. Try again in a minute." };
-    return { status: "error", message: "Couldn't build the kit this time. Please try again." };
+    const detail = (e as Error).name === "AbortError" ? "the AI took longer than 55 seconds" : (e as Error).message.slice(0, 200);
+    console.error("buildActionKit failed:", e);
+    return { status: "error", message: `Couldn't build the kit this time (${detail}). Please try again.` };
   }
   if (!items.length) return { status: "error", message: "The AI's answer wasn't usable. Please try again." };
 
