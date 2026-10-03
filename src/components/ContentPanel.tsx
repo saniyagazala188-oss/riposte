@@ -128,6 +128,14 @@ export function ContentPanel({
                 </li>
               ))}
             </ul>
+            {(() => {
+              const rest = topics.source_count - topics.topics.reduce((n, t) => n + t.count, 0);
+              return rest > 0 ? (
+                <p className="mt-3 text-xs text-muted">
+                  {rest} of {topics.source_count} titles didn&apos;t fit one of these main topics.
+                </p>
+              ) : null;
+            })()}
           </>
         )}
         {!hasFeed && !hasSitemap && (
