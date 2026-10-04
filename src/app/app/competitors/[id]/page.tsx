@@ -11,6 +11,8 @@ import { SignalList, SIGNAL_SELECT, type SignalRow } from "@/components/SignalLi
 import { timeAgo } from "@/lib/time";
 import { ContentPanel, type TopicsRow } from "@/components/ContentPanel";
 import { loadContent } from "@/lib/content/load";
+import { StoryList, STORY_SELECT, type StoryRow } from "@/components/InsightLists";
+import { FindStoriesButton } from "@/components/InsightButtons";
 import { AddSourceForm } from "./AddSourceForm";
 
 export const maxDuration = 90;
@@ -98,6 +100,15 @@ export default async function CompetitorPage({
     supabase.from("content_topics").select("generated_at, source_count, summary, topics").eq("competitor_id", id).maybeSingle(),
   ]);
   const signals = (signalRows ?? []) as unknown as SignalRow[];
+  const { data: storyRows } = await supabase
+    .from("stories")
+    .select(STORY_SELECT)
+    .eq("competitor_id", id)
+    .neq("status", "dismissed")
+    .order("created_at", { ascending: false })
+    .limit(10);
+  const stories = (storyRows ?? []) as unknown as StoryRow[];
+  const signalTitles = new Map(signals.map((s) => [s.id, s.title]));
   const sources = ((sourceRows ?? []) as Source[]).sort((a, b) => ORDER.indexOf(a.type) - ORDER.indexOf(b.type));
   const foundCount = sources.filter((s) => s.discovered).length;
   const neverChecked = sources.length > 0 && sources.every((s) => !s.last_checked_at);
@@ -185,6 +196,27 @@ export default async function CompetitorPage({
         <div className="border-t border-line px-5 py-5">
           <AddSourceForm competitorId={competitor.id} />
         </div>
+      </section>
+
+      <section className={`${card} mt-6`}>
+        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-line px-5 py-4">
+          <div className="min-w-0">
+            <h2 className="font-display text-xl font-bold">Connected moves</h2>
+            <p className="mt-0.5 text-sm text-muted">
+              Related signals from {competitor.name} joined into one story. Checked automatically after new signals.
+            </p>
+          </div>
+          <FindStoriesButton competitorId={competitor.id} />
+        </div>
+        {stories.length ? (
+          <StoryList stories={stories} signalTitles={signalTitles} />
+        ) : (
+          <p className="px-5 py-6 text-sm text-muted">
+            {signals.length >= 2
+              ? "No connected moves found yet."
+              : "Connected moves appear once there are at least 2 signals from this competitor."}
+          </p>
+        )}
       </section>
 
       <section className={`${card} mt-6`}>

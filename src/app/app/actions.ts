@@ -15,6 +15,7 @@ import { sendAlerts, sendDigests } from "@/lib/notify/alerts";
 import { emailConfigured, sendEmail, sendSlack } from "@/lib/notify/send";
 import { SITE_URL } from "@/lib/notify/templates";
 import { loadContent } from "@/lib/content/load";
+import { findStories, findTrends } from "@/lib/insights/run";
 import { titlesForTopics } from "@/lib/content/stats";
 import { buildTopicPrompt, cleanTopics, TOPIC_SCHEMA } from "@/lib/content/topics";
 import { nameFromDomain, normalizeDomain, type SourceType } from "@/lib/discovery/parse";
@@ -183,6 +184,15 @@ export async function checkNow(_prev: CheckState, formData: FormData): Promise<C
 
   const results = await checkSources(supabase, sources as SourceRow[], { concurrency: 4, budgetMs: 40000 });
   const ai = await explainAndAlert(user.id, supabase);
+  // New signals may connect to earlier ones from this competitor: look for linked moves.
+  let linked = 0;
+  if (ai.written) {
+    try {
+      linked = (await findStories(supabase, user.id, competitorId, { timeoutMs: 15000 })).found;
+    } catch {
+      // linking is a bonus; the check itself succeeded
+    }
+  }
   revalidatePath("/app", "layout");
 
   const changed = results.filter((r) => r.status === "changed").length;
@@ -200,6 +210,7 @@ export async function checkNow(_prev: CheckState, formData: FormData): Promise<C
     skipped ? `${skipped} will be checked next time.` : "",
     ai.written ? `${ai.written} new ${ai.written === 1 ? "signal" : "signals"} explained.` : "",
     ai.waiting ? `${ai.waiting} ${ai.waiting === 1 ? "change is" : "changes are"} waiting to be explained.` : "",
+    linked ? `${linked} connected ${linked === 1 ? "move" : "moves"} found.` : "",
   ];
   return { status: "done", message: parts.filter(Boolean).join(" ") };
 }
@@ -438,4 +449,43 @@ export async function analyseTopics(_prev: CheckState, formData: FormData): Prom
   if (error) return { status: "error", message: "Couldn't save the topics. Please try again." };
   revalidatePath("/app", "layout");
   return { status: "done", message: `Found ${result.topics.length} topics in ${titles.length} titles.` };
+}
+
+// ---------- Linked signals and trends ----------
+
+function aiError(e: unknown): CheckState {
+  if (e instanceof RateLimited || e instanceof Overloaded)
+    return { status: "error", message: "Google's AI is overloaded right now. Try again in a minute." };
+  return { status: "error", message: `Couldn't finish this time (${(e as Error).message.slice(0, 160)}).` };
+}
+
+export async function findStoriesAction(_prev: CheckState, formData: FormData): Promise<CheckState> {
+  const { supabase, user } = await requireUser();
+  try {
+    const r = await findStories(supabase, user.id, String(formData.get("competitor_id") ?? ""));
+    revalidatePath("/app", "layout");
+    return { status: "done", message: r.message };
+  } catch (e) {
+    return aiError(e);
+  }
+}
+
+export async function findTrendsAction(): Promise<CheckState> {
+  const { supabase, user } = await requireUser();
+  try {
+    const r = await findTrends(supabase, user.id);
+    revalidatePath("/app", "layout");
+    return { status: r.found ? "done" : "error", message: r.message };
+  } catch (e) {
+    return aiError(e);
+  }
+}
+
+export async function setInsightStatus(formData: FormData) {
+  const { supabase } = await requireUser();
+  const table = formData.get("kind") === "trend" ? "trends" : "stories";
+  const status = String(formData.get("status") ?? "");
+  if (!["new", "reviewed", "dismissed"].includes(status)) return;
+  await supabase.from(table).update({ status }).eq("id", String(formData.get("id") ?? ""));
+  revalidatePath("/app", "layout");
 }

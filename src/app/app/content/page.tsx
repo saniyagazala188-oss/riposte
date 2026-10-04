@@ -5,6 +5,8 @@ import { loadContent } from "@/lib/content/load";
 import { pageMix, paceFromFeed } from "@/lib/content/stats";
 import type { Topic } from "@/lib/content/topics";
 import { timeAgo } from "@/lib/time";
+import { TrendList, TREND_SELECT, type TrendRow } from "@/components/InsightLists";
+import { FindTrendsButton } from "@/components/InsightButtons";
 
 export const metadata = { title: "Content · Riposte" };
 export const maxDuration = 60;
@@ -12,10 +14,12 @@ export const maxDuration = 60;
 // Side-by-side view of what every competitor publishes.
 export default async function ContentPage() {
   const { supabase } = await requireUser();
-  const [{ data: competitors }, { data: topicRows }] = await Promise.all([
+  const [{ data: competitors }, { data: topicRows }, { data: trendRows }] = await Promise.all([
     supabase.from("competitors").select("id, name, domain").order("name"),
     supabase.from("content_topics").select("competitor_id, topics, generated_at"),
+    supabase.from("trends").select(TREND_SELECT).neq("status", "dismissed").order("created_at", { ascending: false }).limit(8),
   ]);
+  const trends = (trendRows ?? []) as unknown as TrendRow[];
   const list = competitors ?? [];
   const content = await loadContent(
     supabase,
@@ -47,6 +51,23 @@ export default async function ContentPage() {
         How often each competitor publishes, what kind of pages they have, and which topics they keep writing about.
         Worked out from the blog feeds and sitemaps Riposte reads every morning.
       </p>
+
+      <section className={`${card} mt-6`}>
+        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-line px-5 py-4">
+          <div className="min-w-0">
+            <h2 className="font-display text-xl font-bold">Trending across competitors</h2>
+            <p className="mt-0.5 max-w-xl text-sm text-muted">
+              Topics that two or more competitors published about in the last 45 days. Refreshed every Monday, or now.
+            </p>
+          </div>
+          <FindTrendsButton />
+        </div>
+        {trends.length ? (
+          <TrendList trends={trends} />
+        ) : (
+          <p className="px-5 py-6 text-sm text-muted">No trends yet. Click “Find trends” to compare what your competitors publish.</p>
+        )}
+      </section>
 
       {rows.length === 0 ? (
         <div className="mt-6 rounded-2xl border border-dashed border-line bg-surface p-8 text-center">

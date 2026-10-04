@@ -61,7 +61,7 @@ export function SignalList({ signals, showCompetitor = false }: { signals: Signa
         const source = s.changes?.sources;
         const done = s.status !== "new";
         return (
-          <li key={s.id} className={`px-5 py-5 ${done ? "opacity-70" : ""}`}>
+          <li key={s.id} id={`signal-${s.id}`} className={`scroll-mt-6 px-5 py-5 ${done ? "opacity-70" : ""}`}>
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
               <span className={`rounded-full px-2 py-0.5 font-semibold ${impact.className}`}>{impact.label}</span>
               <span className="text-muted">{CATEGORY[s.category] ?? "Other"}</span>

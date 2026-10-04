@@ -4,6 +4,7 @@ import { card, eyebrow, primaryButton } from "@/components/styles";
 import { ChangeList, CHANGE_SELECT, type ChangeRow } from "@/components/ChangeList";
 import { SignalList, SIGNAL_SELECT, type SignalRow } from "@/components/SignalList";
 import { ExplainPendingButton } from "@/components/ActionButtons";
+import { StoryList, STORY_SELECT, type StoryRow } from "@/components/InsightLists";
 
 export const metadata = { title: "Feed · Riposte" };
 export const maxDuration = 90;
@@ -45,6 +46,18 @@ export default async function AppHome({ searchParams }: { searchParams: Promise<
     supabase.from("signals").select("id", { count: "exact", head: true }).eq("status", "new").eq("noise", false),
   ]);
   const pending = (pendingRows ?? []) as unknown as ChangeRow[];
+  const { data: storyRows } = await supabase
+    .from("stories")
+    .select(STORY_SELECT)
+    .eq("status", "new")
+    .order("created_at", { ascending: false })
+    .limit(10);
+  const stories = (storyRows ?? []) as unknown as StoryRow[];
+  const linkedIds = [...new Set(stories.flatMap((s) => s.signal_ids))];
+  const { data: linkedRows } = linkedIds.length
+    ? await supabase.from("signals").select("id, title").in("id", linkedIds)
+    : { data: [] as { id: string; title: string }[] };
+  const signalTitles = new Map((linkedRows ?? []).map((r) => [r.id as string, r.title as string]));
   const signals = (signalRows ?? []) as unknown as SignalRow[];
 
   const steps = [
@@ -129,6 +142,18 @@ export default async function AppHome({ searchParams }: { searchParams: Promise<
             <ExplainPendingButton />
           </div>
           <ChangeList changes={pending} showCompetitor />
+        </section>
+      )}
+
+      {stories.length > 0 && (
+        <section className={`${card} mt-6`}>
+          <div className="border-b border-line px-5 py-4">
+            <h2 className="font-display text-xl font-bold">Connected moves</h2>
+            <p className="mt-0.5 text-sm text-muted">
+              Related changes by one competitor, joined into one story, so a campaign reads as one move, not three alerts.
+            </p>
+          </div>
+          <StoryList stories={stories} signalTitles={signalTitles} showCompetitor />
         </section>
       )}
 

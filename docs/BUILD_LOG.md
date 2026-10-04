@@ -244,3 +244,22 @@ Phase 6 is split into three parts, built one at a time:
 
 - **Crayon's pages still said "Checked 1 day ago" in the evening**, so the 7am run seemed to have skipped them. Cause: the morning job only re-checked a daily page if its last check was at least 20 hours old. Crayon had been checked by hand at about 9pm the night before, only 10 hours earlier, so it was skipped, and would only have been checked the following morning, about 34 hours after the manual check. Fixed: a daily page is now due unless it was checked in the last 12 hours. Since the job runs once a day, every daily page is checked every morning unless someone pressed Check now overnight.
 - **Check now on Crayon, about 26 hours after the last check:** "Checked 5 pages. 5 unchanged since the last check." No false changes across a full day on 5 real pages (blog, feed, pricing, 8 MB sitemap, AI toolkit page), which is stronger proof of the noise filter than the 7-minute test. The automatic morning job itself is still to be confirmed at 7am on 5 Oct, with the 12-hour rule.
+
+### 6b · Linked signals and trend alerts
+
+**Goal:** see a competitor's coordinated campaign as one story instead of three separate alerts, and spot a topic early when several competitors start publishing about it.
+
+**Built:**
+- **Connected moves (linked signals):** the AI reads a competitor's signals from the last 30 days and joins the ones that belong to the same move (for example a price rise + a launch post + a changelog entry about one new feature) into a story: a title, what they're doing, why it matters to you, one next step, and links to each connected signal. Shown at the top of the feed and on the competitor page, with Mark reviewed and Dismiss.
+- **When it runs:** after Check now finds new signals, in the morning job for every competitor with new signals, and on the **Find connected moves** button.
+- **Trend alerts:** the AI compares what each competitor published in the last 45 days (dated feed posts and newly found pages) and flags topics that **two or more competitors** cover: the topic, what they're saying, why it matters, a content step to take, and the real titles from each competitor. Shown at the top of the Content page; refreshed every Monday before the digest, or with **Find trends**.
+- **Demo upgrade:** the fictional Acme now has a blog feed (`/demo/feed.xml`) and a changelog (`/demo/changelog`) that switch together with its pricing page. In the "after" version, Pro rises to $59 with AI battlecards, two launch posts appear, and two changelog entries ship: one coordinated move that Riposte should join into a single story.
+
+**Decisions:**
+- **No forced connections:** a story needs at least 2 signals and the AI may return none; a trend needs at least 2 competitors, each with real titles copied from its own list, or it is dropped.
+- **Reviewed or dismissed stories stay:** a new run replaces only stories still marked new.
+- **The morning job stays inside its time limit:** linking and trends stop early if time runs short and continue the next day.
+
+**Tested before deploying** (sample data): stories keep only valid, distinct signal numbers and need at least 2; trends drop titles that aren't in the competitor's own list, match names regardless of case, and are dropped when fewer than 2 competitors remain.
+
+**Setup:** migration `0009_phase6b_stories_trends.sql`. No new keys.
