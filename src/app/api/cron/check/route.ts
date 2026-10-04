@@ -5,7 +5,7 @@ import { processChanges } from "@/lib/signals/process";
 import { sendAlerts, sendDigests } from "@/lib/notify/alerts";
 
 // Runs every morning (see vercel.json):
-// 1. checks every page that is due (daily competitors after ~20 hours, weekly after ~6.5 days),
+// 1. checks every page that is due (daily competitors after 12 hours, weekly after ~6.5 days),
 // 2. turns new changes into AI signals,
 // 3. sends alerts for high-impact signals,
 // 4. on Mondays, sends the weekly digest.
@@ -34,7 +34,8 @@ export async function GET(request: Request) {
   const due = (data ?? []).filter((s) => {
     if (!s.last_checked_at) return true;
     const competitor = s.competitors as unknown as { check_frequency: string } | null;
-    const gap = competitor?.check_frequency === "weekly" ? 156 * HOUR : 20 * HOUR;
+    // The job runs once a day, so a daily page is due unless someone pressed Check now in the last 12 hours.
+    const gap = competitor?.check_frequency === "weekly" ? 156 * HOUR : 12 * HOUR;
     return now - new Date(s.last_checked_at).getTime() >= gap;
   }) as SourceRow[];
 

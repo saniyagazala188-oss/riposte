@@ -239,3 +239,7 @@ Phase 6 is split into three parts, built one at a time:
   - *Still weak:* the "what it means for you" part of the summary is generic ("a clear blueprint for using competitive insights"). Crayon sells in the same space as Riposte, so this should point at overlap and gaps. To sharpen with the trend and gap work in 6b.
 
 **Phase 6a status:** working on the live site (pace, page mix, comparison-page count, AI topics).
+
+## 4 Oct 2026 · Checking the first automatic morning run
+
+- **Crayon's pages still said "Checked 1 day ago" in the evening**, so the 7am run seemed to have skipped them. Cause: the morning job only re-checked a daily page if its last check was at least 20 hours old. Crayon had been checked by hand at about 9pm the night before, only 10 hours earlier, so it was skipped, and would only have been checked the following morning, about 34 hours after the manual check. Fixed: a daily page is now due unless it was checked in the last 12 hours. Since the job runs once a day, every daily page is checked every morning unless someone pressed Check now overnight.
