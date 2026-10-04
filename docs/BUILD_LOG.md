@@ -263,3 +263,9 @@ Phase 6 is split into three parts, built one at a time:
 **Tested before deploying** (sample data): stories keep only valid, distinct signal numbers and need at least 2; trends drop titles that aren't in the competitor's own list, match names regardless of case, and are dropped when fewer than 2 competitors remain.
 
 **Setup:** migration `0009_phase6b_stories_trends.sql`. No new keys.
+
+**Tested on the live site, 5 Oct 2026 (just after midnight):** Acme's blog feed and changelog were added and saved as starting points in the "before" version. Check now in the "after" version said: **"Checked 3 pages. 3 changed. 3 new signals explained. 1 connected move found."**
+- 3 new high-impact signals: the price rise to $59 with AI battlecards and an Enterprise tier (pricing page), the launch posts for AI battlecards and Acme Enterprise (blog feed), and the AI battlecards and SSO entries (changelog).
+- **Connected move:** "Acme shifts pricing and product tiers around AI battlecards and enterprise features", linking **4 signals**: today's three plus the earlier price-drop signal, which the AI correctly saw as part of the same packaging story. Each linked signal is listed and clickable.
+- Content section updated by itself: 2 posts in the last 30 days, last post 10 hours ago.
+- *Weak spot:* the story's next step ("Monitor Acme's pricing stability over the next month") is passive compared with the signal-level actions. To tighten in the story prompt: the step should be something the team creates or changes.
