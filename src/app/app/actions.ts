@@ -475,7 +475,7 @@ export async function findTrendsAction(): Promise<CheckState> {
   try {
     const r = await findTrends(supabase, user.id);
     revalidatePath("/app", "layout");
-    return { status: r.found ? "done" : "error", message: r.message };
+    return { status: "done", message: r.message };
   } catch (e) {
     return aiError(e);
   }
