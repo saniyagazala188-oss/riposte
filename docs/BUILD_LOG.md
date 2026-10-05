@@ -499,3 +499,9 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 
 - The app's side menu has a new **Riposte** group: Blog, Changelog and About the founder. They open the public pages, and "Open dashboard →" in the site header brings you back.
 - The site header now shows Blog, Changelog and About on phones too (they were hidden on small screens).
+
+## Fix: AI visibility answers weren't saving (5 Oct, 23:28 IST)
+
+- **Problem:** "Asked 5 of 5", but every prompt still said "Not asked yet". The `search_entry` column was added to migration 0011 after it had been run, so every save failed, and the code didn't check the save error.
+- **Fix:** the save error is now checked and shown plainly. In Supabase: `alter table public.visibility_answers add column if not exists search_entry text; notify pgrst, 'reload schema';`
+- **First real run:** Crayon and Klue named in 4 of 5 answers, Visualping in 3, Riposte in 0. 4 gaps, each with "Why are they winning?".

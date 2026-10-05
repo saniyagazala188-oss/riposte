@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-05T23:28:00+05:30",
+    title: "AI visibility answers save again",
+    body: "Answers were asked but not saved because of a missing database column, and the error was hidden. Save errors now show plainly, and the first real run is in: Crayon and Klue named in 4 of 5 answers, Riposte in none yet.",
+    kind: "fix",
+  },
+  {
     at: "2026-10-05T23:25:00+05:30",
     title: "Blog, changelog and about in the app menu",
     body: "The app's side menu now links to the blog, this changelog and the founder page, and the site header shows them on phones too.",
