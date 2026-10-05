@@ -8,7 +8,7 @@ export function GET() {
   const posts = allPosts();
   const body = `# Riposte
 
-> Riposte is a competitive intelligence tool for marketers. It checks competitors' pricing pages, release notes, blogs and sitemaps every morning, explains each real change against your own product, and drafts the response: what to create, who owns it and where to share it. It also tracks what competitors publish, flags pages rewritten for a new search intent, keeps comparison pages current, and shows who AI tools recommend for your buyers' questions.
+> Riposte is a competitive intelligence tool for marketers. It checks competitors' pricing pages, release notes, blogs and sitemaps every morning, explains each real change against your own product, and drafts the response: what to create, who owns it and where to share it. It also tracks what competitors publish, flags pages rewritten for a new search intent, keeps comparison pages current, turns trends and AI answer gaps into content briefs, and shows who AI tools recommend for your buyers' questions and why.
 
 Founded by ${AUTHOR.name}, a product marketer based in Bengaluru, India. Built in public in October 2026.
 

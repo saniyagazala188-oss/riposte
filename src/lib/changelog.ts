@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-05T23:58:00+05:30",
+    title: "Landing page catches up",
+    body: "The home page now lists content briefs and \"why they're winning\", says Riposte shows who AI recommends to your buyers and why, and links to the blog and changelog.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-05T23:55:00+05:30",
     title: "\"Why are they winning?\" gives real reasons",
     body: "It now reads the AI answer itself: what each competitor is picked for, whether your product says the same, and what to publish to compete. Recent moves show only when there are some. Briefs use these reasons, and AI calls wait and retry through busy minutes instead of failing.",

@@ -514,3 +514,9 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - **Panel:** each competitor card shows "AI picks it for", the match line, "To compete", and recent moves only when there are some. The brief button appears after the reasons and uses them as evidence.
 - **Fewer live failures:** `generateJson` now retries on per-minute limits (429) as well as busy errors (503), switching between Flash and Flash-Lite with waits of 1, 4, 8 and 15 seconds, within the time budget.
 - **Demo tip:** open the panels and write the brief before recording, so everything is saved and opens instantly.
+
+## Landing page update (5 Oct, 23:58 IST)
+
+- The hero now says Riposte shows who AI recommends to your buyers, and why it isn't you yet.
+- "What you get" adds **Content briefs** and **Why they're winning**. Action kits mention the Actions list, and the AI visibility line no longer promises Google Search (the free key answers without it).
+- The early access section links to the blog and changelog. llms.txt mentions briefs and the "why".

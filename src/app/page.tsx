@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { WaitlistForm } from "@/components/WaitlistForm";
 import { createClient } from "@/lib/supabase/server";
@@ -26,11 +27,13 @@ const steps = [
 
 const features = [
   ["Signal feed and alerts", "Real changes only, with a before/after view. High-impact moves go to email or Slack the morning they're found."],
-  ["Action kit", "A response plan for every signal: what to create, where it goes, who owns it, with first drafts ready to edit."],
+  ["Action kits", "A response plan for every signal: what to create, where it goes, who owns it, with first drafts ready to edit. All actions in one list: Today, This week, Later."],
   ["Content intelligence", "Competitors' publishing pace, page mix and topics, rewritten pages that change search intent, and topics trending across competitors."],
+  ["Content briefs", "One click turns a trend, or an AI answer you're missing from, into a brief: keyword, intent, angle, quick answer, outline and FAQs."],
   ["Living comparisons", "Fair \"you vs them\" pages written from what's on their site, flagged out of date when they change pricing or product."],
   ["Prompt Studio", "Buyer prompts for AI search from your keywords: commercial intent only, no brand names, ready to export."],
-  ["AI visibility", "Your prompts asked in Gemini with Google Search: who gets named, in what order, and which sites the answers rely on."],
+  ["AI visibility", "Your buyers' questions asked in Gemini: who gets named, in what order, and which sites the answers rely on."],
+  ["Why they're winning", "When AI names competitors and not you, see what it picks each one for, whether your product says the same, and what to publish to compete."],
   ["Weekly digest", "A Monday email with the week's moves and the responses your team shipped."],
 ];
 
@@ -76,7 +79,8 @@ export default async function Home() {
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted">
               Riposte watches your competitors&apos; launches, content and pricing every day. It tells you what changed,
-              what it means for you, and what to do about it, and shows who wins the answers in AI search.
+              what it means for you, and what to do about it. It also shows who AI recommends to your buyers, and why
+              it isn&apos;t you yet.
             </p>
             <div className="mt-7">
               <WaitlistForm id="hero-email" />
@@ -136,7 +140,9 @@ export default async function Home() {
             <h2 className="font-display text-3xl font-bold">Get early access</h2>
             <p className="max-w-xl text-muted">
               Riposte is being built in public. Join the waitlist and be one of the first teams to try it on your own
-              competitors.
+              competitors. Follow along on the{" "}
+              <Link href="/blog" className="font-medium text-accent hover:underline">blog</Link> and the{" "}
+              <Link href="/changelog" className="font-medium text-accent hover:underline">changelog</Link>.
             </p>
             <WaitlistForm id="footer-email" />
           </div>
