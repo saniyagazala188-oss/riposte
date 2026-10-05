@@ -70,6 +70,16 @@ export async function generateJson<T>(prompt: string, schema: object, { timeoutM
 
 // ---------- Grounded answers (Gemini + Google Search) ----------
 
+// Google's own explanation from an error response, shortened.
+async function googleReason(res: Response): Promise<string> {
+  try {
+    const body = (await res.json()) as { error?: { message?: string } };
+    return (body.error?.message ?? "").replace(/\s+/g, " ").slice(0, 220);
+  } catch {
+    return "";
+  }
+}
+
 export type GroundedAnswer = {
   text: string;
   queries: string[];
@@ -88,8 +98,11 @@ async function groundedOnce(model: string, prompt: string, timeoutMs: number): P
       body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: prompt }] }], tools: [{ google_search: {} }] }),
       cache: "no-store",
     });
-    if (res.status === 429) throw new RateLimited("Gemini rate limit reached");
-    if (res.status === 503 || res.status === 500) throw new Overloaded(`Gemini is overloaded (${res.status})`);
+    if (res.status === 429 || res.status === 503 || res.status === 500) {
+      const reason = await googleReason(res);
+      if (res.status === 429) throw new RateLimited(`${model}: limit reached (${reason})`);
+      throw new Overloaded(`${model}: overloaded (${res.status}${reason ? `, ${reason}` : ""})`);
+    }
     if (!res.ok) throw new Error(`Gemini answered ${res.status}: ${(await res.text()).slice(0, 300)}`);
     const data = (await res.json()) as {
       candidates?: {
@@ -124,9 +137,12 @@ export async function groundedAnswer(prompt: string, { timeoutMs = 45000 } = {})
   if (!process.env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not set");
   const main = process.env.GEMINI_MODEL || "gemini-flash-latest";
   const fallback = process.env.GEMINI_FALLBACK_MODEL || "gemini-flash-lite-latest";
+  // Main model, again after a pause, then the lighter model (which has its own quota, so it is
+  // also tried when the main model's limit is reached).
   const plan = [
     { model: main, wait: 0 },
-    { model: fallback, wait: 1500 },
+    { model: main, wait: 2000 },
+    { model: fallback, wait: 1000 },
   ];
   const deadline = Date.now() + timeoutMs;
   let lastError: unknown;
@@ -134,11 +150,12 @@ export async function groundedAnswer(prompt: string, { timeoutMs = 45000 } = {})
     if (step.wait) await sleep(step.wait);
     const left = deadline - Date.now();
     if (left < 5000) break;
+    if (lastError instanceof RateLimited && step.model === main) continue; // a limit won't clear in 2 seconds
     try {
       return await groundedOnce(step.model, prompt, left);
     } catch (e) {
       lastError = e;
-      if (!(e instanceof Overloaded)) throw e;
+      if (!(e instanceof Overloaded) && !(e instanceof RateLimited)) throw e;
     }
   }
   throw lastError ?? new Overloaded("Gemini is overloaded");

@@ -5,7 +5,7 @@ import { BRAND_SCHEMA, buildBrandPrompt, citationDomains, cleanBrands, entitiesF
 
 const HOUR = 60 * 60 * 1000;
 
-export type VisibilityResult = { asked: number; failed: number; waiting: number; busy: boolean };
+export type VisibilityResult = { asked: number; failed: number; waiting: number; busy: boolean; reason?: string };
 
 // Asks each tracked prompt in Gemini with Google Search and records who the answer names
 // and which sites it used. Prompts answered within `freshHours` are skipped.
@@ -47,6 +47,7 @@ export async function runVisibility(
   let asked = 0;
   let failed = 0;
   let busy = false;
+  let reason: string | undefined;
   let next = 0;
 
   async function handle(p: { id: string; user_id: string; text: string }) {
@@ -73,6 +74,8 @@ export async function runVisibility(
       });
       asked++;
     } catch (e) {
+      reason = (e as Error).message;
+      console.error("visibility", reason);
       if (e instanceof RateLimited || e instanceof Overloaded) {
         busy = true;
         return;
@@ -85,5 +88,5 @@ export async function runVisibility(
     while (!busy && next < due.length && Date.now() - started < budgetMs) await handle(due[next++]);
   }
   await Promise.all(Array.from({ length: Math.min(concurrency, due.length) }, worker));
-  return { asked, failed, waiting: due.length - asked - failed, busy };
+  return { asked, failed, waiting: due.length - asked - failed, busy, reason };
 }
