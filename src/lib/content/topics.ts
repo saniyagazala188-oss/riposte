@@ -43,7 +43,7 @@ TITLES>>>
 Return JSON:
 - summary: 1-2 plain sentences on what ${competitor}'s content strategy focuses on, and what that means for the marketer above.
 - topics: 4 to 8 topics, largest first. For each: name (2-5 words, a topic a marketer would recognise, e.g. "Visual regression testing", "Competitor alternatives pages"), count (how many of the titles above belong to it; each title counts once), summary (one sentence on the angle they take), examples (2-3 titles copied exactly from the list).
-Use only the titles given. Don't invent titles. Simple English, no hype.`;
+Use only the titles given. Don't invent titles. Describe the marketer's product only with what is said above (for example, don't call it real-time unless it says so). Simple English, no hype.`;
 }
 
 export function cleanTopics(raw: unknown, total: number): TopicResult | null {

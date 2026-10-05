@@ -58,7 +58,7 @@ For each story:
 - title: one line naming the move, e.g. "Acme is moving upmarket with AI battlecards".
 - summary: 1-2 sentences on what ${competitor} is doing, citing the connected changes.
 - so_what: 1-2 sentences on why the combined move matters for the marketer's product and buyers.
-- action: one concrete next step, starting with a verb.
+- action: one concrete next step the team creates or changes (a battlecard, a page, a message, a post), starting with a verb. Not "monitor" or "watch".
 - signals: the numbers of the connected changes (at least 2).
 Use only what the changes say. Simple English, no hype.`;
 }
@@ -142,11 +142,11 @@ CONTENT>>>
 
 Return JSON with "trends": 0 to 4 trends, strongest first. Only include a topic when 2 or more competitors clearly cover it. For each:
 - topic: 2-6 words, e.g. "AI-written battlecards".
-- summary: one sentence on what the competitors are saying about it.
+- summary: one sentence on what the competitors are saying about it, naming every competitor listed for the trend.
 - so_what: one sentence on why it matters for the marketer's product (a gap to fill, a claim to answer, or noise to ignore).
 - action: one concrete content step, starting with a verb, e.g. "Publish a comparison of AI battlecard tools that leads with [your differentiator]".
 - competitors: each competitor covering it, with its name exactly as given and 1-3 titles copied exactly from its list.
-Use only the titles given. Simple English, no hype.`;
+Use only the titles given. Describe the marketer's product only with what its profile above says. Simple English, no hype.`;
 }
 
 export function cleanTrends(raw: unknown, inputs: TrendInput[]): TrendDraft[] {

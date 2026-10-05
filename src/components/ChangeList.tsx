@@ -4,7 +4,8 @@ import { timeAgo } from "@/lib/time";
 
 export type ChangeRow = {
   id: string;
-  kind: "content" | "new_posts" | "new_pages";
+  kind: "content" | "new_posts" | "new_pages" | "rewrite";
+  page_url?: string | null;
   detected_at: string;
   added: unknown[];
   removed: unknown[];
@@ -20,7 +21,7 @@ function More({ total }: { total: number }) {
 }
 
 // The evidence for one change: new posts, new pages, or Before / Now lines.
-export function ChangeBody({ change: c }: { change: Pick<ChangeRow, "kind" | "added" | "removed"> }) {
+export function ChangeBody({ change: c }: { change: Pick<ChangeRow, "kind" | "added" | "removed" | "page_url"> }) {
   const added = c.added ?? [];
   const removed = c.removed ?? [];
   return (
@@ -65,7 +66,18 @@ export function ChangeBody({ change: c }: { change: Pick<ChangeRow, "kind" | "ad
         </div>
       )}
 
-      {c.kind === "content" && (
+      {c.kind === "rewrite" && (
+        <p className="mt-2 text-sm">
+          <span className="font-medium">An existing page was rewritten: </span>
+          {c.page_url && (
+            <a href={c.page_url} target="_blank" rel="noopener noreferrer" className="break-all text-accent hover:underline">
+              {c.page_url}
+            </a>
+          )}
+          {removed.length === 0 && <span className="block text-xs text-muted">No earlier version was saved; this is its outline now.</span>}
+        </p>
+      )}
+      {(c.kind === "content" || c.kind === "rewrite") && (
         <div className="mt-2 grid gap-2 text-sm md:grid-cols-2">
           {removed.length > 0 && (
             <div className="min-w-0 rounded-lg bg-bg p-3">
@@ -131,4 +143,4 @@ export function ChangeList({ changes, showCompetitor = false }: { changes: Chang
 }
 
 export const CHANGE_SELECT =
-  "id, kind, detected_at, added, removed, competitor_id, competitors(name), sources(type, url)";
+  "id, kind, detected_at, added, removed, page_url, competitor_id, competitors(name), sources(type, url)";

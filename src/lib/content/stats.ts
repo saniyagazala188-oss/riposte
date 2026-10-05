@@ -105,3 +105,14 @@ export function titlesForTopics(feed: FeedItem[], urls: string[], max = 120): st
   }
   return [...out].slice(0, max);
 }
+
+// True for pages a content marketer cares about: blog posts, guides, comparison and answer pages.
+export function isContentUrl(u: string): boolean {
+  let path = "";
+  try {
+    path = new URL(u).pathname.toLowerCase();
+  } catch {
+    return false;
+  }
+  return KINDS.filter((k) => ["compare", "answers", "blog", "guides"].includes(k.key)).some((k) => k.test.test(path));
+}

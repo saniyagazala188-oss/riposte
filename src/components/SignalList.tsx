@@ -22,11 +22,11 @@ export type SignalRow = {
   competitors: { name: string } | null;
   action_items?: ActionItemRow[];
   changes:
-    | (Pick<ChangeRow, "kind" | "added" | "removed" | "detected_at"> & { sources: { type: SourceType; url: string } | null })
+    | (Pick<ChangeRow, "kind" | "added" | "removed" | "detected_at" | "page_url"> & { sources: { type: SourceType; url: string } | null })
     | null;
 };
 
-export const SIGNAL_SELECT = `id, created_at, title, what_changed, so_what, action, impact, category, noise, status, competitor_id, competitors(name), changes(kind, added, removed, detected_at, sources(type, url)), action_items(${ACTION_FIELDS})`;
+export const SIGNAL_SELECT = `id, created_at, title, what_changed, so_what, action, impact, category, noise, status, competitor_id, competitors(name), changes(kind, added, removed, detected_at, page_url, sources(type, url)), action_items(${ACTION_FIELDS})`;
 
 const IMPACT = {
   high: { label: "High impact", className: "bg-signal-soft text-signal" },
@@ -70,7 +70,11 @@ export function SignalList({ signals, showCompetitor = false }: { signals: Signa
                   {s.competitors.name}
                 </Link>
               )}
-              {source && <span className="text-muted">{SOURCE_LABELS[source.type]}</span>}
+              {s.changes?.kind === "rewrite" ? (
+                <span className="font-semibold text-signal">Page rewritten</span>
+              ) : (
+                source && <span className="text-muted">{SOURCE_LABELS[source.type]}</span>
+              )}
               <span className="font-mono text-muted">{timeAgo(s.changes?.detected_at ?? s.created_at)}</span>
               {s.status === "reviewed" && <span className="text-accent">✓ Reviewed</span>}
               {s.status === "dismissed" && <span className="text-muted">Dismissed</span>}

@@ -290,3 +290,21 @@ Phase 6 is split into three parts, built one at a time:
   - All quoted titles are real. *Small slip:* trend 1's summary says "both Crayon and Klue" while it lists 3 competitors; the summary should name all of them.
 
 **Phase 6b status: done.** Connected moves and trend alerts both work on the live site with real competitors.
+
+### 6c · Intent-change alerts (rewritten pages)
+
+**Goal:** the old routine compared weekly Ahrefs exports and assumed a URL that "appeared again" had been optimized, without checking what changed. Riposte now spots when a competitor rewrites an existing page and shows exactly how: the title, description and headings, Before / Now, plus whether the page's search intent changed.
+
+**Built:**
+- **Page dates from sitemaps:** Riposte now reads each page's "last changed" date from the sitemap and keeps it with the daily snapshot.
+- **Rewrite detection:** when a blog post, guide, comparison page or answer page gets a new date, Riposte reads its outline (title, meta description, H1–H3) and compares it with the outline saved before. Up to 5 per competitor per check.
+- **Baseline outlines:** the first time Riposte sees a sitemap's dates, it saves the outlines of the 10 most recently changed content pages, so their next rewrite can be compared.
+- **AI explanation:** the signal says what changed and whether the intent or angle shifted (for example an informational how-to turned into a commercial "best tools" comparison, or a new target keyword in the title), and what that means for your own content on the topic. Shown as **Page rewritten** in the feed.
+- **Sitemap regeneration guard:** if most of a sitemap's dates move at once (many sites stamp every page with today's date on each deploy), nothing is reported.
+- **Demo:** Acme now has blog articles and a sitemap with dates. In the "after" version its "10-point checklist for your first competitive intel program" becomes "The 10 best competitive intelligence tools in 2026, compared": an informational guide turned into a commercial comparison.
+
+**Also tightened from the 6b review:** connected-move actions must be something the team creates or changes (not "monitor"); trend summaries must name every competitor in the trend; topic and trend summaries may describe your product only with claims from your profile (no "real-time").
+
+**Tested before deploying** (sample data): lastmod is read per page and image entries are ignored; outlines keep title, description and headings and drop "3 hours ago"; a single moved date is reported, while 100 pages moving at once is treated as regeneration and ignored; non-content pages (pricing) are skipped.
+
+**Setup:** migration `0010_phase6c_rewrites.sql`.

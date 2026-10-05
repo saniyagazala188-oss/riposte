@@ -149,7 +149,7 @@ export function parseFeed(body: string): FeedItem[] | null {
 
 // ---------- sitemaps ----------
 
-export type SitemapResult = { urls: string[]; children: string[] };
+export type SitemapResult = { urls: string[]; children: string[]; lastmod: Record<string, string> };
 
 // Reads page addresses from a sitemap. Uses pattern matching instead of a full XML parse,
 // so a very large sitemap that was cut off part-way still gives every complete entry.
@@ -170,7 +170,16 @@ export function parseSitemap(body: string): SitemapResult | null {
   // A page entry's own <loc> is plain; image and video entries use <image:loc> and similar.
   const urls = isUrlset ? collect(/<url\b[^>]*>([\s\S]*?)<\/url>/gi) : [];
   const children = isIndex ? collect(/<sitemap\b[^>]*>([\s\S]*?)<\/sitemap>/gi) : [];
-  return { urls, children };
+  // When each page was last changed, if the sitemap says so (used to spot rewritten pages).
+  const lastmod: Record<string, string> = {};
+  if (isUrlset) {
+    for (const m of body.matchAll(/<url\b[^>]*>([\s\S]*?)<\/url>/gi)) {
+      const loc = m[1].match(/<loc>([\s\S]*?)<\/loc>/i);
+      const mod = m[1].match(/<lastmod>([\s\S]*?)<\/lastmod>/i);
+      if (loc && mod) lastmod[decode(loc[1])] = decode(mod[1]);
+    }
+  }
+  return { urls, children, lastmod };
 }
 
 // Picks which child sitemaps to read from a sitemap index: content first.
@@ -194,4 +203,39 @@ export function diffSets(before: string[], after: string[], cap = 50) {
   const added = after.filter((x) => !old.has(x));
   const removed = before.filter((x) => !now.has(x));
   return { added: added.slice(0, cap), removed: removed.slice(0, cap), addedCount: added.length, removedCount: removed.length };
+}
+
+// ---------- page outlines (for spotting rewritten pages) ----------
+
+// The parts of a page that show what it is about and which search it targets:
+// title, meta description and headings. Comparing outlines shows a change of angle or intent.
+export function htmlOutline(html: string): string[] {
+  const $ = cheerio.load(html);
+  const out: string[] = [];
+  const title = normalizeLine($("title").first().text());
+  if (title) out.push(`Title: ${title}`);
+  const desc = normalizeLine($('meta[name="description"]').attr("content") ?? "");
+  if (desc) out.push(`Description: ${desc}`);
+  $("h1, h2, h3").each((_, el) => {
+    const t = normalizeLine($(el).text());
+    if (t && out.length < 40) out.push(`${(el as { tagName?: string }).tagName?.toUpperCase() ?? "H"}: ${t}`);
+  });
+  return [...new Set(out)];
+}
+
+// Pages whose "last changed" date moved between two sitemap reads. If most of the sitemap moved
+// at once, the site just regenerated its sitemap, so nothing is reported.
+export function updatedPages(
+  before: Record<string, string>,
+  after: Record<string, string>,
+  keep: (url: string) => boolean,
+  max = 5,
+): string[] {
+  const shared = Object.keys(after).filter((u) => u in before);
+  const moved = shared.filter((u) => before[u] !== after[u]);
+  if (!shared.length || moved.length > Math.max(20, shared.length * 0.3)) return [];
+  return moved
+    .filter(keep)
+    .sort((a, b) => (after[b] > after[a] ? 1 : -1))
+    .slice(0, max);
 }

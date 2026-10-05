@@ -32,3 +32,37 @@ export function demoChangelog(v: 0 | 1) {
       ]
     : base;
 }
+
+// One older post gets rewritten in the "after" version: an informational checklist turns into a
+// commercial "best tools" comparison. This is the kind of intent change Riposte should flag.
+export function demoArticle(slug: string, v: 0 | 1) {
+  const post = [...NEW_POSTS, ...OLD_POSTS].find((p) => p.slug === slug);
+  if (!post) return null;
+  if (slug === "competitive-intel-checklist") {
+    return v === 1
+      ? {
+          title: "The 10 best competitive intelligence tools in 2026, compared",
+          description: "We compared the top competitive intelligence tools on price, alerts and AI features, so you can pick the right one.",
+          sections: [
+            "How we picked these tools",
+            "1. Acme Insights: best for growing marketing teams",
+            "2. Crayon: best for large sales teams",
+            "3. Klue: best for enterprise win-loss programs",
+            "Pricing compared",
+            "Which tool should you choose?",
+          ],
+          updated: "2026-10-05",
+        }
+      : {
+          title: "A 10-point checklist for your first competitive intel program",
+          description: "Ten steps to set up a competitive intelligence program from scratch.",
+          sections: ["Why start a competitive intel program", "Step 1: pick your top 3 competitors", "Step 2: decide what to track", "Step 3: share findings with sales"],
+          updated: post.date,
+        };
+  }
+  return { title: post.title, description: post.title, sections: ["Overview", "What it means for you"], updated: post.date };
+}
+
+export function demoSlugs() {
+  return [...NEW_POSTS, ...OLD_POSTS].map((p) => p.slug);
+}

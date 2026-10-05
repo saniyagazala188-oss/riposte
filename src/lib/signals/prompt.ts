@@ -9,7 +9,8 @@ export type Profile = {
 };
 
 export type ChangeInput = {
-  kind: "content" | "new_posts" | "new_pages";
+  kind: "content" | "new_posts" | "new_pages" | "rewrite";
+  pageUrl2?: string | null;
   added: unknown[];
   removed: unknown[];
   competitorName: string;
@@ -59,7 +60,21 @@ function clip(lines: string[], budget: number) {
   return out;
 }
 
-export function changeEvidence(change: Pick<ChangeInput, "kind" | "added" | "removed">): string {
+export function changeEvidence(change: Pick<ChangeInput, "kind" | "added" | "removed" | "pageUrl2">): string {
+  if (change.kind === "rewrite") {
+    const before = (change.removed as string[]).map((l) => `- ${l}`);
+    const after = (change.added as string[]).map((l) => `+ ${l}`);
+    return [
+      `An EXISTING page on their site was rewritten: ${change.pageUrl2 ?? "(address unknown)"}`,
+      "Its title, description and headings, compared with the earlier version.",
+      before.length ? "BEFORE (removed):" : "No earlier version was saved, so only the current outline is shown.",
+      ...clip(before, MAX_EVIDENCE / 2),
+      "NOW (added):",
+      ...clip(after, MAX_EVIDENCE / 2),
+      "",
+      "For a rewrite, say whether the page's search intent or angle changed (for example an informational how-to guide turned into a commercial 'best tools' comparison, a new target keyword in the title, or a new section aimed at buyers), and what that means for the marketer's own content on this topic.",
+    ].join("\n");
+  }
   if (change.kind === "new_posts") {
     const posts = (change.added as { title?: string; link?: string; date?: string | null }[]).map(
       (p) => `- ${p.title ?? "(untitled)"}${p.link ? ` (${p.link})` : ""}${p.date ? ` · ${p.date}` : ""}`,

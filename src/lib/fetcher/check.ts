@@ -1,14 +1,17 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { fetchPage, USER_AGENT } from "@/lib/discovery";
+import { isContentUrl } from "@/lib/content/stats";
 import {
   diffSets,
   hashOf,
+  htmlOutline,
   htmlToLines,
   parseFeed,
   parseSitemap,
   pickChildSitemaps,
   readerTextToLines,
+  updatedPages,
   type FeedItem,
 } from "./extract";
 import { isAllowed, parseRobots, type Robots } from "./robots";
@@ -34,7 +37,7 @@ const KEEP_SNAPSHOTS = 5;
 type Captured =
   | { kind: "lines"; method: "direct" | "reader"; lines: string[] }
   | { kind: "feed"; items: FeedItem[] }
-  | { kind: "sitemap"; urls: string[] };
+  | { kind: "sitemap"; urls: string[]; lastmod: Record<string, string> };
 
 // ---------- robots.txt, cached per run ----------
 
@@ -100,17 +103,24 @@ async function capture(source: SourceRow): Promise<Captured | CheckOutcome> {
     const parsed = parseSitemap(res.text);
     if (!parsed) return { sourceId: source.id, status: "error", message: "This address isn't a readable sitemap anymore." };
     const urls = [...parsed.urls];
+    const lastmod: Record<string, string> = { ...parsed.lastmod };
     for (const child of pickChildSitemaps(parsed.children)) {
       try {
         const sub = await fetchPage(child, { large: true });
         const inner = sub.ok ? parseSitemap(sub.text) : null;
-        if (inner) urls.push(...inner.urls);
+        if (inner) {
+          urls.push(...inner.urls);
+          Object.assign(lastmod, inner.lastmod);
+        }
       } catch {
         // one unreadable child sitemap shouldn't fail the whole check
       }
       if (urls.length >= MAX_SITEMAP_URLS) break;
     }
-    return { kind: "sitemap", urls: [...new Set(urls)].slice(0, MAX_SITEMAP_URLS) };
+    const kept = [...new Set(urls)].slice(0, MAX_SITEMAP_URLS);
+    const keptMods: Record<string, string> = {};
+    for (const u of kept) if (lastmod[u]) keptMods[u] = lastmod[u];
+    return { kind: "sitemap", urls: kept, lastmod: keptMods };
   }
 
   // Normal web pages: blog, changelog, pricing, other.
@@ -202,14 +212,37 @@ export async function checkSource(db: SupabaseClient, source: SourceRow): Promis
     }
   }
 
-  if (status !== "unchanged" || previous?.content_hash !== hash) {
+  // Sitemaps also say when each page last changed: rewritten blog posts and comparison pages.
+  let modLines: string[] | null = null;
+  if (captured.kind === "sitemap") {
+    modLines = Object.entries(captured.lastmod).map(([u, m]) => `${u}\t${m}`);
+    const prevMods: Record<string, string> = {};
+    for (const line of (previous?.lines as string[] | null) ?? []) {
+      const [u, m] = line.split("\t");
+      if (u && m) prevMods[u] = m;
+    }
+    try {
+      if (!previous || previous.method !== method || !Object.keys(prevMods).length) {
+        // first time Riposte sees this sitemap's dates: remember outlines, report nothing yet
+        await saveBaselineOutlines(db, source, captured.lastmod);
+      } else {
+        const rewritten = await recordRewrites(db, source, updatedPages(prevMods, captured.lastmod, isContentUrl));
+        if (rewritten) status = "changed";
+      }
+    } catch {
+      // page outlines are a bonus; the sitemap check itself succeeded
+    }
+  }
+  const modsChanged = modLines !== null && hashOf(modLines) !== hashOf(((previous?.lines as string[] | null) ?? []));
+
+  if (status !== "unchanged" || previous?.content_hash !== hash || modsChanged) {
     await db.from("snapshots").insert({
       user_id: source.user_id,
       source_id: source.id,
       fetched_at: now,
       method,
       content_hash: hash,
-      lines: captured.kind === "lines" ? captured.lines : null,
+      lines: captured.kind === "lines" ? captured.lines : modLines,
       items: captured.kind === "feed" ? captured.items : captured.kind === "sitemap" ? captured.urls : null,
       char_count: values.join(" ").length,
     });
@@ -259,4 +292,74 @@ export async function checkSources(
 
   await Promise.all(Array.from({ length: Math.min(concurrency, sources.length) }, worker));
   return results;
+}
+
+// ---------- rewritten pages (intent-change alerts) ----------
+
+async function outlineOf(url: string): Promise<string[] | null> {
+  const target = new URL(url);
+  const robots = await robotsFor(target.origin);
+  if (robots && !isAllowed(robots, target.pathname + target.search)) return null;
+  try {
+    const res = await fetchPage(url);
+    if (!res.ok || !res.contentType.includes("html")) return null;
+    const outline = htmlOutline(res.text);
+    return outline.length ? outline : null;
+  } catch {
+    return null;
+  }
+}
+
+// On the first sitemap read, remember the outline of the most recently changed content pages,
+// so a later rewrite of one of them can be shown as Before / Now.
+async function saveBaselineOutlines(db: SupabaseClient, source: SourceRow, lastmod: Record<string, string>) {
+  const recent = Object.entries(lastmod)
+    .filter(([u]) => isContentUrl(u))
+    .sort((a, b) => (b[1] > a[1] ? 1 : -1))
+    .slice(0, 10)
+    .map(([u]) => u);
+  for (const url of recent) {
+    const outline = await outlineOf(url);
+    if (outline) {
+      await db
+        .from("page_outlines")
+        .upsert({ user_id: source.user_id, competitor_id: source.competitor_id, url, outline }, { onConflict: "competitor_id,url" });
+    }
+  }
+}
+
+// For each page whose "last changed" date moved, compare its outline with the one saved before.
+async function recordRewrites(db: SupabaseClient, source: SourceRow, urls: string[]): Promise<number> {
+  let count = 0;
+  for (const url of urls) {
+    const outline = await outlineOf(url);
+    if (!outline) continue;
+    const { data: saved } = await db
+      .from("page_outlines")
+      .select("outline")
+      .eq("competitor_id", source.competitor_id)
+      .eq("url", url)
+      .maybeSingle();
+    const before = (saved?.outline as string[] | undefined) ?? null;
+    const diff = before ? diffSets(before, outline) : null;
+    if (!before || diff!.addedCount || diff!.removedCount) {
+      await db.from("changes").insert({
+        user_id: source.user_id,
+        competitor_id: source.competitor_id,
+        source_id: source.id,
+        kind: "rewrite",
+        page_url: url,
+        added: before ? diff!.added : outline,
+        removed: before ? diff!.removed : [],
+      });
+      count++;
+    }
+    await db
+      .from("page_outlines")
+      .upsert(
+        { user_id: source.user_id, competitor_id: source.competitor_id, url, outline, fetched_at: new Date().toISOString() },
+        { onConflict: "competitor_id,url" },
+      );
+  }
+  return count;
 }

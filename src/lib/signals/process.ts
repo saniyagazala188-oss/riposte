@@ -10,7 +10,8 @@ type PendingChange = {
   id: string;
   user_id: string;
   competitor_id: string;
-  kind: "content" | "new_posts" | "new_pages";
+  kind: "content" | "new_posts" | "new_pages" | "rewrite";
+  page_url: string | null;
   added: unknown[];
   removed: unknown[];
   ai_attempts: number;
@@ -30,7 +31,7 @@ export async function processChanges(
 
   let query = db
     .from("changes")
-    .select("id, user_id, competitor_id, kind, added, removed, ai_attempts, competitors(name, domain), sources(type, url)")
+    .select("id, user_id, competitor_id, kind, added, removed, page_url, ai_attempts, competitors(name, domain), sources(type, url)")
     .eq("processed", false)
     .order("detected_at", { ascending: true })
     .limit(limit);
@@ -61,8 +62,9 @@ export async function processChanges(
       removed: change.removed ?? [],
       competitorName: change.competitors?.name ?? "A competitor",
       competitorDomain: change.competitors?.domain ?? "",
-      pageType: change.sources ? SOURCE_LABELS[change.sources.type] : "Page",
-      pageUrl: change.sources?.url ?? "",
+      pageType: change.kind === "rewrite" ? "Rewritten page (found through the sitemap)" : change.sources ? SOURCE_LABELS[change.sources.type] : "Page",
+      pageUrl: change.page_url ?? change.sources?.url ?? "",
+      pageUrl2: change.page_url,
     });
 
     try {
