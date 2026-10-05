@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-05T23:05:00+05:30",
+    title: "Four product posts on the blog",
+    body: "A tour of every feature, plus deep dives on action kits, AI visibility and living comparison pages.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-05T22:50:00+05:30",
     title: "Content briefs and \"why are they winning\"",
     body: "One click turns a trend, or an AI answer where competitors are named and you aren't, into a ready-to-write brief: keyword, intent, angle, quick answer, outline and FAQs. AI visibility gaps now show the named competitors' recent moves.",
