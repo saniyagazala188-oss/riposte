@@ -14,8 +14,8 @@ Founded by Saniya Gazala with ❤️ · Built with Claude 🤝 Built in public. 
 | 4 | AI signals with before/after view, Slack and email alerts, weekly digest | Done (Slack and morning run to confirm) |
 | 5 | Action kit: what to create, where it goes, who owns it, with first drafts | Done |
 | 6 | Content intelligence, linked signals, intent-change and trend alerts | Done |
-| 7 | Prompt Studio (AEO prompts) | Planned |
-| 8 | AI visibility tracking | Planned |
+| 7 | Prompt Studio (AEO prompts) | Built, live test next |
+| 8 | AI visibility tracking | Built, live test next |
 | 9 | Living comparisons and launch | Planned |
 
 What broke and what was fixed at each phase is recorded in [docs/BUILD_LOG.md](docs/BUILD_LOG.md).

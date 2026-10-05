@@ -316,3 +316,58 @@ Phase 6 is split into three parts, built one at a time:
 - **No false alarms:** Crayon was rechecked 26 hours later. Five pages had unchanged dates, and none were reported.
 
 **Phase 6c status: done.**
+
+**Also added for the video:** a way to clear old test data so the feed looks clean on camera. **Clear history** on a competitor's page deletes that competitor's signals, action items and connected moves. **Start fresh** on the Alerts page deletes all of them, plus trends. Competitors, pages and snapshots are kept, so the next check compares against today and doesn't re-report old changes. Both ask for a second click before deleting.
+
+## Phase 7 · Prompt Studio (AEO prompts)
+
+**Goal:** turn SEO keywords into the buyer prompts people type into AI assistants. This follows Saniya's AEO rules: every prompt asks for a buying recommendation (never "how does X work" or "what's the difference"), no brand names, and prompts are grouped into **Shield topics** (broad category coverage) and **Spear topics** (niches to win, each one product + situation). Within each topic, prompts vary across persona, use case, constraint, comparison, authority and specificity.
+
+**Built:**
+- **Prompts** page: keywords plus optional "Areas to win". Each area becomes a Spear topic. It uses the product profile (category, buyers, what makes you different) and the topics competitors publish about as context.
+- **Rule checks after the AI writes** (the AI isn't trusted to follow the rules on its own). Riposte removes prompts that:
+  - name a brand: your product, any competitor's name or domain;
+  - read as informational ("what's the difference", "how does", "pros and cons", "what should I look for", "explain", "why…");
+  - are outside 10–40 words;
+  - repeat another prompt.
+  The result says how many were removed and why.
+- **Angle coverage chips** on each topic show which of the six angles it covers and which it misses.
+- **Track** up to 10 prompts for AI visibility (Phase 8). Tracked prompts and your own are kept when prompts are rewritten.
+- **Add your own prompt**, checked against the same rules with a plain explanation when it breaks one.
+- **Download CSV (Profound-ready):** `topic,prompt` with a `# --- SHIELD TOPIC: … ---` comment row before each topic, the format from the AEO rules.
+
+**Tested before deploying** (sample prompts):
+- "Is Crayon or Klue better for…" → removed (brand).
+- "What's the difference between…" and "How does competitor monitoring software work…" → removed (informational).
+- "Best CI tool?" → removed (too short).
+- A repeated prompt → removed.
+- Three buyer prompts kept, and the CSV matched the expected format.
+- Brand list for this account: riposte, crayon, klue, acme insights, acme, visualping. Common first words like "product" or "insights" are never treated as brands.
+
+**Setup:** migration `0011_phase7_8_prompts_visibility.sql` (covers phases 7 and 8).
+
+## Phase 8 · AI visibility
+
+**Goal:** see who AI search recommends for your buyer prompts, and why. This uses the official Gemini API with **Grounding with Google Search**; nothing is scraped. ChatGPT and Perplexity have no comparable free official option, so the engine is named on the page.
+
+**Built:**
+- **AI visibility** page:
+  - **Ask N prompts now / Run again now** sends each tracked prompt to Gemini with Google Search on, phrased exactly as a buyer would ask it.
+  - The daily job re-asks each prompt once a week.
+  - A prompt asked in the last 30 minutes is skipped, so a double click doesn't spend searches twice.
+- For each answer, Riposte records:
+  - which products it names and in what order: you, your competitors, and other brands it recommends that you don't track (found by a small second AI call);
+  - the **searches the AI ran** (query fan-out);
+  - the **sites it used** as sources.
+- **Share of AI answers:** how many answers name each product, its average position, and the change since the previous run. Untracked brands that AI keeps naming show up too, so they can be added as competitors.
+- **Sites AI relies on:** the most-cited domains, with competitor domains flagged. Getting listed on those sites is how you get named.
+- **Where competitors are named and you aren't:** the gap list, with who was named and the top sources, so each gap becomes a page to create or a site to get listed on.
+- **Every prompt:** the full answer, its searches and sources, plus Google's search-suggestions box, which Google's terms require next to grounded answers.
+
+**Cost check:** Google gives 5,000 free search queries a month for Grounding with Google Search on Gemini 3 Flash models (shared). 10 prompts a week at about 3–4 searches each is roughly 150 a month.
+
+**Tested before deploying** (sample answer):
+- Klue #1, Crayon #2 (also found by its domain), Kompyte and Visualping found as untracked brands.
+- G2 was named only as a source, so it isn't counted as a product.
+- Duplicate sources are merged.
+- Shares and average positions add up correctly.

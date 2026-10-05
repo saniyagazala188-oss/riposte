@@ -36,6 +36,8 @@ create table if not exists public.visibility_answers (
   you_mentioned boolean not null default false,
   you_position int
 );
+-- Google's search suggestions widget, which must be shown next to a search-grounded answer.
+alter table public.visibility_answers add column if not exists search_entry text;
 create index if not exists visibility_user_idx on public.visibility_answers (user_id, run_at desc);
 create index if not exists visibility_prompt_idx on public.visibility_answers (prompt_id, run_at desc);
 

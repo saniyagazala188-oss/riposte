@@ -4,12 +4,14 @@ import { checkSources, type SourceRow } from "@/lib/fetcher/check";
 import { processChanges } from "@/lib/signals/process";
 import { sendAlerts, sendDigests } from "@/lib/notify/alerts";
 import { findStories, findTrends } from "@/lib/insights/run";
+import { runVisibility } from "@/lib/visibility/run";
 
 // Runs every morning (see vercel.json):
 // 1. checks every page that is due (daily competitors after 12 hours, weekly after ~6.5 days),
 // 2. turns new changes into AI signals,
 // 3. sends alerts for high-impact signals,
-// 4. on Mondays, sends the weekly digest.
+// 4. joins related moves, refreshes trends on Mondays, asks tracked prompts in AI search weekly,
+// 5. on Mondays, sends the weekly digest.
 export const maxDuration = 300;
 export const dynamic = "force-dynamic";
 
@@ -82,10 +84,14 @@ export async function GET(request: Request) {
       }
     }
   }
+  // AI visibility: each tracked prompt is asked again once a week, with whatever time is left.
+  const visibility =
+    timeLeft() > 40000 ? await runVisibility(db, { freshHours: 156, budgetMs: Math.min(90000, timeLeft() - 30000), concurrency: 3 }) : null;
+
   const digest =
     monday || url.searchParams.get("digest") === "1"
       ? await sendDigests(db, { force: url.searchParams.get("digest") === "1" })
       : null;
 
-  return NextResponse.json({ due: due.length, checked: results.length, summary, signals, alerts, linked, trends: trendRuns, digest });
+  return NextResponse.json({ due: due.length, checked: results.length, summary, signals, alerts, linked, trends: trendRuns, visibility, digest });
 }

@@ -9,6 +9,7 @@ const links = [
   { href: "/app/competitors", label: "Competitors" },
   { href: "/app/content", label: "Content" },
   { href: "/app/prompts", label: "Prompts" },
+  { href: "/app/visibility", label: "AI visibility" },
   { href: "/app/product", label: "Your product" },
   { href: "/app/settings", label: "Alerts" },
 ];
