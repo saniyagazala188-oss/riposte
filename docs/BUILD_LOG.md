@@ -505,3 +505,12 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - **Problem:** "Asked 5 of 5", but every prompt still said "Not asked yet". The `search_entry` column was added to migration 0011 after it had been run, so every save failed, and the code didn't check the save error.
 - **Fix:** the save error is now checked and shown plainly. In Supabase: `alter table public.visibility_answers add column if not exists search_entry text; notify pgrst, 'reload schema';`
 - **First real run:** Crayon and Klue named in 4 of 5 answers, Visualping in 3, Riposte in 0. 4 gaps, each with "Why are they winning?".
+
+## "Why are they winning?" gives real reasons (5 Oct, 23:55 IST)
+
+- **Problem:** the panel only showed competitors' recent moves. Crayon and Klue were added recently, so it said "no changes caught, likely older content or reputation", which isn't something a marketer can act on. And the brief button failed live with "Google's AI is busy".
+- **Reasons from the answer:** when a prompt is asked, one AI call reads the answer and returns, for each product it names, what it's picked for (1 to 3 short phrases taken from the answer), whether our product profile claims the same (yes / partly / no), and one sentence on what to publish to compete. This replaced the brand-name call, so it costs no extra calls. Stored on each mention in `mentions` (jsonb), so no migration is needed.
+- **Older answers:** the panel shows "Show the reasons from this answer", which reads the saved answer once and saves the result. The question isn't asked again.
+- **Panel:** each competitor card shows "AI picks it for", the match line, "To compete", and recent moves only when there are some. The brief button appears after the reasons and uses them as evidence.
+- **Fewer live failures:** `generateJson` now retries on per-minute limits (429) as well as busy errors (503), switching between Flash and Flash-Lite with waits of 1, 4, 8 and 15 seconds, within the time budget.
+- **Demo tip:** open the panels and write the brief before recording, so everything is saved and opens instantly.

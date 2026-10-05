@@ -4,6 +4,7 @@ import { card } from "@/components/styles";
 import { timeAgo } from "@/lib/time";
 import {
   entitiesFor,
+  hasReasons,
   shareOfVoice,
   topCitations,
   type AnswerRow,
@@ -12,6 +13,7 @@ import {
 } from "@/lib/visibility/analyse";
 import { RunButton } from "./RunButton";
 import { AnswerToggle } from "./AnswerToggle";
+import { ExplainButton } from "./ExplainButton";
 import { BriefButton } from "@/components/BriefButton";
 import { PageHeader, Pager, pageNum, withParams } from "@/components/ui";
 import { ParamSelect, Reveal } from "@/components/ui-client";
@@ -434,6 +436,7 @@ export default async function VisibilityPage({
                       hideLabel="Hide why they're winning"
                     >
                       <WhyWinning
+                        answerId={a.id}
                         named={a.mentions
                           .filter((m) => m.key !== "you" && m.key !== "other")
                           .slice(0, 3)}
@@ -474,13 +477,22 @@ export default async function VisibilityPage({
   );
 }
 
-// For a gap: the named competitors' recent moves, the sites behind the answer, and a brief to close it.
+// For a gap: why the answer picked each competitor (read from the answer), whether your product
+// claims the same, what to do about it, their recent moves if any, and a brief to close the gap.
+const MATCH = {
+  yes: { label: "Your product says this too", tone: "text-accent" },
+  partly: { label: "Your product partly says this", tone: "text-signal" },
+  no: { label: "Your product doesn't say this", tone: "text-danger" },
+} as const;
+
 function WhyWinning({
+  answerId,
   named,
   movesOf,
   sources,
   promptId,
 }: {
+  answerId: string;
   named: Mention[];
   movesOf: Map<
     string,
@@ -489,60 +501,96 @@ function WhyWinning({
   sources: string[];
   promptId: string;
 }) {
+  const read = hasReasons(named);
   return (
-    <div className="mt-3 rounded-xl border border-line bg-bg p-3 text-sm">
+    <div className="mt-3 rounded-xl border border-line bg-bg p-4 text-sm">
       <p className="text-xs font-semibold uppercase tracking-wider text-muted">
         Why they&apos;re winning this answer
       </p>
-      <ul className="mt-1.5 flex flex-col gap-1.5">
-        {named.map((m) => {
-          const moves = movesOf.get(m.key) ?? [];
-          return (
-            <li key={m.key}>
-              <span className="font-semibold">
-                #{m.position} {m.name}
-              </span>
-              {moves.length ? (
-                <span className="text-muted">
-                  {" "}
-                  · {moves.length} {moves.length === 1 ? "move" : "moves"} in
-                  the last 30 days:{" "}
-                  {moves.slice(0, 2).map((mv, i) => (
-                    <span key={mv.id}>
-                      {i > 0 && "; "}
-                      <Link
-                        href={`/app?show=all&s=${mv.id}`}
-                        className="text-accent hover:underline"
-                      >
-                        {mv.title}
-                      </Link>{" "}
-                      ({timeAgo(mv.created_at)})
-                    </span>
-                  ))}
-                </span>
-              ) : (
-                <span className="text-muted">
-                  {" "}
-                  · no changes caught in the last 30 days, so this is likely
-                  older content or reputation
-                </span>
-              )}
-            </li>
-          );
-        })}
-      </ul>
+      {!read ? (
+        <div className="mt-2">
+          <p className="text-muted">
+            The answer names{" "}
+            {named.map((m) => m.name).join(", ")}. Read the reasons it gives for
+            each, and whether your product says the same.
+          </p>
+          <div className="mt-2.5">
+            <ExplainButton answerId={answerId} />
+          </div>
+        </div>
+      ) : (
+        <ul className="mt-2 flex flex-col gap-3">
+          {named.map((m) => {
+            const moves = movesOf.get(m.key) ?? [];
+            const match = m.you_match ? MATCH[m.you_match] : null;
+            return (
+              <li key={m.key} className="rounded-lg border border-line bg-surface p-3">
+                <p className="font-semibold">
+                  #{m.position} {m.name}
+                </p>
+                {m.known_for?.length ? (
+                  <>
+                    <p className="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs">
+                      <span className="text-muted">AI picks it for:</span>
+                      {m.known_for.map((k) => (
+                        <span key={k} className="rounded bg-signal-soft px-1.5 py-0.5 font-medium text-signal">
+                          {k}
+                        </span>
+                      ))}
+                    </p>
+                    {match && (
+                      <p className={`mt-1.5 text-xs font-semibold ${match.tone}`}>
+                        {match.label}
+                      </p>
+                    )}
+                    {m.gap && (
+                      <p className="mt-1 text-sm">
+                        <span className="font-semibold">To compete: </span>
+                        {m.gap}
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <p className="mt-1 text-sm text-muted">
+                    The answer lists it without giving a reason. The AI already
+                    knows this brand well, so the fix is the same: publish pages
+                    that answer this question and get listed where buyers compare
+                    tools.
+                  </p>
+                )}
+                {moves.length > 0 && (
+                  <p className="mt-1.5 text-xs text-muted">
+                    Recent moves:{" "}
+                    {moves.slice(0, 2).map((mv, i) => (
+                      <span key={mv.id}>
+                        {i > 0 && "; "}
+                        <Link href={`/app?show=all&s=${mv.id}`} className="text-accent hover:underline">
+                          {mv.title}
+                        </Link>{" "}
+                        ({timeAgo(mv.created_at)})
+                      </span>
+                    ))}
+                  </p>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
       {sources.length > 0 && (
-        <p className="mt-1.5 text-xs text-muted">
+        <p className="mt-2 text-xs text-muted">
           The answer leaned on: {sources.join(", ")}
         </p>
       )}
-      <div className="mt-2.5">
-        <BriefButton
-          source="visibility"
-          sourceId={promptId}
-          label="Write a content brief to win this answer"
-        />
-      </div>
+      {read && (
+        <div className="mt-3">
+          <BriefButton
+            source="visibility"
+            sourceId={promptId}
+            label="Write a content brief to win this answer"
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-05T23:55:00+05:30",
+    title: "\"Why are they winning?\" gives real reasons",
+    body: "It now reads the AI answer itself: what each competitor is picked for, whether your product says the same, and what to publish to compete. Recent moves show only when there are some. Briefs use these reasons, and AI calls wait and retry through busy minutes instead of failing.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-05T23:28:00+05:30",
     title: "AI visibility answers save again",
     body: "Answers were asked but not saved because of a missing database column, and the error was hidden. Save errors now show plainly, and the first real run is in: Crayon and Klue named in 4 of 5 answers, Riposte in none yet.",

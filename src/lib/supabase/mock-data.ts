@@ -241,9 +241,17 @@ export function mockTables(): Record<string, Row[]> {
       answer: "Here are strong options:\n\n1. **Klue** – best for enterprise enablement.\n2. **Crayon** – broad website tracking.\n3. **Kompyte** – affordable for small teams.\n4. **Visualping** – simple page change alerts.",
       queries: ["best competitive intelligence tool startup", "competitor monitoring software small team"],
       mentions: [
-        { key: "c2", name: "Klue", position: 1 },
-        { key: "c1", name: "Crayon", position: 2 },
-        { key: "c4", name: "Kompyte", position: 3 },
+        ...(i === 1
+          ? [
+              { key: "c2", name: "Klue", position: 1 },
+              { key: "c1", name: "Crayon", position: 2 },
+              { key: "c4", name: "Kompyte", position: 3 },
+            ]
+          : [
+              { key: "c2", name: "Klue", position: 1, known_for: ["enterprise sales enablement", "battlecards inside Salesforce"], you_match: "partly", gap: "Publish a page showing Riposte's action kits write battlecard updates and talk tracks automatically." },
+              { key: "c1", name: "Crayon", position: 2, known_for: ["broad website change tracking"], you_match: "yes", gap: "Make daily competitor tracking visible on your homepage and in a comparison page against Crayon." },
+              { key: "c4", name: "Kompyte", position: 3, known_for: [], you_match: "no", gap: "" },
+            ]),
         ...(i % 3 === 0 ? [{ key: "other", name: "Contently", position: 4 }] : []),
         ...(i === 4 ? [{ key: "you", name: "Riposte", position: 5 }] : []),
       ],

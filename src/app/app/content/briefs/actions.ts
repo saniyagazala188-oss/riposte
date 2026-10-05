@@ -30,13 +30,18 @@ export async function writeBrief(_prev: BriefState, formData: FormData): Promise
       supabase.from("visibility_answers").select("mentions, citations").eq("prompt_id", sourceId).order("run_at", { ascending: false }).limit(1).maybeSingle(),
     ]);
     if (p) {
-      const mentions = ((a?.mentions as { name: string; position: number }[]) ?? []).slice(0, 6);
+      const mentions = ((a?.mentions as { key: string; name: string; position: number; known_for?: string[]; gap?: string }[]) ?? []).slice(0, 6);
       const cites = ((a?.citations as { domain: string }[]) ?? []).slice(0, 6);
       input = {
         kind: "visibility",
         topic: p.text,
         evidence: [
-          ...mentions.map((m) => `AI recommended #${m.position}: ${m.name}`),
+          ...mentions.map(
+            (m) =>
+              `AI recommended #${m.position}: ${m.name}` +
+              (m.known_for?.length ? `, picked for: ${m.known_for.join("; ")}` : "") +
+              (m.gap ? `. What we'd need to show: ${m.gap}` : ""),
+          ),
           ...(cites.length ? [`Sites the answer relied on: ${cites.map((c) => c.domain).join(", ")}`] : []),
         ],
       };
@@ -54,12 +59,12 @@ export async function writeBrief(_prev: BriefState, formData: FormData): Promise
   try {
     brief = cleanBrief(
       await generateJson(buildBriefPrompt(profile ?? { product_name: null, product_pitch: null, ideal_customer: null }, input), BRIEF_SCHEMA, {
-        timeoutMs: 60000,
+        timeoutMs: 50000,
       }),
     );
   } catch (e) {
     if (e instanceof RateLimited || e instanceof Overloaded)
-      return { status: "error", message: "Google's AI is busy right now. Try again in a minute." };
+      return { status: "error", message: "Google's AI is at its limit for this minute. Wait a minute and click again." };
     return { status: "error", message: `Couldn't write the brief this time (${(e as Error).message.slice(0, 160)}).` };
   }
   if (!brief) return { status: "error", message: "The AI's answer wasn't usable. Please try again." };

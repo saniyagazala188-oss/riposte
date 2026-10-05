@@ -1,7 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { generateJson, geminiConfigured, groundedAnswer, Overloaded, RateLimited } from "@/lib/ai/gemini";
-import { BRAND_SCHEMA, buildBrandPrompt, citationDomains, cleanBrands, entitiesFor, findMentions } from "./analyse";
+import { attachReasons, buildReasonsPrompt, citationDomains, cleanReasons, entitiesFor, findMentions, REASONS_SCHEMA, type Profile, type Reason } from "./analyse";
 
 const HOUR = 60 * 60 * 1000;
 
@@ -30,7 +30,7 @@ export async function runVisibility(
 
   const users = [...new Set(due.map((p) => p.user_id as string))];
   const [{ data: profiles }, { data: comps }] = await Promise.all([
-    db.from("profiles").select("id, product_name").in("id", users),
+    db.from("profiles").select("id, product_name, product_pitch, ideal_customer, differentiators").in("id", users),
     db.from("competitors").select("id, user_id, name, domain").in("user_id", users),
   ]);
   const entitiesOf = new Map(
@@ -55,13 +55,18 @@ export async function runVisibility(
     try {
       const answer = await groundedAnswer(p.text, { timeoutMs: 45000, search });
       if (!answer.grounded) search = false;
-      let others: string[] = [];
+      // One call reads which products the answer names and the reasons it gives for each.
+      let reasons: Reason[] = [];
       try {
-        others = cleanBrands(await generateJson(buildBrandPrompt(answer.text), BRAND_SCHEMA, { timeoutMs: 20000 }));
+        const profile = (profiles?.find((x) => x.id === p.user_id) ?? null) as Profile | null;
+        reasons = cleanReasons(await generateJson(buildReasonsPrompt(answer.text, profile), REASONS_SCHEMA, { timeoutMs: 25000 }));
       } catch {
-        // known competitors are still found by name
+        // known competitors are still found by name; reasons can be added later from the saved answer
       }
-      const mentions = findMentions(answer.text, entitiesOf.get(p.user_id) ?? [], others);
+      const mentions = attachReasons(
+        findMentions(answer.text, entitiesOf.get(p.user_id) ?? [], reasons.map((r) => r.name)),
+        reasons,
+      );
       const you = mentions.find((m) => m.key === "you");
       const { error: saveError } = await db.from("visibility_answers").insert({
         user_id: p.user_id,

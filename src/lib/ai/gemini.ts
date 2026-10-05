@@ -46,15 +46,21 @@ export async function generateJson<T>(prompt: string, schema: object, { timeoutM
   if (!process.env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not set");
   const main = process.env.GEMINI_MODEL || "gemini-flash-latest";
   const fallback = process.env.GEMINI_FALLBACK_MODEL || "gemini-flash-lite-latest";
-  // Main model twice (with a short pause), then the lighter model once.
+  // Busy (503) or per-minute limit (429): retry with growing pauses, switching between the main
+  // and lighter model (each has its own limit). Free keys allow only a few calls a minute,
+  // so the later waits give the limit time to reset. Stops when the time budget runs out.
   const plan = [
     { model: main, wait: 0 },
-    { model: main, wait: 1500 },
     { model: fallback, wait: 1000 },
+    { model: main, wait: 4000 },
+    { model: fallback, wait: 8000 },
+    { model: main, wait: 15000 },
+    { model: fallback, wait: 15000 },
   ];
   const deadline = Date.now() + timeoutMs;
   let lastError: unknown;
   for (const step of plan) {
+    if (step.wait && Date.now() + step.wait + 3000 > deadline) break;
     if (step.wait) await sleep(step.wait);
     const left = deadline - Date.now();
     if (left < 3000) break;
@@ -62,7 +68,7 @@ export async function generateJson<T>(prompt: string, schema: object, { timeoutM
       return await callOnce<T>(step.model, prompt, schema, left);
     } catch (e) {
       lastError = e;
-      if (!(e instanceof Overloaded)) throw e; // only retry when Google is overloaded
+      if (!(e instanceof Overloaded) && !(e instanceof RateLimited)) throw e;
     }
   }
   throw lastError ?? new Overloaded("Gemini is overloaded");
