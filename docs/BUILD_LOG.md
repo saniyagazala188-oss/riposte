@@ -371,3 +371,31 @@ Phase 6 is split into three parts, built one at a time:
 - G2 was named only as a source, so it isn't counted as a product.
 - Duplicate sources are merged.
 - Shares and average positions add up correctly.
+
+## Phase 9 · Living comparisons and launch polish
+
+**Goal:** comparison pages ("You vs Competitor") are among the most-cited pages in AI answers, but they go stale as soon as a competitor changes pricing. Riposte writes a fair comparison from facts it already holds, and flags it the moment it's out of date.
+
+**Built:**
+- **Comparisons** page, with one tab per competitor, each marked *not written*, *✓ up to date* or *out of date*.
+- **Write the page** builds the draft from:
+  - your product profile;
+  - the competitor's latest pricing page snapshot and release notes;
+  - the changes Riposte detected;
+  - the topics they publish about;
+  - your Prompt Studio prompts, so the FAQ answers what buyers ask AI.
+
+  The draft has a title, meta description, intro with a "last updated" date, a criteria table (pricing first), "Choose us if" / "Choose them if", a verdict and an FAQ.
+- **Honesty rules:** prices and plan names are quoted exactly from their site. Anything about them that isn't in the evidence says "Not published". Anything about you that isn't in the profile becomes a [placeholder]. The page must say where the competitor is stronger. No superlatives.
+- **Out of date:** when the competitor gets a pricing, product or positioning signal after the page was written, Riposte shows an alert on the page and a banner on the Feed, listing what changed. **Update the page** rewrites it, and the table highlights the rows that changed since the previous version ("Updated").
+- **Copy as Markdown** for the CMS.
+- **Landing page:** the feature list now matches what was built: AI visibility runs on Gemini with Google Search (not ChatGPT/Perplexity), and Living comparisons and Prompt Studio are listed separately.
+
+**Tested before deploying** (sample data):
+- Rows with no criterion are dropped.
+- Changing Acme's Pro price from $49 to $59 marks only the Pricing row as updated.
+- In the Markdown export, a "|" inside a cell is escaped.
+
+**Demo flow:** write the Acme page while the demo shows $49. After the switch, Check now gives a pricing signal, and the page is flagged out of date. Update the page, and the Pricing row shows $59 with "Updated".
+
+**Setup:** migration `0012_phase9_comparisons.sql`.

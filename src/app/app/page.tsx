@@ -5,6 +5,7 @@ import { ChangeList, CHANGE_SELECT, type ChangeRow } from "@/components/ChangeLi
 import { SignalList, SIGNAL_SELECT, type SignalRow } from "@/components/SignalList";
 import { ExplainPendingButton } from "@/components/ActionButtons";
 import { StoryList, STORY_SELECT, type StoryRow } from "@/components/InsightLists";
+import { loadComparisons } from "@/lib/compare/stale";
 
 export const metadata = { title: "Feed · Riposte" };
 export const maxDuration = 90;
@@ -84,6 +85,7 @@ export default async function AppHome({ searchParams }: { searchParams: Promise<
     },
   ];
   const next = steps.find((s) => !s.done && s.href);
+  const { stale } = await loadComparisons(supabase);
 
   return (
     <div>
@@ -126,6 +128,21 @@ export default async function AppHome({ searchParams }: { searchParams: Promise<
           </li>
         ))}
       </ol>
+      )}
+
+      {stale.size > 0 && (
+        <Link
+          href={`/app/compare?c=${[...stale.keys()][0]}`}
+          className="mt-6 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-signal bg-signal-soft px-5 py-3 text-sm hover:brightness-95"
+        >
+          <span>
+            <span className="font-semibold">
+              {stale.size === 1 ? "A comparison page is" : `${stale.size} comparison pages are`} out of date.
+            </span>{" "}
+            A competitor changed pricing, product or positioning since it was written.
+          </span>
+          <span className="font-semibold">Update →</span>
+        </Link>
       )}
 
       {pending.length > 0 && (

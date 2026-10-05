@@ -25,11 +25,13 @@ const steps = [
 ];
 
 const features = [
-  ["Signal feed and alerts", "Real changes only, with a before/after view. High-impact moves go to Slack or email."],
-  ["Action kit", "A response plan for every signal: comparison page updates, sales talking points, campaigns."],
-  ["Content intelligence", "Competitors' publishing pace, topic clusters, intent changes and trending topics."],
-  ["Prompt Studio and AI visibility", "Commercial-intent AEO prompts, and which competitor pages ChatGPT and Perplexity cite."],
-  ["Leadership digest", "A weekly summary that writes itself, ready to share or export."],
+  ["Signal feed and alerts", "Real changes only, with a before/after view. High-impact moves go to email or Slack the morning they're found."],
+  ["Action kit", "A response plan for every signal: what to create, where it goes, who owns it, with first drafts ready to edit."],
+  ["Content intelligence", "Competitors' publishing pace, page mix and topics, rewritten pages that change search intent, and topics trending across competitors."],
+  ["Living comparisons", "Fair \"you vs them\" pages written from what's on their site, flagged out of date when they change pricing or product."],
+  ["Prompt Studio", "Buyer prompts for AI search from your keywords: commercial intent only, no brand names, ready to export."],
+  ["AI visibility", "Your prompts asked in Gemini with Google Search: who gets named, in what order, and which sites the answers rely on."],
+  ["Weekly digest", "A Monday email with the week's moves and the responses your team shipped."],
 ];
 
 function ExampleSignal() {

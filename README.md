@@ -16,7 +16,7 @@ Founded by Saniya Gazala with ❤️ · Built with Claude 🤝 Built in public. 
 | 6 | Content intelligence, linked signals, intent-change and trend alerts | Done |
 | 7 | Prompt Studio (AEO prompts) | Built, live test next |
 | 8 | AI visibility tracking | Built, live test next |
-| 9 | Living comparisons and launch | Planned |
+| 9 | Living comparisons and launch | Built, live test next |
 
 What broke and what was fixed at each phase is recorded in [docs/BUILD_LOG.md](docs/BUILD_LOG.md).
 
