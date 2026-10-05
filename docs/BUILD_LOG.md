@@ -308,3 +308,11 @@ Phase 6 is split into three parts, built one at a time:
 **Tested before deploying** (sample data): lastmod is read per page and image entries are ignored; outlines keep title, description and headings and drop "3 hours ago"; a single moved date is reported, while 100 pages moving at once is treated as regeneration and ignored; non-content pages (pricing) are skipped.
 
 **Setup:** migration `0010_phase6c_rewrites.sql`.
+
+**Tested live (5 Oct):**
+- Ran migration 0010, opened the Acme demo before and after its switch, then pressed **Check now**. Four changes came in at once; the explain budget ran out before the rewrite, so it waited under "changes waiting". **Explain them now** handled it.
+- **Signal:** "Acme Insights pivots blog post into a comparison list" · High impact · Content · **Page rewritten**. It says the article changed from an informational checklist into a commercial "best tools" comparison, so Acme is going after high-intent comparison searches. The Before / Now outline shows the old title, description and steps struck through, and the new title "The 10 best competitive intelligence tools in 2026, compared" with H2s for Acme, Crayon and Klue and "Pricing compared".
+- **What to do:** "Write a comparison post evaluating the top competitive intelligence tools with a focus on AI search tracking and automated response drafting." This uses Riposte's own differentiators.
+- **No false alarms:** Crayon was rechecked 26 hours later. Five pages had unchanged dates, and none were reported.
+
+**Phase 6c status: done.**
