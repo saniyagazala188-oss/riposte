@@ -21,6 +21,6 @@ export async function runVisibilityNow(): Promise<CheckState> {
   if (r.busy) parts.push("Google's AI stopped answering, so the rest will run next time.");
   else if (r.waiting) parts.push(`${r.waiting} didn't fit in time; press Run again to finish them.`);
   if (r.failed) parts.push(`${r.failed} failed.`);
-  if (r.reason && (r.busy || r.failed)) parts.push(`Google said: ${r.reason}`);
+  if (r.reason && (r.busy || r.failed)) parts.push(r.reason.startsWith("The answer couldn't be saved") ? r.reason : `Google said: ${r.reason}`);
   return { status: r.asked ? "done" : "error", message: parts.join(" ") };
 }
