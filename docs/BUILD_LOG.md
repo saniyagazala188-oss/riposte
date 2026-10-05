@@ -271,3 +271,8 @@ Phase 6 is split into three parts, built one at a time:
 - *Weak spot:* the story's next step ("Monitor Acme's pricing stability over the next month") is passive compared with the signal-level actions. To tighten in the story prompt: the step should be something the team creates or changes.
 - **Find trends (live):** "No shared topics yet across the 2 competitors publishing recently." That's an honest result: in the last 45 days Crayon wrote about its Insights API and competitive enablement, while Acme wrote about AI battlecards and Enterprise, with no real overlap, and the AI didn't invent one. Small fix: this "nothing found" message showed in red like an error; it now shows as a normal result.
 - **Visualping's sitemap now reads correctly:** 211 pages, 14 comparison pages (it showed "–" on 4 Oct before its sitemap had been checked).
+
+**Klue added as a third real competitor (5 Oct):**
+- **Bug: Klue's "Pricing page" was its homepage.** Klue has no public pricing page; when Riposte tried `klue.com/pricing`, the site redirected to the homepage, and Riposte accepted the homepage as "pricing". Fixed: an address that lands on the homepage is never accepted as a pricing, blog or changelog page.
+- **Weak pick: "Blog or guides" was `klue.com/news` (press releases)** while Klue's real content lives at `klue.com/articles`. Fixed: when several blog-like sections exist, Riposte now prefers blog > articles > resources > insights > guides > learn > news.
+- **No blog feed:** Klue doesn't publish an RSS feed, so its publishing pace can't be counted from dates. New Klue articles still show up through its sitemap (as new pages) from the next daily check, and they feed trend alerts over time.

@@ -80,6 +80,8 @@ export async function discoverSources(domain: string): Promise<DiscoveryResult> 
       if (!res.ok) return null;
       const finalUrl = new URL(res.url);
       if (!isSameSite(finalUrl, domain)) return null;
+      // Many sites send unknown addresses back to the homepage; that is not the page we asked for.
+      if (finalUrl.pathname.replace(/\/+$/, "") === "") return null;
       // A feed or sitemap must really be XML, not a "page not found" page.
       if (c.type === "feed" && !/<(rss|feed)\b/i.test(res.text.slice(0, 2000))) return null;
       if (c.type === "sitemap" && !/<(urlset|sitemapindex)\b/i.test(res.text.slice(0, 2000))) return null;

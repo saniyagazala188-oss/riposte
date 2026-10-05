@@ -75,8 +75,11 @@ export function parseHomepage(html: string, baseUrl: string, domain: string): Fo
     for (const { type, test } of PATTERNS) {
       const subdomainMatch = test.test(`/${hostPart}/`) && path.length <= 1;
       if (!test.test(path) && !subdomainMatch) continue;
-      // Prefer short, top-level pages: /blog over /blog/2026/some-post.
-      const score = path.split("/").filter(Boolean).length * 100 + path.length;
+      if (path.replace(/\/+$/, "") === "" && !subdomainMatch) continue; // the homepage itself is never the page
+      // Prefer short, top-level pages (/blog over /blog/2026/some-post), and for blogs prefer
+      // a real blog or articles section over a press/news page.
+      const blogRank = type === "blog" ? ["blog", "articles", "resources", "insights", "guides", "learn", "news"].findIndex((k) => path.includes(k)) : 0;
+      const score = path.split("/").filter(Boolean).length * 100 + Math.max(0, blogRank) * 20 + path.length;
       const current = best.get(type);
       if (!current || score < current.score) best.set(type, { url: clean(url), score });
     }
