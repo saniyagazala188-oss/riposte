@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { setActionStatus } from "@/app/app/actions";
 import { SubmitButton } from "@/components/FormButtons";
-import { CopyButton } from "@/components/KitButtons";
+import { DraftToggle } from "@/components/DraftToggle";
 import { KIND_LABELS, PRIORITY_LABELS, type Kind, type Priority } from "@/lib/actions/prompt";
 
 export type ActionItemRow = {
@@ -26,16 +26,19 @@ const PRIORITY_STYLE: Record<Priority, string> = {
 };
 
 // One action: what to create, who owns it, where it goes, and the first draft.
+// `compact` is the board version: the column already says the urgency.
 export function ActionItemCard({
   item,
   context,
+  compact = false,
 }: {
   item: ActionItemRow;
-  context?: { competitor: string; competitorId: string; signalTitle: string };
+  context?: { competitor: string; competitorId: string; signalTitle: string; signalId?: string };
+  compact?: boolean;
 }) {
   const done = item.status === "done";
   return (
-    <div className={`rounded-xl border border-line bg-surface p-4 ${done ? "opacity-60" : ""}`}>
+    <div className={`rounded-xl border border-line bg-surface ${compact ? "p-3" : "p-4"} ${done ? "opacity-70" : ""}`}>
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
         {context && (
           <Link
@@ -45,28 +48,45 @@ export function ActionItemCard({
             {context.competitor}
           </Link>
         )}
-        <span className={`rounded-full px-2 py-0.5 font-semibold ${PRIORITY_STYLE[item.priority]}`}>
-          {PRIORITY_LABELS[item.priority]}
-        </span>
+        {!compact && (
+          <span className={`rounded-full px-2 py-0.5 font-semibold ${PRIORITY_STYLE[item.priority]}`}>{PRIORITY_LABELS[item.priority]}</span>
+        )}
         <span className="font-semibold text-ink">{KIND_LABELS[item.kind]}</span>
-        <span className="text-muted">Owner: {item.owner}</span>
-        {item.channel && <span className="text-muted">Share in: {item.channel}</span>}
       </div>
-      <p className={`mt-2 font-semibold ${done ? "line-through" : ""}`}>{item.title}</p>
-      {context && <p className="mt-0.5 text-xs text-muted">Responds to: {context.signalTitle}</p>}
-      {item.why && <p className="mt-1 text-sm text-muted">{item.why}</p>}
-      <details className="mt-3">
-        <summary className="cursor-pointer select-none text-sm text-accent hover:underline">See the first draft</summary>
-        <pre className="mt-2 max-h-96 overflow-auto rounded-lg bg-bg p-3 font-sans text-sm whitespace-pre-wrap break-words">{item.draft}</pre>
-      </details>
-      <div className="mt-3 flex flex-wrap gap-2">
-        <CopyButton text={item.draft} />
+      <p className={`mt-1.5 font-semibold leading-snug ${compact ? "text-sm" : ""} ${done ? "line-through" : ""}`}>{item.title}</p>
+      <p className="mt-1 text-xs text-muted">
+        <span className="font-medium text-ink">{item.owner}</span>
+        {item.channel && ` · share in ${item.channel}`}
+      </p>
+      {context && (
+        <p className="mt-1 text-xs text-muted">
+          Responds to:{" "}
+          {context.signalId ? (
+            <Link href={`/app?show=all&s=${context.signalId}`} className="hover:text-ink hover:underline">
+              {context.signalTitle}
+            </Link>
+          ) : (
+            context.signalTitle
+          )}
+        </p>
+      )}
+      {item.why && !compact && <p className="mt-1.5 text-sm text-muted">{item.why}</p>}
+      <DraftToggle draft={item.draft} compact={compact}>
         <form action={setActionStatus}>
           <input type="hidden" name="action_id" value={item.id} />
           <input type="hidden" name="status" value={done ? "open" : "done"} />
-          <SubmitButton pendingLabel="Saving…">{done ? "Reopen" : "Mark done"}</SubmitButton>
+          <SubmitButton
+            pendingLabel="Saving…"
+            className={
+              done
+                ? undefined
+                : "inline-flex items-center justify-center rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-accent-ink hover:brightness-110 disabled:opacity-60"
+            }
+          >
+            {done ? "Reopen" : compact ? "Done ✓" : "Mark done ✓"}
+          </SubmitButton>
         </form>
-      </div>
+      </DraftToggle>
     </div>
   );
 }

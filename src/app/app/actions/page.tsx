@@ -1,141 +1,124 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
-import { card, eyebrow } from "@/components/styles";
 import { ActionItemCard, ACTION_FIELDS, type ActionItemRow } from "@/components/ActionItemCard";
-import { OWNERS, PRIORITIES, PRIORITY_LABELS } from "@/lib/actions/prompt";
-import { ActionFilters } from "./ActionFilters";
+import { OWNERS, PRIORITY_LABELS, type Priority } from "@/lib/actions/prompt";
+import { Empty, PageHeader } from "@/components/ui";
+import { ParamSelect } from "@/components/ui-client";
 
 export const metadata = { title: "Actions · Riposte" };
 
 type Row = ActionItemRow & {
+  signal_id: string;
   competitor_id: string;
+  done_at: string | null;
   competitors: { name: string } | null;
   signals: { title: string } | null;
 };
 
-type Params = { owner?: string; competitor?: string; group?: string; show?: string };
+type Params = { owner?: string; competitor?: string };
 
-// Every action across all signals. Filter by owner or competitor; group by urgency or competitor.
+const COLUMNS: { key: Priority | "done"; label: string; hint: string; tone: string }[] = [
+  { key: "now", label: PRIORITY_LABELS.now, hint: "Do these first", tone: "bg-signal" },
+  { key: "this_week", label: PRIORITY_LABELS.this_week, hint: "Plan into this week", tone: "bg-accent" },
+  { key: "later", label: PRIORITY_LABELS.later, hint: "When there's time", tone: "bg-muted" },
+  { key: "done", label: "Done", hint: "Most recent first", tone: "bg-accent" },
+];
+
+// Every action from every action kit, as a board: Today → This week → Later → Done.
 export default async function ActionsPage({ searchParams }: { searchParams: Promise<Params> }) {
   const params = await searchParams;
   const owner = OWNERS.find((o) => o === params.owner);
-  const showDone = params.show === "done";
-  const byCompetitor = params.group === "competitor";
   const { supabase } = await requireUser();
 
   const { data: competitorRows } = await supabase.from("competitors").select("id, name").order("name");
   const competitors = competitorRows ?? [];
   const competitor = competitors.find((c) => c.id === params.competitor);
 
-  let query = supabase
-    .from("action_items")
-    .select(`${ACTION_FIELDS}, competitor_id, competitors(name), signals(title)`)
-    .eq("status", showDone ? "done" : "open")
-    .order("created_at", { ascending: false })
-    .limit(300);
-  if (owner) query = query.eq("owner", owner);
-  if (competitor) query = query.eq("competitor_id", competitor.id);
-  const [{ data }, { count: doneCount }, { data: openRows }] = await Promise.all([
-    query,
-    supabase.from("action_items").select("id", { count: "exact", head: true }).eq("status", "done"),
-    supabase.from("action_items").select("competitor_id").eq("status", "open"),
-  ]);
-  const items = (data ?? []) as unknown as Row[];
-  const openTotal = (openRows ?? []).length;
-  const openPer = new Map<string, number>();
-  for (const r of openRows ?? []) openPer.set(r.competitor_id, (openPer.get(r.competitor_id) ?? 0) + 1);
-
-  // Builds a link that keeps the other filters.
-  const link = (change: Partial<Params>) => {
-    const next: Params = {
-      owner,
-      competitor: competitor?.id,
-      group: byCompetitor ? "competitor" : undefined,
-      show: showDone ? "done" : undefined,
-      ...change,
-    };
-    const p = new URLSearchParams();
-    for (const [k, v] of Object.entries(next)) if (v) p.set(k, v);
-    const q = p.toString();
-    return q ? `/app/actions?${q}` : "/app/actions";
+  const base = () => {
+    let q = supabase
+      .from("action_items")
+      .select(`${ACTION_FIELDS}, signal_id, done_at, competitor_id, competitors(name), signals(title)`)
+      .limit(300);
+    if (owner) q = q.eq("owner", owner);
+    if (competitor) q = q.eq("competitor_id", competitor.id);
+    return q;
   };
-  const ctx = (i: Row) => ({ competitor: i.competitors?.name ?? "", competitorId: i.competitor_id, signalTitle: i.signals?.title ?? "" });
-
-  const groups: { key: string; label: string; rows: Row[] }[] = showDone
-    ? [{ key: "done", label: "Done", rows: items }]
-    : byCompetitor
-      ? competitors
-          .map((c) => ({ key: c.id, label: c.name, rows: items.filter((i) => i.competitor_id === c.id) }))
-          .filter((g) => g.rows.length)
-      : PRIORITIES.map((p) => ({ key: p, label: PRIORITY_LABELS[p], rows: items.filter((i) => i.priority === p) })).filter(
-          (g) => g.rows.length,
-        );
+  const [{ data: openData }, { data: doneData }] = await Promise.all([
+    base().eq("status", "open").order("created_at", { ascending: false }),
+    base().eq("status", "done").order("done_at", { ascending: false }).limit(30),
+  ]);
+  const open = (openData ?? []) as unknown as Row[];
+  const done = (doneData ?? []) as unknown as Row[];
+  const ctx = (i: Row) => ({
+    competitor: i.competitors?.name ?? "",
+    competitorId: i.competitor_id,
+    signalTitle: i.signals?.title ?? "",
+    signalId: i.signal_id,
+  });
+  const rowsFor = (key: Priority | "done") => (key === "done" ? done : open.filter((i) => i.priority === key));
+  const filtered = Boolean(owner || competitor);
 
   return (
     <div>
-      <p className={eyebrow}>Actions</p>
-      <h1 className="mt-1 font-display text-3xl font-bold">What to do next</h1>
-      <p className="mt-2 text-muted">
-        Every action from every action kit. Copy the draft, share it where it says, and tick it off.
-      </p>
+      <PageHeader
+        kicker="Actions"
+        title="What to do next"
+        description="Every response from every action kit, sorted by urgency. Open the draft, copy it, share it where it says, and mark it done."
+      />
 
-      <nav className="mt-6 flex gap-6 border-b border-line" aria-label="Open or done">
-        {[
-          { label: "Open", count: openTotal, active: !showDone, href: link({ show: undefined }) },
-          { label: "Done", count: doneCount ?? 0, active: showDone, href: link({ show: "done", group: undefined }) },
-        ].map((t) => (
-          <Link
-            key={t.label}
-            href={t.href}
-            aria-current={t.active ? "page" : undefined}
-            className={`-mb-px border-b-2 pb-2 text-base font-semibold ${
-              t.active ? "border-accent text-ink" : "border-transparent text-muted hover:text-ink"
-            }`}
-          >
-            {t.label} <span className="ml-1 rounded-full bg-bg px-2 py-0.5 text-sm font-medium text-muted">{t.count}</span>
-          </Link>
-        ))}
-      </nav>
-
-      <div className="mt-5">
-        <ActionFilters
-          competitors={competitors.map((c) => ({
-            value: c.id,
-            label: openPer.get(c.id) ? `${c.name} (${openPer.get(c.id)} open)` : c.name,
-          }))}
-          owners={OWNERS.map((o) => ({ value: o, label: o }))}
-          showGroup={!showDone}
+      <div className="mt-5 flex flex-wrap items-center gap-2">
+        <ParamSelect
+          param="competitor"
+          label="Competitor"
+          options={[{ value: "", label: "All competitors" }, ...competitors.map((c) => ({ value: c.id, label: c.name }))]}
         />
+        <ParamSelect param="owner" label="Owner" options={[{ value: "", label: "Every owner" }, ...OWNERS.map((o) => ({ value: o, label: o }))]} />
+        {filtered && (
+          <Link href="/app/actions" className="px-2 text-sm text-accent hover:underline">
+            Clear filters
+          </Link>
+        )}
+        <p className="ml-auto text-sm text-muted">
+          <span className="font-semibold text-ink">{open.length} open</span> · {done.length} done
+        </p>
       </div>
 
-      {items.length === 0 ? (
-        <div className="mt-6 rounded-2xl border border-dashed border-line bg-surface p-8 text-center">
-          <p className="font-semibold">{showDone ? "Nothing done yet." : "No open actions."}</p>
-          <p className="mx-auto mt-1 max-w-md text-sm text-muted">
-            {owner || competitor
-              ? "Nothing matches these filters."
-              : (
-                  <>
-                    Open a signal in your <Link href="/app" className="text-accent hover:underline">feed</Link> and click
-                    &quot;Build action kit&quot;. Its actions appear here.
-                  </>
-                )}
-          </p>
+      {open.length === 0 && done.length === 0 ? (
+        <div className="mt-6">
+          <Empty title={filtered ? "Nothing matches these filters." : "No actions yet."}>
+            {!filtered && (
+              <>
+                Open a signal in your <Link href="/app" className="text-accent hover:underline">feed</Link>, go to its Action kit
+                tab and click &quot;Build action kit&quot;. Its actions appear here.
+              </>
+            )}
+          </Empty>
         </div>
       ) : (
-        groups.map((g) => (
-          <section key={g.key} className={`${card} mt-6`}>
-            <h2 className="border-b border-line px-5 py-4 font-display text-xl font-bold">
-              {g.label} ({g.rows.length})
-            </h2>
-            <div className="flex flex-col gap-3 p-4">
-              {g.rows.map((i) => (
-                <ActionItemCard key={i.id} item={i} context={ctx(i)} />
-              ))}
-            </div>
-          </section>
-        ))
+        <div className="mt-4 grid items-start gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {COLUMNS.map((col) => {
+            const rows = rowsFor(col.key);
+            return (
+              <section key={col.key} className="flex max-h-[78vh] flex-col rounded-2xl border border-line bg-bg">
+                <header className="flex items-center gap-2 border-b border-line px-3 py-2.5">
+                  <span className={`h-2 w-2 rounded-full ${col.tone}`} aria-hidden />
+                  <h2 className="font-display text-base font-bold">{col.label}</h2>
+                  <span className="rounded-full bg-surface px-2 py-0.5 text-xs font-semibold text-muted">{rows.length}</span>
+                  <span className="ml-auto hidden text-xs text-muted 2xl:inline">{col.hint}</span>
+                </header>
+                <div className="flex flex-col gap-2.5 overflow-y-auto p-2.5">
+                  {rows.length ? (
+                    rows.map((i) => <ActionItemCard key={i.id} item={i} context={ctx(i)} compact />)
+                  ) : (
+                    <p className="px-1 py-4 text-center text-sm text-muted">{col.key === "done" ? "Nothing done yet." : "Nothing here."}</p>
+                  )}
+                </div>
+              </section>
+            );
+          })}
+        </div>
       )}
     </div>
   );
 }
+

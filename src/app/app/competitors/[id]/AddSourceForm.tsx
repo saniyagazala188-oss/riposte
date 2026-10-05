@@ -18,7 +18,7 @@ export function AddSourceForm({ competitorId }: { competitorId: string }) {
   return (
     <form ref={formRef} action={action} className="flex flex-col gap-3">
       <input type="hidden" name="competitor_id" value={competitorId} />
-      <div className="grid gap-3 sm:grid-cols-[12rem_1fr_auto] sm:items-end">
+      <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-1.5">
           <label htmlFor="source-type" className="text-sm font-semibold">
             Type of page
@@ -37,7 +37,7 @@ export function AddSourceForm({ competitorId }: { competitorId: string }) {
           </label>
           <input id="source-url" name="url" required placeholder="https://acme.com/pricing" className={inputClass} />
         </div>
-        <button type="submit" disabled={pending} className={primaryButton}>
+        <button type="submit" disabled={pending} className={`${primaryButton} self-start`}>
           {pending ? "Adding…" : "Add page"}
         </button>
       </div>

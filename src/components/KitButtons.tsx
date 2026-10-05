@@ -27,7 +27,7 @@ export function BuildKitButton({ signalId, redo = false }: { signalId: string; r
 }
 
 // Copies a draft to the clipboard.
-export function CopyButton({ text }: { text: string }) {
+export function CopyButton({ text, label = "Copy draft" }: { text: string; label?: string }) {
   const [copied, setCopied] = useState(false);
   return (
     <button
@@ -43,7 +43,7 @@ export function CopyButton({ text }: { text: string }) {
         }
       }}
     >
-      {copied ? "Copied ✓" : "Copy draft"}
+      {copied ? "Copied ✓" : label}
     </button>
   );
 }

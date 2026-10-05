@@ -48,6 +48,8 @@ export function ContentPanel({
         <Stat label="Comparison pages" value={hasSitemap ? compare : "–"} hint={hasSitemap ? "vs, alternatives, compare" : sitemapNote ?? "No sitemap"} />
       </div>
 
+      <div className="grid items-start gap-5 lg:grid-cols-2">
+        <div className="flex min-w-0 flex-col gap-5">
       {hasFeed && pace.dated > 0 && (
         <div>
           <p className="text-sm font-semibold">Posts per month</p>
@@ -63,7 +65,6 @@ export function ContentPanel({
         </div>
       )}
 
-      <div className="grid gap-5 md:grid-cols-2">
         {hasFeed && pace.latest.length > 0 && (
           <div className="min-w-0">
             <p className="text-sm font-semibold">Latest posts</p>
@@ -79,21 +80,8 @@ export function ContentPanel({
             </ul>
           </div>
         )}
-        {hasSitemap && mix.groups.length > 0 && (
-          <div className="min-w-0">
-            <p className="text-sm font-semibold">What kind of pages they have</p>
-            <ul className="mt-2 flex flex-col divide-y divide-line text-sm">
-              {mix.groups.map((g) => (
-                <li key={g.key} className="flex items-baseline justify-between gap-3 py-1.5">
-                  <span>{g.label}</span>
-                  <span className="font-mono text-muted">{g.count}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
-
+        </div>
+        <div className="flex min-w-0 flex-col gap-5">
       <div className="rounded-xl border border-line p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
@@ -143,6 +131,21 @@ export function ContentPanel({
             Add their blog feed or sitemap on the competitor page so Riposte can see what they publish.
           </p>
         )}
+      </div>
+        {hasSitemap && mix.groups.length > 0 && (
+          <div className="min-w-0">
+            <p className="text-sm font-semibold">What kind of pages they have</p>
+            <ul className="mt-2 flex flex-col divide-y divide-line text-sm">
+              {mix.groups.map((g) => (
+                <li key={g.key} className="flex items-baseline justify-between gap-3 py-1.5">
+                  <span>{g.label}</span>
+                  <span className="font-mono text-muted">{g.count}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        </div>
       </div>
     </div>
   );

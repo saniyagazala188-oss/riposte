@@ -24,7 +24,7 @@ export function GenerateForm({ keywords, priorities, hasPrompts }: { keywords: s
           <span className="text-muted">One per line, from your SEO list or the words buyers use.</span>
           <textarea
             name="keywords"
-            rows={6}
+            rows={4}
             defaultValue={keywords}
             className={inputClass}
             placeholder={"competitive intelligence tool\ncompetitor monitoring software\nbattlecard software\ncompetitor price tracking"}
@@ -35,7 +35,7 @@ export function GenerateForm({ keywords, priorities, hasPrompts }: { keywords: s
           <span className="text-muted">Niches where you want AI to recommend you. Each becomes a Spear topic.</span>
           <textarea
             name="priorities"
-            rows={6}
+            rows={4}
             defaultValue={priorities}
             className={inputClass}
             placeholder={"Competitor alerts for content teams\nAuto-drafted responses to competitor launches"}
@@ -64,22 +64,24 @@ export function AddPromptForm({ topics }: { topics: string[] }) {
   }, [state]);
   return (
     <form ref={ref} action={action} className="flex flex-col gap-3">
-      <div className="flex flex-col gap-3 md:flex-row">
+      <div className="flex flex-col gap-3">
         <input
           name="text"
-          className={`${inputClass} md:flex-[3]`}
+          className={inputClass}
           placeholder="What's the best competitor tracking tool for a two-person content team?"
           aria-label="Your prompt"
         />
-        <input name="topic" list="prompt-topics" className={`${inputClass} md:flex-1`} placeholder="Topic" aria-label="Topic" />
+        <div className="flex gap-2">
+          <input name="topic" list="prompt-topics" className={`${inputClass} flex-1`} placeholder="Topic (pick or type)" aria-label="Topic" />
         <datalist id="prompt-topics">
           {topics.map((t) => (
             <option key={t} value={t} />
           ))}
         </datalist>
-        <button type="submit" disabled={pending} className={secondaryButton}>
-          {pending ? "Checking…" : "Add"}
-        </button>
+          <button type="submit" disabled={pending} className={secondaryButton}>
+            {pending ? "Checking…" : "Add"}
+          </button>
+        </div>
       </div>
       <Message state={state} pending={pending} />
     </form>

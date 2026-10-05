@@ -57,10 +57,12 @@ export function StoryList({
   stories,
   signalTitles,
   showCompetitor = false,
+  signalHref = (id: string) => `/app?show=all&s=${id}`,
 }: {
   stories: StoryRow[];
   signalTitles: Map<string, string>;
   showCompetitor?: boolean;
+  signalHref?: (id: string) => string;
 }) {
   return (
     <ul className="divide-y divide-line">
@@ -92,9 +94,9 @@ export function StoryList({
           <ul className="mt-1 flex flex-col gap-1 text-sm">
             {s.signal_ids.map((id) => (
               <li key={id}>
-                <a href={`#signal-${id}`} className="text-accent hover:underline">
+                <Link href={signalHref(id)} className="text-accent hover:underline">
                   {signalTitles.get(id) ?? "A signal"}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
@@ -131,7 +133,7 @@ export function TrendList({ trends }: { trends: TrendRow[] }) {
           <div className="mt-3 grid gap-3 md:grid-cols-2">
             {t.competitors.map((c) => (
               <div key={c.id} className="min-w-0 text-sm">
-                <Link href={`/app/competitors/${c.id}#content`} className="font-semibold hover:underline">
+                <Link href={`/app/competitors/${c.id}?tab=content`} className="font-semibold hover:underline">
                   {c.name}
                 </Link>
                 <ul className="mt-1 flex flex-col gap-0.5 text-muted">

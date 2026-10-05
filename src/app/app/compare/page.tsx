@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
-import { card, eyebrow } from "@/components/styles";
+import { card } from "@/components/styles";
+import { PageHeader, withParams } from "@/components/ui";
+import { SearchBox } from "@/components/ui-client";
 import { timeAgo } from "@/lib/time";
 import { loadComparisons } from "@/lib/compare/stale";
 import { changedRows, comparisonMarkdown } from "@/lib/compare/prompt";
@@ -11,7 +13,7 @@ export const maxDuration = 90;
 
 const clean = (n: string) => n.replace(/\(.*?\)/g, "").trim();
 
-export default async function ComparePage({ searchParams }: { searchParams: Promise<{ c?: string }> }) {
+export default async function ComparePage({ searchParams }: { searchParams: Promise<{ c?: string; q?: string; f?: string }> }) {
   const { supabase, user } = await requireUser();
   const [{ data: comps }, { data: profile }] = await Promise.all([
     supabase.from("competitors").select("id, name").order("name"),
@@ -19,7 +21,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
   ]);
   const list = comps ?? [];
   const { pages, stale } = await loadComparisons(supabase);
-  const { c } = await searchParams;
+  const { c, q: query, f: filter } = await searchParams;
   const selected = list.find((x) => x.id === c) ?? list.find((x) => pages.has(x.id)) ?? list[0];
   const page = selected ? pages.get(selected.id) : undefined;
   const changes = selected ? stale.get(selected.id) ?? [] : [];
@@ -27,43 +29,87 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
   const them = selected ? clean(selected.name) : "";
   const updated = page ? changedRows(page.content, page.previous_content) : new Set<string>();
 
+  const q = (query ?? "").trim().toLowerCase();
+  const shown = list
+    .filter((x) => !q || x.name.toLowerCase().includes(q))
+    .filter((x) => !filter || (filter === "stale" ? stale.has(x.id) : filter === "written" ? pages.has(x.id) && !stale.has(x.id) : !pages.has(x.id)));
+  const counts = {
+    stale: list.filter((x) => stale.has(x.id)).length,
+    written: list.filter((x) => pages.has(x.id) && !stale.has(x.id)).length,
+    none: list.filter((x) => !pages.has(x.id)).length,
+  };
+
   return (
     <div>
-      <p className={eyebrow}>Living comparisons</p>
-      <h1 className="mt-1 font-display text-3xl font-bold">Comparison pages that stay true</h1>
-      <p className="mt-2 max-w-2xl text-muted">
-        A fair &quot;{you} vs competitor&quot; page, written from your profile and what Riposte reads on their site. When
-        they change pricing, product or positioning, the page is flagged out of date and updates in one click.
-      </p>
+      <PageHeader
+        kicker="Living comparisons"
+        title="Comparison pages that stay true"
+        description={`A fair "${you} vs competitor" page, written from your profile and what Riposte reads on their site. When they change pricing, product or positioning, the page is flagged out of date and updates in one click.`}
+      />
 
       {!list.length ? (
         <p className="mt-6 text-muted">
           Add a competitor first on the <Link href="/app/competitors" className="text-accent hover:underline">Competitors</Link> page.
         </p>
       ) : (
-        <>
-          <nav className="mt-6 flex flex-wrap gap-2" aria-label="Competitors">
-            {list.map((x) => {
-              const active = x.id === selected?.id;
-              const status = !pages.has(x.id) ? "not written" : stale.has(x.id) ? "out of date" : "up to date";
-              return (
-                <Link
-                  key={x.id}
-                  href={`/app/compare?c=${x.id}`}
-                  aria-current={active ? "page" : undefined}
-                  className={`rounded-xl border px-3 py-2 text-sm ${active ? "border-accent bg-accent-soft" : "border-line bg-surface hover:border-muted"}`}
-                >
-                  <span className="font-semibold">vs {clean(x.name)}</span>
-                  <span className={`ml-2 text-xs ${status === "out of date" ? "font-semibold text-signal" : status === "up to date" ? "text-accent" : "text-muted"}`}>
-                    {status === "up to date" ? "✓ up to date" : status}
-                  </span>
-                </Link>
-              );
-            })}
-          </nav>
+        <div className="mt-5 grid items-start gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
+          <aside className={`${card} overflow-hidden lg:sticky lg:top-6`}>
+            <div className="flex flex-col gap-2 border-b border-line p-3">
+              <SearchBox placeholder="Find a competitor" />
+              <div className="flex flex-wrap gap-1 text-xs">
+                {[
+                  { key: "", label: `All ${list.length}` },
+                  { key: "stale", label: `Out of date ${counts.stale}` },
+                  { key: "written", label: `Up to date ${counts.written}` },
+                  { key: "none", label: `Not written ${counts.none}` },
+                ].map((f) => (
+                  <Link
+                    key={f.key}
+                    href={withParams("/app/compare", { c: selected?.id, q: query, f: f.key || undefined })}
+                    scroll={false}
+                    className={`rounded-full border px-2 py-1 font-medium ${
+                      (filter ?? "") === f.key ? "border-accent bg-accent-soft text-ink" : "border-line text-muted hover:text-ink"
+                    }`}
+                  >
+                    {f.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+            <ul className="max-h-[60vh] divide-y divide-line overflow-y-auto">
+              {shown.map((x) => {
+                const active = x.id === selected?.id;
+                const status = !pages.has(x.id) ? "not written" : stale.has(x.id) ? "out of date" : "up to date";
+                return (
+                  <li key={x.id}>
+                    <Link
+                      href={withParams("/app/compare", { c: x.id, q: query, f: filter })}
+                      scroll={false}
+                      aria-current={active ? "page" : undefined}
+                      className={`flex items-center justify-between gap-2 border-l-4 px-3 py-2.5 text-sm ${
+                        active ? "border-accent bg-accent-soft" : "border-transparent hover:bg-bg"
+                      }`}
+                    >
+                      <span className="min-w-0 truncate font-semibold">vs {clean(x.name)}</span>
+                      <span
+                        className={`shrink-0 text-xs ${
+                          status === "out of date" ? "font-semibold text-signal" : status === "up to date" ? "text-accent" : "text-muted"
+                        }`}
+                      >
+                        {status === "up to date" ? "✓ up to date" : status}
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+              {!shown.length && <li className="px-3 py-4 text-sm text-muted">No competitor matches.</li>}
+            </ul>
+          </aside>
+
+          <div className="min-w-0">
 
           {selected && !page && (
-            <section className={`${card} mt-5 p-6`}>
+            <section className={`${card} p-6`}>
               <h2 className="font-display text-xl font-bold">
                 {you} vs {them}
               </h2>
@@ -78,14 +124,14 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
           {selected && page && (
             <>
               {changes.length > 0 && (
-                <section className="mt-5 rounded-2xl border border-signal bg-signal-soft p-5">
+                <section className="rounded-2xl border border-signal bg-signal-soft p-5">
                   <h2 className="font-semibold">
                     Out of date: {them} changed {changes.length === 1 ? "something" : `${changes.length} things`} since this page was written
                   </h2>
                   <ul className="mb-4 mt-2 list-disc pl-5 text-sm">
                     {changes.slice(0, 5).map((s) => (
                       <li key={s.id}>
-                        <Link href={`/app#signal-${s.id}`} className="hover:underline">
+                        <Link href={`/app?show=all&s=${s.id}`} className="hover:underline">
                           {s.title}
                         </Link>{" "}
                         <span className="text-muted">· {timeAgo(s.created_at)}</span>
@@ -96,7 +142,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
                 </section>
               )}
 
-              <article className={`${card} mt-5`}>
+              <article className={`${card} ${changes.length ? "mt-4" : ""}`}>
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3 text-sm">
                   <span className="text-muted">
                     Written {timeAgo(page.generated_at)}
@@ -173,7 +219,8 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
               </article>
             </>
           )}
-        </>
+          </div>
+        </div>
       )}
     </div>
   );

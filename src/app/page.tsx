@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { WaitlistForm } from "@/components/WaitlistForm";
+import { createClient } from "@/lib/supabase/server";
 
 const problems = [
   {
@@ -60,13 +61,18 @@ function ExampleSignal() {
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const signedIn = supabase ? Boolean((await supabase.auth.getUser()).data.user) : false;
   return (
     <div className="min-h-dvh">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
         <Logo />
-        <Link href="/login" className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium hover:border-muted">
-          Log in
+        <Link
+          href={signedIn ? "/app" : "/login"}
+          className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium hover:border-muted"
+        >
+          {signedIn ? "Open dashboard →" : "Log in"}
         </Link>
       </header>
 

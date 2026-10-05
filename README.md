@@ -59,3 +59,7 @@ supabase/migrations/          Database setup, one file per phase
 supabase/templates/           Branded login email for Supabase
 docs/BUILD_LOG.md             What broke and what was fixed, phase by phase
 ```
+
+## Preview the app without a database
+
+For design work: `RIPOSTE_MOCK=1 NEXT_PUBLIC_SUPABASE_URL=https://x.supabase.co NEXT_PUBLIC_SUPABASE_ANON_KEY=x npm run dev` serves every page with sample data (development only; never used on the live site).

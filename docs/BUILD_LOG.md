@@ -407,3 +407,49 @@ Phase 6 is split into three parts, built one at a time:
 - **Fix:** when search quota is missing, Riposte asks the same prompt without web search and labels it clearly ("no web search" on each answer, and a note explaining why at the top). These answers still show which products the model already recommends, but they have no sources or searches.
 - **Lasting fix:** turn on billing for the Gemini key in Google AI Studio. Grounding includes 5,000 free searches a month, and Riposte's weekly run of 10 prompts uses about 150. Set a budget alert at the same time.
 - **Third run, with a new free key (5 Oct, 17:21): "gemini-flash-latest: overloaded (503)".** Search quota was missing again, so Riposte switched to the no-search answer, but it tried only the main model once, and Google was overloaded right then. Fixed: the no-search answer now also retries and falls back to Flash-Lite. Once one prompt shows the key has no search quota, the rest of the run skips search straight away, so the run is faster and uses fewer requests. Prompts are now asked 2 at a time instead of 3, to put less pressure on Google.
+
+## UI redesign (5 Oct, from Saniya's review)
+
+**Feedback:**
+- The header was cluttered and wrapped onto two lines.
+- Every page was one long scroll.
+- Signals, connected moves and waiting changes were mixed together.
+- "See exactly what changed" was a tiny link that's easy to miss.
+- The competitor, comparison and prompt lists wouldn't hold up at 50–100 items.
+- Alerts needed a two-column layout.
+- Every login needed an email link, even right after logging out.
+
+**What changed:**
+- **Sidebar navigation**, grouped into Monitor (Feed, Actions, Competitors), Content (Content intel, Comparisons), AI search (Prompt Studio, AI visibility) and Settings. The Feed and Actions entries show how many items are waiting. On a phone, a Menu button opens the same list.
+- **Feed**, three tabs:
+  - **Signals:** a compact list on the left and the selected signal on the right, with its own tabs: *Why it matters · What changed · Action kit*. "What changed" is now a full tab with "Open their page ↗". You can filter by competitor, and the list shows 20 per page. The feed went from about 7,600px tall to one screen.
+  - **Connected moves** and **Waiting to be explained** are separate tabs.
+- **Action drafts:** "Show draft" is now a real button next to Copy and Mark done, everywhere.
+- **Actions** is a board with **Today → This week → Later → Done** columns. Each column scrolls on its own, and you can filter by competitor and owner.
+- **Competitors** is a table with search, "N new" to review, pages watched, unreadable pages, last checked and frequency, 10 per page.
+- **Competitor page** uses tabs: Signals (the same list + detail view) · Connected moves · Pages watched (with "Add a page" alongside) · Their content · Settings (frequency, clear history, remove).
+- **Content intel:**
+  - An **"At a glance" table on top**: posts in 30 and 90 days, last post, pages, comparison pages, AI answer pages and top topic for every competitor, 10 per page.
+  - **Trends** and **Recently published** (the newest posts across all competitors) sit side by side underneath.
+  - The per-competitor report uses two columns.
+- **Comparisons:** a searchable competitor list on the left, filterable by out of date, up to date or not written, with the page on the right. It works for 50+ competitors.
+- **Prompt Studio:**
+  - "Write prompts" and "Add your own prompt" are both at the top, with a counter for prompts, topics and how many are tracked.
+  - **Shield** and **Spear** topics sit side by side. Each topic shows its first 4 prompts, with "Show all".
+  - Search, and a "Tracked" filter.
+  - The tracked limit went from 10 to 30.
+- **AI visibility:**
+  - Share of answers lists only products that were named; the rest are summed up in one line.
+  - The prompt list has filters (All · Competitors named, not you · You're named · Not asked yet), a topic dropdown and 10 per page.
+  - "Read the answer" is a button.
+- **Your product:** the form sits next to a completeness bar and "Where Riposte uses this".
+- **Alerts & account:** two columns. Alerts on the left; Try it, Account and Start fresh on the right.
+- **Login:**
+  - Log in with **email + password**.
+  - **Sign up** asks for one confirmation email, then works with the password.
+  - **"Email me a link"** is still there for a forgotten password.
+  - Signed-in visitors skip the login page and go straight to the dashboard, and the landing page shows "Open dashboard →".
+  - Existing accounts set a password under **Alerts & account → Account**.
+  - "Continue with Google" is built in and switches on with `NEXT_PUBLIC_GOOGLE_LOGIN=on`, once Google is enabled in Supabase.
+
+**How it was checked:** a local preview with sample data (24 competitors, 12 signals, 19 actions, 60 prompts; `RIPOSTE_MOCK=1`, development only) was screenshotted page by page on desktop and phone sizes.

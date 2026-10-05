@@ -5,7 +5,7 @@
 import type { Profile } from "@/lib/signals/prompt";
 
 // How many prompts can be checked in AI search (keeps within the free Gemini quota).
-export const MAX_TRACKED = 10;
+export const MAX_TRACKED = 30;
 
 export const DIMENSIONS = ["persona", "use_case", "constraint", "comparison", "authority", "specificity"] as const;
 export type Dimension = (typeof DIMENSIONS)[number];

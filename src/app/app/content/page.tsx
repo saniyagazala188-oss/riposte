@@ -1,18 +1,22 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
-import { card, eyebrow } from "@/components/styles";
+import { card } from "@/components/styles";
 import { loadContent } from "@/lib/content/load";
 import { pageMix, paceFromFeed } from "@/lib/content/stats";
 import type { Topic } from "@/lib/content/topics";
 import { timeAgo } from "@/lib/time";
 import { TrendList, TREND_SELECT, type TrendRow } from "@/components/InsightLists";
 import { FindTrendsButton } from "@/components/InsightButtons";
+import { Empty, PageHeader, Pager, PanelHead, pageNum, withParams } from "@/components/ui";
 
 export const metadata = { title: "Content · Riposte" };
 export const maxDuration = 60;
 
-// Side-by-side view of what every competitor publishes.
-export default async function ContentPage() {
+const PER_PAGE = 10;
+
+// What every competitor publishes: a stats table first, then trends and the latest posts side by side.
+export default async function ContentPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+  const params = await searchParams;
   const { supabase } = await requireUser();
   const [{ data: competitors }, { data: topicRows }, { data: trendRows }] = await Promise.all([
     supabase.from("competitors").select("id, name, domain").order("name"),
@@ -32,100 +36,132 @@ export default async function ContentPage() {
       const data = content.get(c.id)!;
       const pace = paceFromFeed(data.feed);
       const mix = pageMix(data.urls);
-      return {
-        ...c,
-        data,
-        pace,
-        mix,
-        compare: mix.groups.find((g) => g.key === "compare")?.count ?? 0,
-        topics: (topicsOf.get(c.id) ?? []).slice(0, 3),
-      };
+      const count = (k: string) => mix.groups.find((g) => g.key === k)?.count ?? 0;
+      return { ...c, data, pace, mix, compare: count("compare"), answers: count("answers"), topic: topicsOf.get(c.id)?.[0]?.name };
     })
     .sort((a, b) => b.pace.last90 - a.pace.last90 || b.mix.total - a.mix.total);
 
+  const pages = Math.max(1, Math.ceil(rows.length / PER_PAGE));
+  const page = Math.min(pageNum(params.page), pages);
+  const shown = rows.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
+  // Newest posts across every competitor.
+  const latest = rows
+    .flatMap((r) => r.pace.latest.map((p) => ({ ...p, competitor: r.name, competitorId: r.id })))
+    .sort((a, b) => (a.date < b.date ? 1 : -1))
+    .slice(0, 25);
+
+  const dash = <span className="text-muted">–</span>;
+
   return (
     <div>
-      <p className={eyebrow}>Content intelligence</p>
-      <h1 className="mt-1 font-display text-3xl font-bold">What your competitors publish</h1>
-      <p className="mt-2 max-w-2xl text-muted">
-        How often each competitor publishes, what kind of pages they have, and which topics they keep writing about.
-        Worked out from the blog feeds and sitemaps Riposte reads every morning.
-      </p>
-
-      <section className={`${card} mt-6`}>
-        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-line px-5 py-4">
-          <div className="min-w-0">
-            <h2 className="font-display text-xl font-bold">Trending across competitors</h2>
-            <p className="mt-0.5 max-w-xl text-sm text-muted">
-              Topics that two or more competitors published about in the last 45 days. Refreshed every Monday, or now.
-            </p>
-          </div>
-          <FindTrendsButton />
-        </div>
-        {trends.length ? (
-          <TrendList trends={trends} />
-        ) : (
-          <p className="px-5 py-6 text-sm text-muted">No trends yet. Click “Find trends” to compare what your competitors publish.</p>
-        )}
-      </section>
+      <PageHeader
+        kicker="Content intelligence"
+        title="What your competitors publish"
+        description="Publishing pace, page types and topics for every competitor, from the blog feeds and sitemaps Riposte reads every morning."
+      />
 
       {rows.length === 0 ? (
-        <div className="mt-6 rounded-2xl border border-dashed border-line bg-surface p-8 text-center">
-          <p className="font-semibold">No competitors yet.</p>
-          <p className="mt-1 text-sm text-muted">
-            <Link href="/app/competitors" className="text-accent hover:underline">Add a competitor</Link> to see what they publish.
-          </p>
+        <div className="mt-6">
+          <Empty title="No competitors yet.">
+            <Link href="/app/competitors" className="text-accent hover:underline">
+              Add a competitor
+            </Link>{" "}
+            to see what they publish.
+          </Empty>
         </div>
       ) : (
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
-          {rows.map((r) => (
-            <section key={r.id} className={`${card} flex flex-col p-5`}>
-              <div className="flex items-baseline justify-between gap-3">
-                <h2 className="font-display text-xl font-bold">{r.name}</h2>
-                <span className="font-mono text-xs text-muted">{r.domain}</span>
+        <>
+          <section className={`${card} mt-5 overflow-hidden`}>
+            <PanelHead title="At a glance" description="Most active publishers first. Click a competitor for its full content report." />
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[760px] text-sm">
+                <thead>
+                  <tr className="border-b border-line text-left text-xs uppercase tracking-wider text-muted">
+                    <th className="px-4 py-2.5 font-semibold">Competitor</th>
+                    <th className="px-3 py-2.5 text-right font-semibold">Posts · 30d</th>
+                    <th className="px-3 py-2.5 text-right font-semibold">Posts · 90d</th>
+                    <th className="px-3 py-2.5 font-semibold">Last post</th>
+                    <th className="px-3 py-2.5 text-right font-semibold">Pages</th>
+                    <th className="px-3 py-2.5 text-right font-semibold">Comparison</th>
+                    <th className="px-3 py-2.5 text-right font-semibold">AI answer</th>
+                    <th className="px-4 py-2.5 font-semibold">Top topic</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-line">
+                  {shown.map((r) => (
+                    <tr key={r.id} className="hover:bg-bg">
+                      <td className="px-4 py-2.5">
+                        <Link href={`/app/competitors/${r.id}?tab=content`} className="font-semibold hover:underline">
+                          {r.name}
+                        </Link>
+                      </td>
+                      <td className="px-3 py-2.5 text-right font-mono">{r.data.hasFeed ? r.pace.last30 : dash}</td>
+                      <td className="px-3 py-2.5 text-right font-mono">{r.data.hasFeed ? r.pace.last90 : dash}</td>
+                      <td className="px-3 py-2.5 text-muted">
+                        {r.pace.newest ? timeAgo(r.pace.newest) : <span title={r.data.feedNote ?? "No blog feed"}>{r.data.feedNote ?? "No feed"}</span>}
+                      </td>
+                      <td className="px-3 py-2.5 text-right font-mono">{r.data.hasSitemap ? r.mix.total : dash}</td>
+                      <td className="px-3 py-2.5 text-right font-mono">{r.data.hasSitemap ? r.compare : dash}</td>
+                      <td className="px-3 py-2.5 text-right font-mono">{r.data.hasSitemap ? r.answers : dash}</td>
+                      <td className="px-4 py-2.5">
+                        {r.topic ? (
+                          <span className="rounded-full bg-accent-soft px-2 py-0.5 text-xs">{r.topic}</span>
+                        ) : (
+                          <Link href={`/app/competitors/${r.id}?tab=content`} className="text-xs text-muted hover:text-ink">
+                            Not analysed
+                          </Link>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {rows.length > PER_PAGE && (
+              <div className="border-t border-line px-4 py-3">
+                <Pager page={page} perPage={PER_PAGE} total={rows.length} href={(n) => withParams("/app/content", { page: n > 1 ? n : undefined })} />
               </div>
-              <dl className="mt-4 grid grid-cols-3 gap-2 text-center">
-                <div className="rounded-lg bg-bg p-2">
-                  <dt className="text-xs text-muted">Posts, 90 days</dt>
-                  <dd className="font-display text-xl font-bold">{r.data.hasFeed ? r.pace.last90 : "–"}</dd>
-                </div>
-                <div className="rounded-lg bg-bg p-2">
-                  <dt className="text-xs text-muted">Pages</dt>
-                  <dd className="font-display text-xl font-bold">{r.data.hasSitemap ? r.mix.total : "–"}</dd>
-                  {!r.data.hasSitemap && <dd className="text-xs text-muted">{r.data.sitemapNote ?? "No sitemap"}</dd>}
-                </div>
-                <div className="rounded-lg bg-bg p-2">
-                  <dt className="text-xs text-muted">Comparison pages</dt>
-                  <dd className="font-display text-xl font-bold">{r.data.hasSitemap ? r.compare : "–"}</dd>
-                </div>
-              </dl>
-              <p className="mt-3 text-sm text-muted">
-                {r.pace.newest ? `Last post ${timeAgo(r.pace.newest)}.` : r.data.hasFeed
-                    ? "No dated posts in their feed."
-                    : r.data.feedNote === "No blog feed"
-                      ? "No blog feed, so publishing pace is unknown."
-                      : `Blog feed: ${(r.data.feedNote ?? "").toLowerCase()}.`}
-              </p>
-              <div className="mt-3 flex-1">
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted">Top topics</p>
-                {r.topics.length ? (
-                  <ul className="mt-2 flex flex-wrap gap-2">
-                    {r.topics.map((t) => (
-                      <li key={t.name} className="rounded-full bg-accent-soft px-3 py-1 text-sm">
-                        {t.name}
-                      </li>
-                    ))}
-                  </ul>
+            )}
+          </section>
+
+          <div className="mt-5 grid items-start gap-5 lg:grid-cols-2">
+            <section className={`${card} overflow-hidden`}>
+              <PanelHead
+                title="Trending across competitors"
+                description="Topics two or more competitors published about in the last 45 days. Refreshed every Monday."
+                actions={<FindTrendsButton />}
+              />
+              <div className="max-h-[640px] overflow-y-auto">
+                {trends.length ? (
+                  <TrendList trends={trends} />
                 ) : (
-                  <p className="mt-1 text-sm text-muted">Not analysed yet.</p>
+                  <p className="px-5 py-6 text-sm text-muted">No trends yet. Click “Find trends” to compare what your competitors publish.</p>
                 )}
               </div>
-              <Link href={`/app/competitors/${r.id}#content`} className="mt-4 text-sm font-semibold text-accent hover:underline">
-                See {r.name}&apos;s content →
-              </Link>
             </section>
-          ))}
-        </div>
+
+            <section className={`${card} overflow-hidden`}>
+              <PanelHead title="Recently published" description="The newest posts from every competitor's blog feed." />
+              <ul className="max-h-[640px] divide-y divide-line overflow-y-auto">
+                {latest.map((p) => (
+                  <li key={`${p.competitorId}-${p.link || p.title}`} className="px-5 py-2.5 text-sm">
+                    <a href={p.link} target="_blank" rel="noopener noreferrer" className="font-medium hover:text-accent hover:underline">
+                      {p.title}
+                    </a>
+                    <p className="mt-0.5 text-xs text-muted">
+                      <Link href={`/app/competitors/${p.competitorId}?tab=content`} className="font-semibold text-ink hover:underline">
+                        {p.competitor}
+                      </Link>{" "}
+                      · {timeAgo(p.date)}
+                    </p>
+                  </li>
+                ))}
+                {!latest.length && <li className="px-5 py-6 text-sm text-muted">No dated posts yet. Riposte reads blog feeds every morning.</li>}
+              </ul>
+            </section>
+          </div>
+        </>
       )}
     </div>
   );

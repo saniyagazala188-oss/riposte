@@ -5,6 +5,11 @@ import { getSupabaseEnv } from "./env";
 // Supabase client for server components, server actions and route handlers.
 // It reads and writes the login session from cookies.
 export async function createClient() {
+  // Local preview with sample data (development only, see mock.ts).
+  if (process.env.RIPOSTE_MOCK === "1" && process.env.NODE_ENV !== "production") {
+    const { createMockClient } = await import("./mock");
+    return createMockClient() as never;
+  }
   const env = getSupabaseEnv();
   if (!env) return null;
   const cookieStore = await cookies();
