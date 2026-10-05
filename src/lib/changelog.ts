@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-05T23:25:00+05:30",
+    title: "Blog, changelog and about in the app menu",
+    body: "The app's side menu now links to the blog, this changelog and the founder page, and the site header shows them on phones too.",
+    kind: "fix",
+  },
+  {
     at: "2026-10-05T23:05:00+05:30",
     title: "Four product posts on the blog",
     body: "A tour of every feature, plus deep dives on action kits, AI visibility and living comparison pages.",

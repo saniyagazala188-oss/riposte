@@ -494,3 +494,8 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
   Missing facts become [placeholders]. Briefs are listed on Content intel with a New / Writing / Published status, and copy as Markdown.
 - **Why are they winning?** On AI visibility gaps, a button shows each named competitor's moves caught in the last 30 days (linked to the signals) and the sites the answer relied on, plus "Write a content brief to win this answer". It's behind a button so the list stays short.
 - **Setup:** migration `0013_content_briefs.sql`.
+
+## Blog, changelog and about in the app menu (5 Oct, 23:25 IST)
+
+- The app's side menu has a new **Riposte** group: Blog, Changelog and About the founder. They open the public pages, and "Open dashboard →" in the site header brings you back.
+- The site header now shows Blog, Changelog and About on phones too (they were hidden on small screens).

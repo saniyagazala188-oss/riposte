@@ -11,11 +11,11 @@ const NAV = [
 
 export function SiteHeader({ signedIn = false }: { signedIn?: boolean }) {
   return (
-    <header className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4">
+    <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4">
       <Logo />
-      <nav className="flex items-center gap-1 text-sm" aria-label="Site">
+      <nav className="flex flex-wrap items-center gap-0.5 text-sm sm:gap-1" aria-label="Site">
         {NAV.map((n) => (
-          <Link key={n.href} href={n.href} className="hidden rounded-lg px-3 py-1.5 font-medium text-muted hover:text-ink sm:inline-block">
+          <Link key={n.href} href={n.href} className="rounded-lg px-2 py-1.5 font-medium text-muted hover:text-ink sm:px-3">
             {n.label}
           </Link>
         ))}
