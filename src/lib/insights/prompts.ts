@@ -130,7 +130,7 @@ export function buildTrendPrompt(profile: Profile, inputs: TrendInput[], days: n
   const blocks = inputs
     .map((c) => `${c.name}:\n${c.titles.map((t) => `- ${t}`).join("\n")}`)
     .join("\n\n");
-  return `You are a content strategist. Below is what each competitor published in the last ${days} days (post titles and new page names). Find TOPICS that at least 2 different competitors are publishing about. These are trends the marketer should know about.
+  return `You are a content strategist. Below is what each competitor published in the last ${days} days (post titles and new page names), or, for a competitor with few dated posts, example titles from the main topics of its content. Find TOPICS that at least 2 different competitors are publishing about. These are trends the marketer should know about.
 
 THE MARKETER'S COMPANY
 ${you(profile)}

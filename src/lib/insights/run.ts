@@ -95,7 +95,7 @@ export async function findTrends(db: SupabaseClient, userId: string, { timeoutMs
   const list = competitors ?? [];
   const since = Date.now() - TREND_WINDOW_DAYS * DAY;
 
-  const [content, { data: newPages }] = await Promise.all([
+  const [content, { data: newPages }, { data: topicRows }] = await Promise.all([
     loadContent(
       db,
       list.map((c) => c.id),
@@ -106,7 +106,11 @@ export async function findTrends(db: SupabaseClient, userId: string, { timeoutMs
       .eq("user_id", userId)
       .in("kind", ["new_pages", "new_posts"])
       .gte("detected_at", new Date(since).toISOString()),
+    db.from("content_topics").select("competitor_id, topics").eq("user_id", userId),
   ]);
+  const topicsOf = new Map(
+    (topicRows ?? []).map((t) => [t.competitor_id as string, (t.topics ?? []) as { name: string; examples: string[] }[]]),
+  );
 
   const inputs: TrendInput[] = [];
   for (const c of list) {
@@ -121,12 +125,17 @@ export async function findTrends(db: SupabaseClient, userId: string, { timeoutMs
         if (t.length > 8) titles.add(t.slice(0, 160));
       }
     }
+    // Few recent dated posts (no blog feed, or a quiet month): use the topics already found
+    // for this competitor, so sites without a feed still count.
+    if (titles.size < 5) {
+      for (const t of topicsOf.get(c.id) ?? []) for (const e of t.examples ?? []) if (e.length > 8) titles.add(e.slice(0, 160));
+    }
     if (titles.size) inputs.push({ id: c.id, name: c.name, titles: [...titles].slice(0, 40) });
   }
   if (inputs.length < 2) {
     return {
       found: 0,
-      message: `Trends need at least 2 competitors that published in the last ${TREND_WINDOW_DAYS} days. Right now ${inputs.length} ${inputs.length === 1 ? "does" : "do"}. Add competitors with a blog feed.`,
+      message: `Trends need content from at least 2 competitors (posts from the last ${TREND_WINDOW_DAYS} days, or topics found with "Find their topics"). Right now ${inputs.length} ${inputs.length === 1 ? "has" : "have"} it.`,
     };
   }
 

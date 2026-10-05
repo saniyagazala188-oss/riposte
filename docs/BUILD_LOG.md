@@ -283,3 +283,4 @@ Phase 6 is split into three parts, built one at a time:
 - Examples come from sitemap page names (lower-case, from the address) because Klue has no feed; Crayon's come from real post titles.
 
 **Phase 6b status:** connected moves and trend alerts work on the live site. Trends need more competitor publishing data, which builds up from the daily checks.
+- **Trends couldn't use Klue yet:** trends only read dated posts from the last 45 days, and Klue has no blog feed, so it added nothing until new pages appear in its sitemap. Fixed: for a competitor with fewer than 5 recent dated posts, trends also use the example titles from its topic analysis ("Find their topics"). Competitors without a feed now count from day one.
