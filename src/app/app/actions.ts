@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { requireUser } from "@/lib/auth";
+import { limitsFor } from "@/lib/access";
 import { discoverSources } from "@/lib/discovery";
 import { checkSources, type SourceRow } from "@/lib/fetcher/check";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -22,7 +23,6 @@ import { nameFromDomain, normalizeDomain, type SourceType } from "@/lib/discover
 
 export type FormState = { status: "idle" | "saved" | "error"; message?: string };
 
-const MAX_COMPETITORS = 10;
 const SOURCE_TYPES: SourceType[] = ["changelog", "blog", "feed", "pricing", "sitemap", "other"];
 
 // ---------- Your product ----------
@@ -48,14 +48,15 @@ export async function saveProduct(_prev: FormState, formData: FormData): Promise
 // ---------- Competitors ----------
 
 export async function addCompetitor(_prev: FormState, formData: FormData): Promise<FormState> {
-  const { supabase } = await requireUser();
+  const { supabase, user } = await requireUser();
+  const MAX_COMPETITORS = limitsFor(user.email).competitors;
   const domain = normalizeDomain(String(formData.get("domain") ?? ""));
   if (!domain) return { status: "error", message: "Enter a website like acme.com." };
   const name = String(formData.get("name") ?? "").trim().slice(0, 80) || nameFromDomain(domain);
 
   const { count } = await supabase.from("competitors").select("id", { count: "exact", head: true });
   if ((count ?? 0) >= MAX_COMPETITORS) {
-    return { status: "error", message: `You can track up to ${MAX_COMPETITORS} competitors for now. Remove one to add another.` };
+    return { status: "error", message: `During the beta you can track up to ${MAX_COMPETITORS} competitors. Remove one to add another.` };
   }
 
   const { data: competitor, error } = await supabase

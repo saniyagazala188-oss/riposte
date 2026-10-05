@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
+import { limitsFor } from "@/lib/access";
 import { generateJson, geminiConfigured, Overloaded, RateLimited } from "@/lib/ai/gemini";
 import {
   brandTerms,
@@ -10,7 +11,6 @@ import {
   parseKeywords,
   promptProblem,
   PROMPT_SCHEMA,
-  MAX_TRACKED,
 } from "@/lib/aeo/prompts";
 import type { CheckState } from "@/app/app/actions";
 
@@ -88,7 +88,8 @@ export async function generatePrompts(_prev: CheckState, formData: FormData): Pr
 }
 
 export async function toggleTracked(formData: FormData) {
-  const { supabase } = await requireUser();
+  const { supabase, user } = await requireUser();
+  const MAX_TRACKED = limitsFor(user.email).trackedPrompts;
   const id = String(formData.get("prompt_id") ?? "");
   const track = formData.get("track") === "1";
   if (track) {

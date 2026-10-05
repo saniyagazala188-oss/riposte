@@ -520,3 +520,16 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - The hero now says Riposte shows who AI recommends to your buyers, and why it isn't you yet.
 - "What you get" adds **Content briefs** and **Why they're winning**. Action kits mention the Actions list, and the AI visibility line no longer promises Google Search (the free key answers without it).
 - The early access section links to the blog and changelog. llms.txt mentions briefs and the "why".
+
+## Free, invite-only beta (6 Oct, 00:45 IST)
+
+**Why:** before posting on LinkedIn. Until now anyone could sign up at /login, and every user runs on the same free Gemini and Resend quotas. Pricing waits until beta users say what they'd pay for.
+
+- **Approvals:** migration `0014_invite_only_beta.sql` adds `approved_at` and `invited_at` to `waitlist`, approves everyone who already has an account, and adds `is_approved()`, a security-definer function that checks only the signed-in person's own email.
+- **The gate:** `requireUser()` checks `is_approved()` for every page and action in /app. People who aren't approved are added to the waitlist (source "signed up") and sent to /waitlist ("You're on the list"). If the check isn't set up yet, it lets people in rather than locking everyone out.
+- **Admins:** set in the `ADMIN_EMAILS` Vercel setting (comma-separated), kept out of the code. Admins skip the gate and the limits, and see Admin in the menu.
+- **Admin page (/app/admin):** counts (waiting, approved, signed up, feedback), Waiting / Approved / Feedback tabs, Approve, Remove access, and "Invite someone directly". Approving emails the invite through Resend. If email can't be sent (Resend only sends to your own address until a domain is verified), the page shows the invite text to copy into WhatsApp or LinkedIn.
+- **Beta limits:** 5 competitors and 10 tracked prompts per person (`src/lib/access.ts`), 30 and 30 for admins.
+- **Feedback:** a Give feedback page in the menu asks what you use it for, what you'd miss most, what's missing, whether you'd pay, and what feels fair. Answers show on the admin page with a would-pay count.
+- **Wording:** the sign-up tab, the waitlist confirmation and the landing page say free, invite-only beta. /waitlist is blocked in robots.txt.
+- **Setup:** run migration 0014, then add `ADMIN_EMAILS` in Vercel and redeploy.

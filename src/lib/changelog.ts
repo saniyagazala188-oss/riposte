@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-06T00:45:00+05:30",
+    title: "Free, invite-only beta",
+    body: "Riposte opens as a free beta. People join the waitlist and are approved in small groups, with limits of 5 competitors and 10 tracked prompts each. A Give feedback form asks what you'd miss most and what it's worth to you, so pricing comes from real users.",
+    kind: "decision",
+  },
+  {
     at: "2026-10-05T23:58:00+05:30",
     title: "Landing page catches up",
     body: "The home page now lists content briefs and \"why they're winning\", says Riposte shows who AI recommends to your buyers and why, and links to the blog and changelog.",

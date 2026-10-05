@@ -63,6 +63,8 @@ const ICONS: Record<string, React.ReactNode> = {
       <path d="M12 7v5l3 2" />
     </>
   ),
+  feedback: <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />,
+  admin: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />,
   about: (
     <>
       <circle cx="12" cy="8" r="4" />
@@ -82,7 +84,7 @@ function Icon({ name }: { name: string }) {
 type Item = { href: string; label: string; icon: string; badge?: number };
 type Group = { label: string; items: Item[] };
 
-export function navGroups(counts: { toReview: number; openActions: number }): Group[] {
+export function navGroups(counts: { toReview: number; openActions: number }, admin = false): Group[] {
   return [
     {
       label: "Monitor",
@@ -111,11 +113,13 @@ export function navGroups(counts: { toReview: number; openActions: number }): Gr
       items: [
         { href: "/app/product", label: "Your product", icon: "product" },
         { href: "/app/settings", label: "Alerts & account", icon: "alerts" },
+        ...(admin ? [{ href: "/app/admin", label: "Admin", icon: "admin" }] : []),
       ],
     },
     {
       label: "Riposte",
       items: [
+        { href: "/app/feedback", label: "Give feedback", icon: "feedback" },
         { href: "/blog", label: "Blog", icon: "blog" },
         { href: "/changelog", label: "Changelog", icon: "changelog" },
         { href: "/about", label: "About the founder", icon: "about" },
@@ -180,15 +184,17 @@ export function AppSidebar({
   logo,
   email,
   counts,
+  admin = false,
 }: {
   logo: React.ReactNode;
   email: string;
   counts: { toReview: number; openActions: number };
+  admin?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   useEffect(() => setOpen(false), [pathname]);
-  const groups = navGroups(counts);
+  const groups = navGroups(counts, admin);
 
   return (
     <>

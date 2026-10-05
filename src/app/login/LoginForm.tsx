@@ -116,6 +116,13 @@ export function LoginForm() {
         </div>
       )}
 
+      {mode === "signup" && (
+        <p className="rounded-lg bg-accent-soft px-3 py-2 text-sm">
+          Riposte is in a free, invite-only beta. Sign up with the email you joined the waitlist with. You can start
+          as soon as you&apos;re approved.
+        </p>
+      )}
+
       {GOOGLE && mode !== "link" && (
         <>
           <button type="button" onClick={google} className={`${secondaryButton} w-full py-2.5 text-base`}>

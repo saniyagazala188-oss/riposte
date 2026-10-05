@@ -11,7 +11,7 @@ export function WaitlistForm({ id = "waitlist-email" }: { id?: string }) {
   if (state.status === "joined") {
     return (
       <p className="rounded-xl border border-line bg-accent-soft px-4 py-3 text-sm">
-        <span className="font-semibold">You&apos;re on the list.</span> We&apos;ll email you when early access opens.
+        <span className="font-semibold">You&apos;re on the list.</span> I approve new people every few days and youWe&apos;ll email you when early access opens.apos;ll get an email when youWe&apos;ll email you when early access opens.apos;re in.
       </p>
     );
   }

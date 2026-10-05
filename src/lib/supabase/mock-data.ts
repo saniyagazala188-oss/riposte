@@ -318,6 +318,23 @@ export function mockTables(): Record<string, Row[]> {
     visibility_answers,
     comparisons,
     page_outlines: [],
+    waitlist: [
+      { email: "priya@acmesaas.com", source: "landing", created_at: ago(0.2), approved_at: null, invited_at: null },
+      { email: "rahul.pmm@example.com", source: "signed up", created_at: ago(1), approved_at: null, invited_at: null },
+      { email: "meera@contentco.io", source: "landing", created_at: ago(3), approved_at: ago(2), invited_at: ago(2) },
+    ],
+    feedback: [
+      {
+        id: "f1",
+        email: "meera@contentco.io",
+        created_at: ago(1),
+        uses_for: "Watching three competitors' blogs and pricing pages",
+        miss_most: "The action kits. The talk track saved me an hour on Monday.",
+        missing: "I'd like to share a signal with my sales lead in one click.",
+        would_pay: "maybe",
+        pay_amount: "$29 a month",
+      },
+    ],
     content_briefs: [
       {
         id: "b1",

@@ -5,7 +5,8 @@ import { PageHeader, withParams } from "@/components/ui";
 import { SearchBox } from "@/components/ui-client";
 import { TopicCard } from "./TopicCard";
 import { SubmitButton } from "@/components/FormButtons";
-import { DIMENSION_LABELS, DIMENSIONS, MAX_TRACKED, type Dimension } from "@/lib/aeo/prompts";
+import { DIMENSION_LABELS, DIMENSIONS, type Dimension } from "@/lib/aeo/prompts";
+import { limitsFor } from "@/lib/access";
 import { deletePrompt, toggleTracked } from "./actions";
 import { AddPromptForm, GenerateForm } from "./PromptForms";
 
@@ -25,6 +26,7 @@ type PromptRow = {
 export default async function PromptsPage({ searchParams }: { searchParams: Promise<{ q?: string; show?: string }> }) {
   const params = await searchParams;
   const { supabase, user } = await requireUser();
+  const MAX_TRACKED = limitsFor(user.email).trackedPrompts;
   const [{ data: profile }, { data }] = await Promise.all([
     supabase.from("profiles").select("product_pitch, aeo_keywords, aeo_priorities").eq("id", user.id).maybeSingle(),
     supabase.from("ai_prompts").select("id, topic, kind, dimension, text, source, tracked").order("position"),
