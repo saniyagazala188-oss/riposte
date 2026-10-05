@@ -174,8 +174,8 @@ export function parseSitemap(body: string): SitemapResult | null {
 }
 
 // Picks which child sitemaps to read from a sitemap index: content first.
-export function pickChildSitemaps(children: string[], max = 3): string[] {
-  const content = children.filter((c) => /(post|blog|article|resource|guide|news|learn)/i.test(c));
+export function pickChildSitemaps(children: string[], max = 6): string[] {
+  const content = children.filter((c) => /(post|blog|article|resource|guide|news|learn|topic|faq|question|answer|compare|vs|alternative)/i.test(c));
   const rest = children.filter((c) => !content.includes(c));
   return [...content, ...rest].slice(0, max);
 }
