@@ -5,6 +5,7 @@ import "@fontsource-variable/bricolage-grotesque";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://riposte-eta.vercel.app"),
   title: "Riposte",
   description:
     "Competitive intelligence for marketers: what your competitors changed, what it means for you, and what to do about it.",

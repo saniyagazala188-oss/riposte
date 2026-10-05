@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { Logo } from "@/components/Logo";
+import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { WaitlistForm } from "@/components/WaitlistForm";
 import { createClient } from "@/lib/supabase/server";
 
@@ -66,15 +65,7 @@ export default async function Home() {
   const signedIn = supabase ? Boolean((await supabase.auth.getUser()).data.user) : false;
   return (
     <div className="min-h-dvh">
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-        <Logo />
-        <Link
-          href={signedIn ? "/app" : "/login"}
-          className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium hover:border-muted"
-        >
-          {signedIn ? "Open dashboard →" : "Log in"}
-        </Link>
-      </header>
+      <SiteHeader signedIn={signedIn} />
 
       <main>
         <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 pt-10 pb-16 lg:grid-cols-[1.1fr_1fr] lg:pt-16">
@@ -152,10 +143,7 @@ export default async function Home() {
         </section>
       </main>
 
-      <footer className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-6 text-sm text-muted">
-        <span>© {new Date().getFullYear()} Riposte</span>
-        <span>Founded by Saniya Gazala with ❤️ · Built with Claude 🤝</span>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

@@ -457,3 +457,26 @@ Phase 6 is split into three parts, built one at a time:
   - tabs **Today · This week · Later · Done**, each with a count;
   - a clean list on the left showing competitor, type, owner and title;
   - the selected action on the right, with its owner, where to share it, the signal it responds to, and the **first draft already open**, then **Copy draft** and **Mark done**.
+
+## Public site: blog, changelog, about (5 Oct, night)
+
+**Why:** so Riposte looks like a real product, and the blog itself shows SEO and AEO work.
+
+**Built:**
+- **Blog** (`/blog`), written as Markdown files in `content/blog`. `content/blog/README.md` explains how to add a post. It starts with 3 posts: how to track competitors as a weekly system, how to spot a competitor page changing search intent, and why I built Riposte.
+- **SEO and AEO on every post:**
+  - meta title (under 60 characters) and meta description (under 160), both checked;
+  - canonical link and Open Graph/Twitter tags;
+  - a **Quick answer** box at the top that AI tools can quote;
+  - table of contents, then FAQs at the end;
+  - schema: BlogPosting (author as Person, publisher as Organization), FAQPage and BreadcrumbList;
+  - an author box linking to the about page, and "Keep reading" links.
+- **Changelog** (`/changelog`): every step from the plan on 2 Oct to today, grouped by day, with the real times (IST) taken from the build history. Each entry is labelled Launch, Improvement, Fix or Milestone.
+- **About** (`/about`): founder profile with experience, writing and a LinkedIn link, plus ProfilePage/Person schema. No phone number.
+- **`sitemap.xml`, `robots.txt` and `llms.txt`**:
+  - the sitemap lists the public pages;
+  - robots blocks the logged-in app;
+  - `llms.txt` is a plain-text guide to the site for AI tools.
+- Shared header and footer on the landing page and all public pages, with Blog, Changelog and About links.
+
+**Caught before shipping:** the first `robots.txt` blocked `/demo`. Riposte respects robots.txt, so the Acme demo would have stopped being checked. `/demo` is now allowed.
