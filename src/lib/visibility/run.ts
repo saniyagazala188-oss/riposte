@@ -63,7 +63,7 @@ export async function runVisibility(
       }
       const mentions = findMentions(answer.text, entitiesOf.get(p.user_id) ?? [], others);
       const you = mentions.find((m) => m.key === "you");
-      await db.from("visibility_answers").insert({
+      const { error: saveError } = await db.from("visibility_answers").insert({
         user_id: p.user_id,
         prompt_id: p.id,
         engine: answer.grounded ? "gemini-google-search" : "gemini-no-search",
@@ -75,6 +75,7 @@ export async function runVisibility(
         you_position: you?.position ?? null,
         search_entry: answer.searchEntry,
       });
+      if (saveError) throw new Error(`The answer couldn't be saved: ${saveError.message}`);
       asked++;
     } catch (e) {
       reason = (e as Error).message;
