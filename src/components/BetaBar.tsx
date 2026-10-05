@@ -21,7 +21,7 @@ export function BetaBar({
     return (
       <div className="mb-6 rounded-xl border border-accent bg-accent-soft p-4 text-sm sm:p-5">
         <p className="font-display text-lg font-bold">Welcome to the Riposte beta</p>
-        <p className="mt-1 text-muted">It&apos;s free while Riposte is in beta. Here&apos;s what&apos;s included:</p>
+        <p className="mt-1 text-muted">It&apos;s free for as long as the beta runs, and you&apos;ll get 30 days&apos; notice before any pricing. Here&apos;s what&apos;s included:</p>
         <ul className="mt-2 grid gap-x-6 gap-y-1 sm:grid-cols-2">
           <li>• Watch up to {limits.competitors} competitors</li>
           <li>• Track up to {limits.trackedPrompts} AI search prompts</li>

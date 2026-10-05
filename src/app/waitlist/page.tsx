@@ -23,7 +23,7 @@ export default async function WaitlistPage() {
         <h1 className="mt-3 font-display text-4xl font-extrabold tracking-tight">You&apos;re on the list.</h1>
         <p className="mt-4 text-lg text-muted">
           Riposte is invite-only while it&apos;s in beta, so every team gets a good experience. I approve new people
-          every few days, and you&apos;ll get an email when you&apos;re in.
+          every few days, and you&apos;ll get an email when you&apos;re in. The beta is free, with 30 days&apos; notice before any pricing.
         </p>
         <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
           <span>

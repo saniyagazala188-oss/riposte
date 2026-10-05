@@ -84,7 +84,7 @@ export default async function Home() {
             </p>
             <div className="mt-7">
               <WaitlistForm id="hero-email" />
-              <p className="mt-2 text-sm text-muted">Free during the beta. Invite-only, so I can help every team get set up. No sales call.</p>
+              <p className="mt-2 text-sm text-muted">Free during the beta, with 30 days&apos; notice before any pricing. No sales call.</p>
             </div>
           </div>
           <ExampleSignal />
