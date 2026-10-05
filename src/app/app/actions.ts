@@ -127,6 +127,18 @@ export async function deleteCompetitor(formData: FormData) {
   redirect("/app/competitors");
 }
 
+// Clears found changes, signals, action items and connected moves (one competitor, or all with trends),
+// so the feed starts clean. Pages, snapshots and outlines stay, so the next check compares as before.
+export async function clearHistory(formData: FormData) {
+  const { supabase, user } = await requireUser();
+  const id = String(formData.get("competitor_id") ?? "");
+  const scope = <T extends { eq: (c: string, v: string) => T }>(q: T) => (id ? q.eq("competitor_id", id) : q);
+  await scope(supabase.from("changes").delete().eq("user_id", user.id)); // signals and action items go with them
+  await scope(supabase.from("stories").delete().eq("user_id", user.id));
+  if (!id) await supabase.from("trends").delete().eq("user_id", user.id);
+  revalidatePath("/app", "layout");
+}
+
 // ---------- Sources ----------
 
 export async function addSource(_prev: FormState, formData: FormData): Promise<FormState> {

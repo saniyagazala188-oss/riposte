@@ -4,6 +4,8 @@ import { SendTestButton } from "@/components/ActionButtons";
 import { emailConfigured } from "@/lib/notify/send";
 import { geminiConfigured } from "@/lib/ai/gemini";
 import { AlertSettingsForm } from "./AlertSettingsForm";
+import { clearHistory } from "@/app/app/actions";
+import { ConfirmSubmit } from "@/components/FormButtons";
 
 export const metadata = { title: "Alerts · Riposte" };
 
@@ -49,6 +51,19 @@ export default async function SettingsPage() {
           <SendTestButton what="digest" label="Send this week's digest now" />
           {profile?.slack_webhook_url && <SendTestButton what="slack" label="Send a test to Slack" />}
         </div>
+      </section>
+
+      <section className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line p-5">
+        <div>
+          <h2 className="font-semibold">Start fresh</h2>
+          <p className="text-sm text-muted">
+            Deletes every signal, action item, connected move and trend. Competitors and their pages stay, and
+            tracking carries on from today.
+          </p>
+        </div>
+        <form action={clearHistory}>
+          <ConfirmSubmit label="Clear all history" confirmLabel="Yes, clear everything" pendingLabel="Clearing…" />
+        </form>
       </section>
     </div>
   );

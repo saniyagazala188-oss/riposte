@@ -23,7 +23,7 @@ export function SubmitButton({
 }
 
 // A delete button that asks for a second click before submitting.
-export function ConfirmSubmit({ label, confirmLabel }: { label: string; confirmLabel: string }) {
+export function ConfirmSubmit({ label, confirmLabel, pendingLabel = "Removing…" }: { label: string; confirmLabel: string; pendingLabel?: string }) {
   const [armed, setArmed] = useState(false);
   const { pending } = useFormStatus();
   if (!armed) {
@@ -36,7 +36,7 @@ export function ConfirmSubmit({ label, confirmLabel }: { label: string; confirmL
   return (
     <span className="flex flex-wrap items-center gap-2">
       <button type="submit" disabled={pending} className={`${secondaryButton} border-danger text-danger`}>
-        {pending ? "Removing…" : confirmLabel}
+        {pending ? pendingLabel : confirmLabel}
       </button>
       <button type="button" onClick={() => setArmed(false)} className={secondaryButton}>
         Cancel

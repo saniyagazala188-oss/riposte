@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { SOURCE_LABELS, type SourceType } from "@/lib/discovery/parse";
-import { deleteCompetitor, rediscover, removeSource, updateFrequency } from "@/app/app/actions";
+import { clearHistory, deleteCompetitor, rediscover, removeSource, updateFrequency } from "@/app/app/actions";
 import { ConfirmSubmit, SubmitButton } from "@/components/FormButtons";
 import { card, eyebrow, secondaryButton } from "@/components/styles";
 import { CheckNowButton } from "@/components/CheckNowButton";
@@ -283,6 +283,19 @@ export default async function CompetitorPage({
       </section>
 
       <section className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line p-5">
+        <div>
+          <h2 className="font-semibold">Clear {competitor.name}&apos;s history</h2>
+          <p className="text-sm text-muted">
+            Deletes its signals, action items and connected moves. Tracking carries on from today.
+          </p>
+        </div>
+        <form action={clearHistory}>
+          <input type="hidden" name="competitor_id" value={competitor.id} />
+          <ConfirmSubmit label="Clear history" confirmLabel="Yes, clear it" pendingLabel="Clearing…" />
+        </form>
+      </section>
+
+      <section className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line p-5">
         <div>
           <h2 className="font-semibold">Stop tracking {competitor.name}</h2>
           <p className="text-sm text-muted">Removes this competitor and all its pages.</p>
