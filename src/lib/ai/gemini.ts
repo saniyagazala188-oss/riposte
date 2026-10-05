@@ -74,7 +74,7 @@ export async function generateJson<T>(prompt: string, schema: object, { timeoutM
 async function googleReason(res: Response): Promise<string> {
   try {
     const body = (await res.json()) as { error?: { message?: string } };
-    return (body.error?.message ?? "").replace(/\s+/g, " ").slice(0, 220);
+    return (body.error?.message ?? "").replace(/\s+/g, " ").slice(0, 400);
   } catch {
     return "";
   }
@@ -85,9 +85,10 @@ export type GroundedAnswer = {
   queries: string[];
   sources: { title: string; uri: string }[];
   searchEntry: string | null;
+  grounded: boolean; // false when Google Search wasn't available and the model answered from its own knowledge
 };
 
-async function groundedOnce(model: string, prompt: string, timeoutMs: number): Promise<GroundedAnswer> {
+async function groundedOnce(model: string, prompt: string, timeoutMs: number, search = true): Promise<GroundedAnswer> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -95,7 +96,7 @@ async function groundedOnce(model: string, prompt: string, timeoutMs: number): P
       method: "POST",
       signal: controller.signal,
       headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY ?? "" },
-      body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: prompt }] }], tools: [{ google_search: {} }] }),
+      body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: prompt }] }], ...(search ? { tools: [{ google_search: {} }] } : {}) }),
       cache: "no-store",
     });
     if (res.status === 429 || res.status === 503 || res.status === 500) {
@@ -125,6 +126,7 @@ async function groundedOnce(model: string, prompt: string, timeoutMs: number): P
         .map((ch) => ({ title: ch.web?.title ?? "", uri: ch.web?.uri ?? "" }))
         .filter((s) => s.title || s.uri),
       searchEntry: g?.searchEntryPoint?.renderedContent ?? null,
+      grounded: search,
     };
   } finally {
     clearTimeout(timer);
@@ -132,13 +134,12 @@ async function groundedOnce(model: string, prompt: string, timeoutMs: number): P
 }
 
 // Asks the prompt the way a buyer would, with Google Search switched on, and returns the answer
-// with the searches it ran and the sites it used.
+// with the searches it ran and the sites it used. If every model's search quota is used up
+// (free keys often have none), it answers without search and says so (grounded: false).
 export async function groundedAnswer(prompt: string, { timeoutMs = 45000 } = {}): Promise<GroundedAnswer> {
   if (!process.env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not set");
   const main = process.env.GEMINI_MODEL || "gemini-flash-latest";
   const fallback = process.env.GEMINI_FALLBACK_MODEL || "gemini-flash-lite-latest";
-  // Main model, again after a pause, then the lighter model (which has its own quota, so it is
-  // also tried when the main model's limit is reached).
   const plan = [
     { model: main, wait: 0 },
     { model: main, wait: 2000 },
@@ -157,6 +158,10 @@ export async function groundedAnswer(prompt: string, { timeoutMs = 45000 } = {})
       lastError = e;
       if (!(e instanceof Overloaded) && !(e instanceof RateLimited)) throw e;
     }
+  }
+  if (lastError instanceof RateLimited && process.env.VISIBILITY_NO_SEARCH_FALLBACK !== "off") {
+    const left = deadline - Date.now();
+    if (left >= 5000) return groundedOnce(main, prompt, left, false);
   }
   throw lastError ?? new Overloaded("Gemini is overloaded");
 }

@@ -10,6 +10,7 @@ export const maxDuration = 90;
 
 type Answer = AnswerRow & {
   id: string;
+  engine: string;
   run_at: string;
   answer: string;
   queries: string[];
@@ -39,7 +40,7 @@ export default async function VisibilityPage() {
   const { data: answerRows } = prompts.length
     ? await supabase
         .from("visibility_answers")
-        .select("id, prompt_id, run_at, answer, queries, mentions, citations, you_mentioned, you_position, search_entry")
+        .select("id, prompt_id, run_at, engine, answer, queries, mentions, citations, you_mentioned, you_position, search_entry")
         .in("prompt_id", prompts.map((p) => p.id))
         .order("run_at", { ascending: false })
         .limit(300)
@@ -60,6 +61,7 @@ export default async function VisibilityPage() {
   const cited = topCitations(now);
   const compDomains = new Map((comps ?? []).map((c) => [c.domain.replace(/^www\./, ""), c.name]));
   const lastRun = answers[0]?.run_at;
+  const noSearch = now.filter((a) => a.engine === "gemini-no-search").length;
   const gaps = prompts
     .map((p) => ({ p, a: latest.get(p.id) }))
     .filter((x): x is { p: typeof x.p; a: Answer } => Boolean(x.a && !x.a.you_mentioned && x.a.mentions.some((m) => m.key !== "you" && m.key !== "other")));
@@ -90,6 +92,14 @@ export default async function VisibilityPage() {
                 {lastRun ? <span className="text-muted"> · last asked {timeAgo(lastRun)}</span> : <span className="text-muted"> · not asked yet</span>}
               </p>
               <p className="mt-0.5 text-xs text-muted">Engine: Gemini with Google Search. Answers vary run to run, so watch the trend.</p>
+              {noSearch > 0 && (
+                <p className="mt-2 max-w-xl rounded-lg bg-signal-soft px-3 py-2 text-xs">
+                  {noSearch} of {now.length} answers came from Gemini&apos;s own knowledge, without live Google Search, because
+                  this Gemini key has no search quota. They show what the model already believes about the category, but have
+                  no sources. Turning on billing for the key in Google AI Studio enables search (the first 5,000 searches a
+                  month are free).
+                </p>
+              )}
             </div>
             <RunButton first={!lastRun} count={prompts.length} />
           </section>
@@ -210,6 +220,7 @@ export default async function VisibilityPage() {
                         <span className="text-muted">Not asked yet</span>
                       )}
                       {a && <span className="font-mono text-muted">{timeAgo(a.run_at)}</span>}
+                      {a?.engine === "gemini-no-search" && <span className="text-muted">· no web search</span>}
                     </div>
                     <p className="mt-1.5 font-semibold">{p.text}</p>
                     {a && (

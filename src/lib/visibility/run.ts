@@ -64,6 +64,7 @@ export async function runVisibility(
       await db.from("visibility_answers").insert({
         user_id: p.user_id,
         prompt_id: p.id,
+        engine: answer.grounded ? "gemini-google-search" : "gemini-no-search",
         answer: answer.text.slice(0, 20000),
         queries: answer.queries.slice(0, 10),
         mentions,
