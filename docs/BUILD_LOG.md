@@ -399,3 +399,10 @@ Phase 6 is split into three parts, built one at a time:
 **Demo flow:** write the Acme page while the demo shows $49. After the switch, Check now gives a pricing signal, and the page is flagged out of date. Update the page, and the Pricing row shows $59 with "Updated".
 
 **Setup:** migration `0012_phase9_comparisons.sql`.
+
+**Phase 8 live test (5 Oct):**
+- Prompt Studio wrote the prompts, and Saniya tracked 5 of them.
+- **First run: "Asked 0 of 5. Google's AI got busy."** The message hid the real reason. Fixed: failures now end with "Google said: …" and Google's own error.
+- **Second run showed the real reason:** "limit reached (You exceeded your current quota, please check your plan and billing details)" on both Gemini Flash and Flash-Lite. Ordinary Gemini calls (signals, prompts) still worked, so the problem is specific to search: this free Gemini key has no quota for Grounding with Google Search.
+- **Fix:** when search quota is missing, Riposte asks the same prompt without web search and labels it clearly ("no web search" on each answer, and a note explaining why at the top). These answers still show which products the model already recommends, but they have no sources or searches.
+- **Lasting fix:** turn on billing for the Gemini key in Google AI Studio. Grounding includes 5,000 free searches a month, and Riposte's weekly run of 10 prompts uses about 150. Set a budget alert at the same time.
