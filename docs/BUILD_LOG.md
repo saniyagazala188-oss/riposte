@@ -453,3 +453,7 @@ Phase 6 is split into three parts, built one at a time:
   - "Continue with Google" is built in and switches on with `NEXT_PUBLIC_GOOGLE_LOGIN=on`, once Google is enabled in Supabase.
 
 **How it was checked:** a local preview with sample data (24 competitors, 12 signals, 19 actions, 60 prompts; `RIPOSTE_MOCK=1`, development only) was screenshotted page by page on desktop and phone sizes.
+- **Actions board felt congested (Saniya, 6pm):** four narrow columns put too many buttons in too little space. Replaced with the same pattern as the Feed:
+  - tabs **Today · This week · Later · Done**, each with a count;
+  - a clean list on the left showing competitor, type, owner and title;
+  - the selected action on the right, with its owner, where to share it, the signal it responds to, and the **first draft already open**, then **Copy draft** and **Mark done**.

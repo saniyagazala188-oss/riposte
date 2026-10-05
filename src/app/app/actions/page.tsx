@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { ActionItemCard, ACTION_FIELDS, type ActionItemRow } from "@/components/ActionItemCard";
-import { OWNERS, PRIORITY_LABELS, type Priority } from "@/lib/actions/prompt";
-import { Empty, PageHeader } from "@/components/ui";
+import { KIND_LABELS, OWNERS, PRIORITY_LABELS, type Priority } from "@/lib/actions/prompt";
+import { card } from "@/components/styles";
+import { Empty, LinkTabs, PageHeader, withParams } from "@/components/ui";
 import { ParamSelect } from "@/components/ui-client";
 
 export const metadata = { title: "Actions · Riposte" };
@@ -15,16 +16,18 @@ type Row = ActionItemRow & {
   signals: { title: string } | null;
 };
 
-type Params = { owner?: string; competitor?: string };
+type Params = { owner?: string; competitor?: string; tab?: string; a?: string };
 
-const COLUMNS: { key: Priority | "done"; label: string; hint: string; tone: string }[] = [
-  { key: "now", label: PRIORITY_LABELS.now, hint: "Do these first", tone: "bg-signal" },
-  { key: "this_week", label: PRIORITY_LABELS.this_week, hint: "Plan into this week", tone: "bg-accent" },
-  { key: "later", label: PRIORITY_LABELS.later, hint: "When there's time", tone: "bg-muted" },
-  { key: "done", label: "Done", hint: "Most recent first", tone: "bg-accent" },
+const TABS: { key: Priority | "done"; label: string; hint: string }[] = [
+  { key: "now", label: PRIORITY_LABELS.now, hint: "Do these first." },
+  { key: "this_week", label: PRIORITY_LABELS.this_week, hint: "Plan these into this week." },
+  { key: "later", label: PRIORITY_LABELS.later, hint: "When there's time." },
+  { key: "done", label: "Done", hint: "Most recent first." },
 ];
 
-// Every action from every action kit, as a board: Today → This week → Later → Done.
+const PRIORITY_DOT: Record<Priority, string> = { now: "bg-signal", this_week: "bg-accent", later: "bg-muted" };
+
+// Every action from every action kit: urgency tabs, a list on the left, the selected action on the right.
 export default async function ActionsPage({ searchParams }: { searchParams: Promise<Params> }) {
   const params = await searchParams;
   const owner = OWNERS.find((o) => o === params.owner);
@@ -57,13 +60,20 @@ export default async function ActionsPage({ searchParams }: { searchParams: Prom
   });
   const rowsFor = (key: Priority | "done") => (key === "done" ? done : open.filter((i) => i.priority === key));
   const filtered = Boolean(owner || competitor);
+  // Open the first tab that has something in it, unless one was chosen.
+  const tab =
+    TABS.find((t) => t.key === params.tab)?.key ?? TABS.find((t) => t.key !== "done" && rowsFor(t.key).length)?.key ?? "now";
+  const rows = rowsFor(tab);
+  const selected = rows.find((r) => r.id === params.a) ?? rows[0];
+  const link = (change: Partial<Params>) =>
+    withParams("/app/actions", { competitor: competitor?.id, owner, tab: params.tab, ...change });
 
   return (
     <div>
       <PageHeader
         kicker="Actions"
         title="What to do next"
-        description="Every response from every action kit, sorted by urgency. Open the draft, copy it, share it where it says, and mark it done."
+        description="Every response from every action kit, sorted by urgency. Pick one, copy the draft, share it where it says, and mark it done."
       />
 
       <div className="mt-5 flex flex-wrap items-center gap-2">
@@ -95,28 +105,48 @@ export default async function ActionsPage({ searchParams }: { searchParams: Prom
           </Empty>
         </div>
       ) : (
-        <div className="mt-4 grid items-start gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {COLUMNS.map((col) => {
-            const rows = rowsFor(col.key);
-            return (
-              <section key={col.key} className="flex max-h-[78vh] flex-col rounded-2xl border border-line bg-bg">
-                <header className="flex items-center gap-2 border-b border-line px-3 py-2.5">
-                  <span className={`h-2 w-2 rounded-full ${col.tone}`} aria-hidden />
-                  <h2 className="font-display text-base font-bold">{col.label}</h2>
-                  <span className="rounded-full bg-surface px-2 py-0.5 text-xs font-semibold text-muted">{rows.length}</span>
-                  <span className="ml-auto hidden text-xs text-muted 2xl:inline">{col.hint}</span>
-                </header>
-                <div className="flex flex-col gap-2.5 overflow-y-auto p-2.5">
-                  {rows.length ? (
-                    rows.map((i) => <ActionItemCard key={i.id} item={i} context={ctx(i)} compact />)
-                  ) : (
-                    <p className="px-1 py-4 text-center text-sm text-muted">{col.key === "done" ? "Nothing done yet." : "Nothing here."}</p>
-                  )}
-                </div>
-              </section>
-            );
-          })}
-        </div>
+        <>
+          <LinkTabs
+            className="mt-4"
+            active={tab}
+            tabs={TABS.map((t) => ({ key: t.key, label: t.label, count: rowsFor(t.key).length, href: link({ tab: t.key, a: undefined }) }))}
+          />
+          {rows.length === 0 ? (
+            <div className="mt-4">
+              <Empty title={tab === "done" ? "Nothing done yet." : `Nothing for ${TABS.find((t) => t.key === tab)!.label.toLowerCase()}.`} />
+            </div>
+          ) : (
+            <div className="mt-4 grid items-start gap-4 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+              <div className={`${card} overflow-hidden`}>
+                <p className="border-b border-line px-4 py-2 text-xs text-muted">{TABS.find((t) => t.key === tab)!.hint}</p>
+                <ul className="max-h-[68vh] divide-y divide-line overflow-y-auto">
+                  {rows.map((i) => {
+                    const on = i.id === selected?.id;
+                    return (
+                      <li key={i.id}>
+                        <Link
+                          href={link({ tab, a: i.id })}
+                          scroll={false}
+                          aria-current={on ? "true" : undefined}
+                          className={`block border-l-4 px-4 py-3 ${on ? "border-accent bg-accent-soft" : "border-transparent hover:bg-bg"}`}
+                        >
+                          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
+                            {i.status === "open" && <span className={`h-2 w-2 rounded-full ${PRIORITY_DOT[i.priority]}`} aria-hidden />}
+                            <span className="font-semibold text-ink">{i.competitors?.name}</span>
+                            <span className="text-muted">{KIND_LABELS[i.kind]}</span>
+                            <span className="ml-auto text-muted">{i.owner}</span>
+                          </div>
+                          <p className={`mt-1 text-sm font-semibold leading-snug ${i.status === "done" ? "text-muted line-through" : ""}`}>{i.title}</p>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+              <div className="lg:sticky lg:top-6">{selected && <ActionItemCard item={selected} context={ctx(selected)} expanded />}</div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
