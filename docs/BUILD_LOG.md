@@ -284,3 +284,9 @@ Phase 6 is split into three parts, built one at a time:
 
 **Phase 6b status:** connected moves and trend alerts work on the live site. Trends need more competitor publishing data, which builds up from the daily checks.
 - **Trends couldn't use Klue yet:** trends only read dated posts from the last 45 days, and Klue has no blog feed, so it added nothing until new pages appear in its sitemap. Fixed: for a competitor with fewer than 5 recent dated posts, trends also use the example titles from its topic analysis ("Find their topics"). Competitors without a feed now count from day one.
+- **Find trends after the fix (live):** "Found 2 trends across 3 competitors."
+  1. **AI competitive agents and battlecards** (Crayon, Klue, Acme): Crayon's Glean integration and Field Agent for Slack, Klue's Compete Agent and AI-generated strengths and weaknesses, Acme's AI-written battlecards. Why it matters: the market wants AI automation, so Riposte should stress that it explains changes and writes the response. To do: publish a post contrasting AI alert generation with actionable response drafting.
+  2. **Sales battlecard best practices** (Crayon, Klue): "8 best practices for effective sales battlecards", "Battlecard rollout plan" vs Klue's "battlecard framework", "nine tips for building your first sales battlecard". To do: a guide on cutting battlecard creation time in half with auto-drafted first versions and owners.
+  - All quoted titles are real. *Small slip:* trend 1's summary says "both Crayon and Klue" while it lists 3 competitors; the summary should name all of them.
+
+**Phase 6b status: done.** Connected moves and trend alerts both work on the live site with real competitors.
