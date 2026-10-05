@@ -13,7 +13,7 @@ export async function runVisibilityNow(): Promise<CheckState> {
   if (!count) return { status: "error", message: "Track a few prompts in Prompt Studio first." };
 
   // Prompts asked in the last 30 minutes are skipped, so a second click doesn't spend searches twice.
-  const r = await runVisibility(supabase, { userId: user.id, freshHours: 0.5, budgetMs: 70000, concurrency: 3 });
+  const r = await runVisibility(supabase, { userId: user.id, freshHours: 0.5, budgetMs: 70000, concurrency: 2 });
   revalidatePath("/app/visibility");
   if (!r.asked && !r.failed && !r.waiting && !r.busy)
     return { status: "done", message: "All tracked prompts were asked in the last 30 minutes. Results are below." };

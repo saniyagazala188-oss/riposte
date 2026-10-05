@@ -86,7 +86,7 @@ export async function GET(request: Request) {
   }
   // AI visibility: each tracked prompt is asked again once a week, with whatever time is left.
   const visibility =
-    timeLeft() > 40000 ? await runVisibility(db, { freshHours: 156, budgetMs: Math.min(90000, timeLeft() - 30000), concurrency: 3 }) : null;
+    timeLeft() > 40000 ? await runVisibility(db, { freshHours: 156, budgetMs: Math.min(90000, timeLeft() - 30000), concurrency: 2 }) : null;
 
   const digest =
     monday || url.searchParams.get("digest") === "1"

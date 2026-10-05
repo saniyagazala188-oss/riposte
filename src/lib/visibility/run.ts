@@ -11,7 +11,7 @@ export type VisibilityResult = { asked: number; failed: number; waiting: number;
 // and which sites it used. Prompts answered within `freshHours` are skipped.
 export async function runVisibility(
   db: SupabaseClient,
-  { userId, freshHours = 156, budgetMs = 60000, concurrency = 3 }: { userId?: string; freshHours?: number; budgetMs?: number; concurrency?: number } = {},
+  { userId, freshHours = 156, budgetMs = 60000, concurrency = 2 }: { userId?: string; freshHours?: number; budgetMs?: number; concurrency?: number } = {},
 ): Promise<VisibilityResult> {
   if (!geminiConfigured()) return { asked: 0, failed: 0, waiting: 0, busy: false };
   let q = db.from("ai_prompts").select("id, user_id, text").eq("tracked", true).limit(200);
@@ -48,11 +48,13 @@ export async function runVisibility(
   let failed = 0;
   let busy = false;
   let reason: string | undefined;
+  let search = true; // switched off for the rest of the run once the key turns out to have no search quota
   let next = 0;
 
   async function handle(p: { id: string; user_id: string; text: string }) {
     try {
-      const answer = await groundedAnswer(p.text, { timeoutMs: 45000 });
+      const answer = await groundedAnswer(p.text, { timeoutMs: 45000, search });
+      if (!answer.grounded) search = false;
       let others: string[] = [];
       try {
         others = cleanBrands(await generateJson(buildBrandPrompt(answer.text), BRAND_SCHEMA, { timeoutMs: 20000 }));

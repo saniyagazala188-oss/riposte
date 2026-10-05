@@ -136,32 +136,57 @@ async function groundedOnce(model: string, prompt: string, timeoutMs: number, se
 // Asks the prompt the way a buyer would, with Google Search switched on, and returns the answer
 // with the searches it ran and the sites it used. If every model's search quota is used up
 // (free keys often have none), it answers without search and says so (grounded: false).
-export async function groundedAnswer(prompt: string, { timeoutMs = 45000 } = {}): Promise<GroundedAnswer> {
+export async function groundedAnswer(
+  prompt: string,
+  { timeoutMs = 45000, search = true }: { timeoutMs?: number; search?: boolean } = {},
+): Promise<GroundedAnswer> {
   if (!process.env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not set");
   const main = process.env.GEMINI_MODEL || "gemini-flash-latest";
   const fallback = process.env.GEMINI_FALLBACK_MODEL || "gemini-flash-lite-latest";
-  const plan = [
-    { model: main, wait: 0 },
-    { model: main, wait: 2000 },
-    { model: fallback, wait: 1000 },
-  ];
   const deadline = Date.now() + timeoutMs;
   let lastError: unknown;
-  for (const step of plan) {
-    if (step.wait) await sleep(step.wait);
-    const left = deadline - Date.now();
-    if (left < 5000) break;
-    if (lastError instanceof RateLimited && step.model === main) continue; // a limit won't clear in 2 seconds
-    try {
-      return await groundedOnce(step.model, prompt, left);
-    } catch (e) {
-      lastError = e;
-      if (!(e instanceof Overloaded) && !(e instanceof RateLimited)) throw e;
+
+  // Tries the steps in order. Retries only when Google is busy (503) or a quota is used up (429).
+  async function attempt(plan: { model: string; wait: number }[], withSearch: boolean) {
+    for (const step of plan) {
+      if (step.wait) await sleep(step.wait);
+      const left = deadline - Date.now();
+      if (left < 5000) break;
+      if (lastError instanceof RateLimited && step.model === main && withSearch) continue; // a limit won't clear in seconds
+      try {
+        return await groundedOnce(step.model, prompt, left, withSearch);
+      } catch (e) {
+        lastError = e;
+        if (!(e instanceof Overloaded) && !(e instanceof RateLimited)) throw e;
+      }
+    }
+    return null;
+  }
+
+  if (search) {
+    const found = await attempt(
+      [
+        { model: main, wait: 0 },
+        { model: main, wait: 2000 },
+        { model: fallback, wait: 1000 },
+      ],
+      true,
+    );
+    if (found) return found;
+    if (!(lastError instanceof RateLimited) || process.env.VISIBILITY_NO_SEARCH_FALLBACK === "off") {
+      throw lastError ?? new Overloaded("Gemini is overloaded");
     }
   }
-  if (lastError instanceof RateLimited && process.env.VISIBILITY_NO_SEARCH_FALLBACK !== "off") {
-    const left = deadline - Date.now();
-    if (left >= 5000) return groundedOnce(main, prompt, left, false);
-  }
+  // No search quota on this key: answer from the model's own knowledge, labelled as such.
+  lastError = undefined;
+  const plain = await attempt(
+    [
+      { model: main, wait: 0 },
+      { model: fallback, wait: 1000 },
+      { model: main, wait: 3000 },
+    ],
+    false,
+  );
+  if (plain) return plain;
   throw lastError ?? new Overloaded("Gemini is overloaded");
 }
