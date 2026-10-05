@@ -8,6 +8,7 @@ import { LinkTabs, PageHeader, PanelHead } from "@/components/ui";
 import { SubmitButton } from "@/components/FormButtons";
 import { timeAgo } from "@/lib/time";
 import { approveEmail, unapproveEmail } from "./actions";
+import { CopyInvite } from "./CopyInvite";
 
 export const metadata = { title: "Admin · Riposte" };
 export const dynamic = "force-dynamic";
@@ -77,17 +78,16 @@ export default async function AdminPage({
 
       {justApproved && (
         <div className="mt-4 rounded-xl border border-accent bg-accent-soft p-4 text-sm">
-          <p className="font-semibold">
-            {justApproved} is approved.{" "}
-            {params.mail === "sent" ? "The invite email is on its way." : "The invite email couldn't be sent, so send this yourself:"}
-          </p>
-          {params.mail !== "sent" && (
+          <p className="font-semibold">✓ {justApproved} is approved and can now use Riposte.</p>
+          {params.mail === "sent" ? (
+            <p className="mt-1 text-muted">They&apos;ve been emailed an invite.</p>
+          ) : (
             <>
-              <pre className="mt-2 whitespace-pre-wrap rounded-lg bg-surface p-3 font-sans text-sm">{inviteMessage(justApproved).text}</pre>
-              <p className="mt-2 text-xs text-muted">
-                Emails to other people need a verified sending domain in Resend. Until then, copy this into WhatsApp,
-                LinkedIn or your own email.
+              <p className="mt-1 text-muted">
+                Riposte couldn&apos;t email them yet (that needs a verified sending domain), so let them know yourself.
+                Copy this message and send it to them on WhatsApp, LinkedIn or email.
               </p>
+              <CopyInvite text={inviteMessage(justApproved).text} />
             </>
           )}
         </div>

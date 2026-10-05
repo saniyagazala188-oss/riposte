@@ -533,3 +533,10 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - **Feedback:** a Give feedback page in the menu asks what you use it for, what you'd miss most, what's missing, whether you'd pay, and what feels fair. Answers show on the admin page with a would-pay count.
 - **Wording:** the sign-up tab, the waitlist confirmation and the landing page say free, invite-only beta. /waitlist is blocked in robots.txt.
 - **Setup:** run migration 0014, then add `ADMIN_EMAILS` in Vercel and redeploy.
+
+## Beta polish after the first real test (6 Oct, 01:45 IST)
+
+- Tested end to end with a second account in incognito: sign up, confirm the email, "You're on the list", show up under Waiting, Approve, then straight into the app.
+- **Waitlist page:** no Log in button (they're already signed in) and no repeated Blog/Changelog links. Just the message and "Signed in as … · Not you? Log out".
+- **Admin approval box:** it read like a message to the admin. Now it says "✓ approved", explains that Riposte can't email them yet, and gives a **Copy the invite message** button with a preview.
+- **Beta bar for beta users (not admins):** a welcome card listing what's included until they add a first competitor (5 competitors, 10 tracked prompts, morning checks plus Check now, email alerts and the Monday digest). After that, a slim strip on every page: Free beta · Competitors 2 of 5 · Tracked prompts 3 of 10 · Give feedback.
