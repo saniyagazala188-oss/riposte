@@ -47,6 +47,7 @@ export function paceFromFeed(items: FeedItem[], now = Date.now()): Pace {
 // Groups that marketers care about, recognised from the page address.
 const KINDS: { key: string; label: string; test: RegExp }[] = [
   { key: "compare", label: "Comparison & alternatives", test: /(^|[/-])(vs|versus|alternatives?|compare|comparison|competitors?)([/-]|$)/i },
+  { key: "answers", label: "Answer pages for AI search", test: /\/(topics?|questions?|answers?|faqs?|llm-info|llms?\.txt|ai-info)(\/|$|\.)/i },
   { key: "blog", label: "Blog posts", test: /\/(blog|blogs|posts?|articles?|news|insights)\//i },
   { key: "guides", label: "Guides & learning", test: /\/(guides?|learn|academy|resources?|library|ebooks?|whitepapers?|webinars?|glossary|tutorials?|docs?|how-to)\b/i },
   { key: "customers", label: "Customer stories", test: /\/(customers?|case-stud(y|ies)|success-stor(y|ies)|testimonials?)\b/i },
@@ -96,7 +97,7 @@ export function titlesForTopics(feed: FeedItem[], urls: string[], max = 120): st
       return "";
     }
   };
-  const blogish = urls.filter((u) => KINDS.slice(0, 3).some((k) => k.test.test(pathOf(u))));
+  const blogish = urls.filter((u) => KINDS.slice(0, 4).some((k) => k.test.test(pathOf(u))));
   for (const u of blogish) {
     if (out.size >= max) break;
     const t = titleFromUrl(u);
