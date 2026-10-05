@@ -310,6 +310,36 @@ export function mockTables(): Record<string, Row[]> {
     visibility_answers,
     comparisons,
     page_outlines: [],
+    content_briefs: [
+      {
+        id: "b1",
+        user_id,
+        created_at: ago(2),
+        source: "visibility",
+        source_id: "pr0_0",
+        topic: "What is the best competitive intelligence tool for a solo product marketer?",
+        status: "new",
+        content: {
+          title: "The best competitive intelligence tool for a solo product marketer",
+          meta_title: "Best Competitive Intelligence Tool for Solo PMMs",
+          target_keyword: "competitive intelligence tool for product marketers",
+          secondary_keywords: ["competitor tracking for small teams", "competitor monitoring tool", "battlecard software for startups"],
+          intent: "commercial",
+          intent_why: "The reader is choosing a tool and wants a recommendation.",
+          angle: "Most lists compare enterprise tools built for sales. This one is for a marketer working alone, and judges tools on whether they draft the response.",
+          quick_answer: "A solo product marketer needs a tool that watches competitors automatically and turns changes into ready-to-ship responses. Look for daily checks, explanations tied to your product, and drafts for battlecards and comparison pages.",
+          outline: [
+            { heading: "What a solo PMM actually needs", points: ["Time, not more dashboards", "Coverage of 3 to 5 rivals"] },
+            { heading: "How we compared the tools", points: ["Setup time", "Explanations", "Drafted responses"] },
+            { heading: "The options, side by side", points: ["Enterprise CI suites", "Page change monitors", "[Your product]"] },
+            { heading: "Which one to choose", points: ["By team size", "By budget [add your price]"] },
+          ],
+          faqs: ["Do I need a competitive intelligence tool if I'm the only PMM?", "How much does a CI tool cost for a startup?", "Can ChatGPT track competitors for me?"],
+          competitor_notes: "Klue and Crayon publish enterprise-focused guides; nobody writes for a solo marketer.",
+          cta: "Try Riposte free on your top three competitors.",
+        },
+      },
+    ],
   };
   return cache;
 }

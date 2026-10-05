@@ -480,3 +480,17 @@ Phase 6 is split into three parts, built one at a time:
 - Shared header and footer on the landing page and all public pages, with Blog, Changelog and About links.
 
 **Caught before shipping:** the first `robots.txt` blocked `/demo`. Riposte respects robots.txt, so the Acme demo would have stopped being checked. `/demo` is now allowed.
+
+## Content briefs and "why are they winning" (5 Oct, night)
+
+Two features Spyline (a similar tool a friend shared) doesn't show, both on Riposte's own idea of helping marketers respond:
+- **Content briefs:** "Write a content brief" on any trend (Content intel) or AI visibility gap. Gemini writes a brief from your product profile and the evidence (competitor titles, or who AI named and which sites it relied on):
+  - title, meta title (with character count), target and secondary keywords;
+  - search intent and why;
+  - the angle that uses what makes you different;
+  - a **quick answer** for the top of the page;
+  - a 5–7 section outline, FAQs, what competitors cover, and a call to action.
+
+  Missing facts become [placeholders]. Briefs are listed on Content intel with a New / Writing / Published status, and copy as Markdown.
+- **Why are they winning?** On AI visibility gaps, a button shows each named competitor's moves caught in the last 30 days (linked to the signals) and the sites the answer relied on, plus "Write a content brief to win this answer". It's behind a button so the list stays short.
+- **Setup:** migration `0013_content_briefs.sql`.

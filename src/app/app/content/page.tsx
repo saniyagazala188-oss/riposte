@@ -23,6 +23,12 @@ export default async function ContentPage({ searchParams }: { searchParams: Prom
     supabase.from("content_topics").select("competitor_id, topics, generated_at"),
     supabase.from("trends").select(TREND_SELECT).neq("status", "dismissed").order("created_at", { ascending: false }).limit(8),
   ]);
+  const { data: briefRows } = await supabase
+    .from("content_briefs")
+    .select("id, created_at, source, topic, content, status")
+    .order("created_at", { ascending: false })
+    .limit(30);
+  const briefs = (briefRows ?? []) as { id: string; created_at: string; source: string; topic: string; content: { title: string; target_keyword: string }; status: string }[];
   const trends = (trendRows ?? []) as unknown as TrendRow[];
   const list = competitors ?? [];
   const content = await loadContent(
@@ -134,7 +140,7 @@ export default async function ContentPage({ searchParams }: { searchParams: Prom
               />
               <div className="max-h-[640px] overflow-y-auto">
                 {trends.length ? (
-                  <TrendList trends={trends} />
+                  <TrendList trends={trends} withBrief />
                 ) : (
                   <p className="px-5 py-6 text-sm text-muted">No trends yet. Click “Find trends” to compare what your competitors publish.</p>
                 )}
@@ -161,6 +167,35 @@ export default async function ContentPage({ searchParams }: { searchParams: Prom
               </ul>
             </section>
           </div>
+
+          <section className={`${card} mt-5 overflow-hidden`}>
+            <PanelHead
+              title="Content briefs"
+              description="Ready-to-write briefs from trends and from AI answers where competitors are named and you aren't."
+            />
+            {briefs.length ? (
+              <ul className="divide-y divide-line">
+                {briefs.map((b) => (
+                  <li key={b.id}>
+                    <Link href={`/app/content/briefs/${b.id}`} className="flex flex-wrap items-center gap-x-3 gap-y-1 px-5 py-3 hover:bg-bg">
+                      <span className="min-w-0 flex-1">
+                        <span className="block font-semibold leading-snug">{b.content.title}</span>
+                        <span className="block text-xs text-muted">
+                          {b.source === "trend" ? "From a trend" : "To win an AI answer"} · keyword: {b.content.target_keyword}
+                        </span>
+                      </span>
+                      <span className="rounded-full bg-bg px-2 py-0.5 text-xs capitalize">{b.status}</span>
+                      <span className="font-mono text-xs text-muted">{timeAgo(b.created_at)}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="px-5 py-6 text-sm text-muted">
+                No briefs yet. Click &quot;Write a content brief&quot; on a trend above, or on a gap in AI visibility.
+              </p>
+            )}
+          </section>
         </>
       )}
     </div>

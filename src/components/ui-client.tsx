@@ -108,3 +108,21 @@ export function ParamSelect({
     </select>
   );
 }
+
+// A clear button that shows or hides a block below it.
+export function Reveal({ label, hideLabel = "Hide", children }: { label: string; hideLabel?: string; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mt-2">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className={`rounded-lg border px-2.5 py-1 text-xs font-semibold ${open ? "border-accent text-accent" : "border-signal bg-signal-soft text-signal hover:brightness-95"}`}
+      >
+        {open ? hideLabel : label}
+      </button>
+      {open && children}
+    </div>
+  );
+}

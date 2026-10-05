@@ -2,6 +2,7 @@ import Link from "next/link";
 import { setInsightStatus } from "@/app/app/actions";
 import { SubmitButton } from "@/components/FormButtons";
 import { timeAgo } from "@/lib/time";
+import { BriefButton } from "@/components/BriefButton";
 
 export type StoryRow = {
   id: string;
@@ -108,7 +109,7 @@ export function StoryList({
 }
 
 // A topic that several competitors started publishing about.
-export function TrendList({ trends }: { trends: TrendRow[] }) {
+export function TrendList({ trends, withBrief = false }: { trends: TrendRow[]; withBrief?: boolean }) {
   return (
     <ul className="divide-y divide-line">
       {trends.map((t) => (
@@ -144,7 +145,14 @@ export function TrendList({ trends }: { trends: TrendRow[] }) {
               </div>
             ))}
           </div>
-          <StatusButtons id={t.id} kind="trend" status={t.status} />
+          <div className="flex flex-wrap items-start gap-2">
+            {withBrief && (
+              <div className="mt-3">
+                <BriefButton source="trend" sourceId={t.id} />
+              </div>
+            )}
+            <StatusButtons id={t.id} kind="trend" status={t.status} />
+          </div>
         </li>
       ))}
     </ul>
