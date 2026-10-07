@@ -10,7 +10,7 @@ const problems = [
   },
   {
     title: "Inconsistent",
-    body: "Which competitors get checked depends on the week, and a page that reappears is assumed to be \"optimized\" without anyone seeing what changed.",
+    body: "Some weeks every competitor gets checked, some weeks only a few. And when a page shows up again, you guess it was updated, without seeing what really changed.",
   },
   {
     title: "Reactive",
