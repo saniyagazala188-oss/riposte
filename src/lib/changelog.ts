@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-07T20:20:00+05:30",
+    title: "Landing page matches the product",
+    body: "Who Riposte is for, a fourth problem (slow, with no sense of how much a change matters), \"Tell it about your product\" as the first step, impact levels, and connected moves.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-06T01:45:00+05:30",
     title: "Beta users see what's included",
     body: "New beta users get a welcome card with their allowance, then a slim strip on every page showing competitors and tracked prompts used. Approving someone gives a one-click copy of the invite message.",

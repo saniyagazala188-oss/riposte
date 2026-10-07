@@ -16,17 +16,22 @@ const problems = [
     title: "Reactive",
     body: "Shifts in search intent and trending topics show up late, as interruptions that push half-finished work back.",
   },
+  {
+    title: "Slow",
+    body: "Hours go into finding what changed, with no sense of how much each change matters, so little time is left for deciding what to do about it.",
+  },
 ];
 
 const steps = [
+  { title: "Tell it about your product", body: "What you sell, who you sell to and what makes you different. Every change is judged against this." },
   { title: "Add a competitor by domain", body: "Riposte finds their release notes, blog feed and pricing page for you." },
   { title: "It checks every day", body: "Each page is compared with the last check. Timestamps, banners and other noise are ignored." },
-  { title: "It explains the change", body: "What changed, what it means for your product, and how much it matters." },
+  { title: "It explains the change", body: "What changed, what it means for your product, and whether it's high, medium or low impact." },
   { title: "It tells you what to make", body: "The assets to create, where each one goes, and who owns it, with first drafts ready." },
 ];
 
 const features = [
-  ["Signal feed and alerts", "Real changes only, with a before/after view. High-impact moves go to email or Slack the morning they're found."],
+  ["Signal feed and alerts", "Real changes only, with a before/after view and an impact level. Related changes by one competitor are joined into one move. High-impact moves go to email or Slack the morning they're found."],
   ["Action kits", "A response plan for every signal: what to create, where it goes, who owns it, with first drafts ready to edit. All actions in one list: Today, This week, Later."],
   ["Content intelligence", "Competitors' publishing pace, page mix and topics, rewritten pages that change search intent, and topics trending across competitors."],
   ["Content briefs", "One click turns a trend, or an AI answer you're missing from, into a brief: keyword, intent, angle, quick answer, outline and FAQs."],
@@ -82,6 +87,7 @@ export default async function Home() {
               what it means for you, and what to do about it. It also shows who AI recommends to your buyers, and why
               it isn&apos;t you yet.
             </p>
+            <p className="mt-3 text-sm font-medium text-ink">Built for product marketers, content teams and SEO teams.</p>
             <div className="mt-7">
               <WaitlistForm id="hero-email" />
               <p className="mt-2 text-sm text-muted">Free during the beta, with 30 days&apos; notice before any pricing. No sales call.</p>
@@ -99,7 +105,7 @@ export default async function Home() {
               It pulls time away from the real job: positioning, stakeholder conversations, and being visible in Google
               and AI answers.
             </p>
-            <div className="mt-8 grid gap-6 md:grid-cols-3">
+            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {problems.map((p) => (
                 <div key={p.title} className="border-t-2 border-ink pt-4">
                   <h3 className="font-display text-xl font-bold">{p.title}</h3>
@@ -112,7 +118,7 @@ export default async function Home() {
 
         <section className="mx-auto max-w-6xl px-4 py-14">
           <h2 className="font-display text-3xl font-bold">How Riposte works</h2>
-          <ol className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <ol className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
             {steps.map((s, i) => (
               <li key={s.title} className="flex flex-col gap-2">
                 <span className="font-mono text-sm text-accent">0{i + 1}</span>

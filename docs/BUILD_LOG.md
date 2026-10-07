@@ -541,3 +541,10 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - **Admin approval box:** it read like a message to the admin. Now it says "✓ approved", explains that Riposte can't email them yet, and gives a **Copy the invite message** button with a preview.
 - **Beta bar for beta users (not admins):** a welcome card listing what's included until they add a first competitor (5 competitors, 10 tracked prompts, morning checks plus Check now, email alerts and the Monday digest). After that, a slim strip on every page: Free beta · Competitors 2 of 5 · Tracked prompts 3 of 10 · Give feedback.
 - **Beta length (decision):** open-ended. Free for as long as the beta runs, with 30 days' notice before any pricing. Said on the welcome card, the invite message, the waitlist page and the landing page.
+
+## Landing page matches the demo script (7 Oct, 20:20 IST)
+
+- Hero: "Built for product marketers, content teams and SEO teams."
+- Problems: added a fourth, **Slow**: hours spent finding what changed, with no sense of how much each change matters.
+- How it works: five steps, starting with **Tell it about your product**. "It explains the change" now mentions high, medium or low impact.
+- Signal feed row: impact level, and related changes joined into one connected move.
