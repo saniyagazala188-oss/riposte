@@ -548,3 +548,19 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - Problems: added a fourth, **Slow**: hours spent finding what changed, with no sense of how much each change matters.
 - How it works: five steps, starting with **Tell it about your product**. "It explains the change" now mentions high, medium or low impact.
 - Signal feed row: impact level, and related changes joined into one connected move.
+
+## Next up: action points (agreed 10 Oct)
+
+**Now:** record and submit the Profound demo video. Everything below waits until that's done.
+
+1. **Analytics.** Add Google Search Console verification and Google Analytics 4 through two Vercel settings. Track waitlist joins, sign-ups and logins as events. Submit the sitemap in Search Console.
+2. **Voice study.** Read Saniya's TestMu author page and past posts, so new posts sound like her.
+3. **Keyword research.** For each category, pick 2 or 3 posts a new site can realistically rank for, from real search and AI-question data.
+4. **Write the posts.** Built to rank and get cited by AI: quick answer box, FAQs, schema, internal links. Saniya reviews each one, adds a real example from her own work, and approves it before it goes live.
+5. **Publish.** Add the posts to the blog (they join the sitemap automatically) and request indexing in Search Console.
+
+**Blog categories:** Competitive intelligence, AI search (AEO), AI agents for marketers, Content strategy, What's new (monthly updates from the changelog). AI testing stays off the Riposte blog (keep it on the TestMu author page, Medium or LinkedIn), so the blog stays focused on one subject.
+
+**Later, not now:** a custom domain. It helps trust and SEO, and lets invite emails reach other people. On hold until after the Profound submission.
+
+**Still open from before:** paid Gemini key (enables web search and "Sites AI relies on"), remove the y7gb2nspvu test account in Admin, and the LinkedIn launch post after the demo is submitted.
