@@ -59,12 +59,17 @@ export async function writeBrief(_prev: BriefState, formData: FormData): Promise
   try {
     brief = cleanBrief(
       await generateJson(buildBriefPrompt(profile ?? { product_name: null, product_pitch: null, ideal_customer: null }, input), BRIEF_SCHEMA, {
-        timeoutMs: 50000,
+        timeoutMs: 80000,
       }),
     );
   } catch (e) {
     if (e instanceof RateLimited || e instanceof Overloaded)
-      return { status: "error", message: "Google's AI is at its limit for this minute. Wait a minute and click again." };
+      return {
+        status: "error",
+        message: /too long/.test((e as Error).message)
+          ? "Google's AI was too slow this time. Please click again."
+          : "Google's AI is at its limit for this minute. Wait a minute and click again.",
+      };
     return { status: "error", message: `Couldn't write the brief this time (${(e as Error).message.slice(0, 160)}).` };
   }
   if (!brief) return { status: "error", message: "The AI's answer wasn't usable. Please try again." };

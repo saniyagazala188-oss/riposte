@@ -10,7 +10,7 @@ import { FindTrendsButton } from "@/components/InsightButtons";
 import { Empty, PageHeader, Pager, PanelHead, pageNum, withParams } from "@/components/ui";
 
 export const metadata = { title: "Content · Riposte" };
-export const maxDuration = 60;
+export const maxDuration = 90;
 
 const PER_PAGE = 10;
 

@@ -564,3 +564,8 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 **Later, not now:** a custom domain. It helps trust and SEO, and lets invite emails reach other people. On hold until after the Profound submission.
 
 **Still open from before:** paid Gemini key (enables web search and "Sites AI relies on"), remove the y7gb2nspvu test account in Admin, and the LinkedIn launch post after the demo is submitted.
+
+## Fix: "This operation was aborted" when writing a brief (10 Oct)
+
+- **Cause:** the first AI call could use the brief's whole 50-second budget. When Gemini was slow, it timed out with "aborted", which wasn't treated as retryable, so the faster fallback model never got a turn.
+- **Fix:** each try is now capped (about 60% of the budget for long jobs, the whole budget for short ones). A timeout counts as "busy" and moves on to the next model. Briefs get 80 seconds, and Content intel allows 90. A slow answer now shows "Google's AI was too slow this time. Please click again."

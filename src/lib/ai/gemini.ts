@@ -58,6 +58,9 @@ export async function generateJson<T>(prompt: string, schema: object, { timeoutM
     { model: fallback, wait: 15000 },
   ];
   const deadline = Date.now() + timeoutMs;
+  // Short jobs keep their whole budget for one try. Longer ones (briefs, prompts, comparisons) give
+  // the first try about 60%, so a stuck answer still leaves time for the faster fallback model.
+  const perTry = timeoutMs <= 30000 ? timeoutMs : Math.max(25000, Math.round(timeoutMs * 0.6));
   let lastError: unknown;
   for (const step of plan) {
     if (step.wait && Date.now() + step.wait + 3000 > deadline) break;
@@ -65,14 +68,18 @@ export async function generateJson<T>(prompt: string, schema: object, { timeoutM
     const left = deadline - Date.now();
     if (left < 3000) break;
     try {
-      return await callOnce<T>(step.model, prompt, schema, left);
+      // One slow answer shouldn't use up the whole budget: cap each try, then move on.
+      return await callOnce<T>(step.model, prompt, schema, Math.min(left, perTry));
     } catch (e) {
-      lastError = e;
-      if (!(e instanceof Overloaded) && !(e instanceof RateLimited)) throw e;
+      lastError = isAbort(e) ? new Overloaded("Gemini took too long to answer") : e;
+      if (!(lastError instanceof Overloaded) && !(lastError instanceof RateLimited)) throw lastError;
     }
   }
   throw lastError ?? new Overloaded("Gemini is overloaded");
 }
+
+const isAbort = (e: unknown) =>
+  e instanceof Error && (e.name === "AbortError" || e.name === "TimeoutError" || /aborted/i.test(e.message));
 
 // ---------- Grounded answers (Gemini + Google Search) ----------
 
