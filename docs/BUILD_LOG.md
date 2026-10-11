@@ -563,6 +563,12 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 
 **Later, not now:** a custom domain. It helps trust and SEO, and lets invite emails reach other people. On hold until after the Profound submission.
 
+**New features agreed 11 Oct (build in this order):**
+
+1. **Knowledge base (start 12 Oct).** On the Your product page, upload PDF and Word (.docx) files: one-pagers, product pages, positioning docs, past content. Normal files are read directly; scanned PDFs go to Gemini to read. After each upload, a check card shows pages and word count, a short AI summary, the first lines of text, and a warning if little text was found. Every AI step (signals, action kits, briefs, comparisons, why they're winning) then judges against the 4 product fields plus these summaries. Beta limits: 10 MB per file, 10 files per user. Files go straight to Supabase Storage from the browser, because Vercel caps request size.
+2. **News and recognition tracker.** Watch 4 places per competitor: their own site (already done), press release wires (PR Newswire, Business Wire), Google News, and YouTube. Label each item as Launch, Partnership, Recognition (Gartner, Forrester, G2, awards) or Funding/acquisition, and explain why it matters and what to do, as today. The AI filters out unrelated news (common names). Not 100% coverage, but close.
+3. **Social media (later).** X has a paid API, LinkedIn doesn't allow reading other companies' pages, and Instagram allows only limited reads. Revisit once there are paying users. Riposte targets B2B SaaS, where launches almost always land on the website.
+
 **Still open from before:** paid Gemini key (enables web search and "Sites AI relies on"), remove the y7gb2nspvu test account in Admin, and the LinkedIn launch post after the demo is submitted.
 
 ## Fix: "This operation was aborted" when writing a brief (10 Oct)
