@@ -34,7 +34,7 @@ export async function generatePrompts(_prev: CheckState, formData: FormData): Pr
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("product_name, product_pitch, ideal_customer, differentiators")
+    .select("product_name, product_pitch, ideal_customer, differentiators, knowledge_summary")
     .eq("id", user.id)
     .maybeSingle();
   if (!profile?.product_pitch) return { status: "error", message: "Fill in Your product first, so the prompts match your buyers." };

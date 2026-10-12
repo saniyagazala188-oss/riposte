@@ -1,11 +1,14 @@
 // Builds the prompt that turns one detected change into a signal, and checks the answer.
 // Pure functions, no network, so they can be tested.
 
+import { knowledgeBlock } from "@/lib/knowledge/context";
+
 export type Profile = {
   product_name: string | null;
   product_pitch: string | null;
   ideal_customer: string | null;
   differentiators?: string | null;
+  knowledge_summary?: string | null; // all uploaded files, summarised (knowledge base)
 };
 
 export type ChangeInput = {
@@ -102,7 +105,10 @@ export function buildSignalPrompt(profile: Profile, change: ChangeInput): string
     `What it does: ${profile.product_pitch || "(not given)"}`,
     `Who it sells to: ${profile.ideal_customer || "(not given)"}`,
     `What makes it different: ${profile.differentiators || "(not given)"}`,
-  ].join("\n");
+    knowledgeBlock(profile.knowledge_summary),
+  ]
+    .filter(Boolean)
+    .join("\n");
 
   return `You are a product marketing analyst. A competitor's website changed. Explain the change to a busy marketer at the company below, judged against THEIR product and buyers.
 

@@ -44,7 +44,7 @@ export async function processChanges(
   const userIds = [...new Set(pending.map((c) => c.user_id))];
   const { data: profiles } = await db
     .from("profiles")
-    .select("id, product_name, product_pitch, ideal_customer, differentiators")
+    .select("id, product_name, product_pitch, ideal_customer, differentiators, knowledge_summary")
     .in("id", userIds);
   const profileOf = new Map((profiles ?? []).map((p) => [p.id as string, p as Profile]));
 

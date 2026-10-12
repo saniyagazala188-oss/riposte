@@ -2,6 +2,7 @@
 // Pure functions, no network, so they can be tested.
 
 import type { Profile } from "@/lib/signals/prompt";
+import { knowledgeBlock } from "@/lib/knowledge/context";
 
 function you(p: Profile) {
   return [
@@ -9,7 +10,10 @@ function you(p: Profile) {
     `What it does: ${p.product_pitch || "(not given)"}`,
     `Who it sells to: ${p.ideal_customer || "(not given)"}`,
     `What makes it different: ${p.differentiators || "(not given)"}`,
-  ].join("\n");
+    knowledgeBlock(p.knowledge_summary),
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 const str = (v: unknown, max: number) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "");

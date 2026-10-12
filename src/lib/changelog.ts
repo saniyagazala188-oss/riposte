@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-12T19:00:00+05:30",
+    title: "Knowledge base: judged against your own content",
+    body: "Upload your one-pagers, positioning docs, case studies and past posts (PDF or Word, up to 10 MB, 10 files in the beta). After each upload a check card shows the pages and words read, a short summary, the first lines and any warning, so you can see it worked. Scanned PDFs are read by Google's AI. Every signal, action kit, brief, comparison and AI search answer now uses your files, and briefs build on topics you've already covered instead of repeating them.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-07T20:20:00+05:30",
     title: "Landing page matches the product",
     body: "Who Riposte is for, a fourth problem (slow, with no sense of how much a change matters), \"Tell it about your product\" as the first step, impact levels, and connected moves.",

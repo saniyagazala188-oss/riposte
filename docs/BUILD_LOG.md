@@ -565,7 +565,7 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 
 **New features agreed 11 Oct (build in this order):**
 
-1. **Knowledge base (start 12 Oct).** On the Your product page, upload PDF and Word (.docx) files: one-pagers, product pages, positioning docs, past content. Normal files are read directly; scanned PDFs go to Gemini to read. After each upload, a check card shows pages and word count, a short AI summary, the first lines of text, and a warning if little text was found. Every AI step (signals, action kits, briefs, comparisons, why they're winning) then judges against the 4 product fields plus these summaries. Beta limits: 10 MB per file, 10 files per user. Files go straight to Supabase Storage from the browser, because Vercel caps request size.
+1. **Knowledge base (built 12 Oct, see below).** On the Your product page, upload PDF and Word (.docx) files: one-pagers, product pages, positioning docs, past content. Normal files are read directly; scanned PDFs go to Gemini to read. After each upload, a check card shows pages and word count, a short AI summary, the first lines of text, and a warning if little text was found. Every AI step (signals, action kits, briefs, comparisons, why they're winning) then judges against the 4 product fields plus these summaries. Beta limits: 10 MB per file, 10 files per user. Files go straight to Supabase Storage from the browser, because Vercel caps request size.
 2. **News and recognition tracker.** Watch 4 places per competitor: their own site (already done), press release wires (PR Newswire, Business Wire), Google News, and YouTube. Label each item as Launch, Partnership, Recognition (Gartner, Forrester, G2, awards) or Funding/acquisition, and explain why it matters and what to do, as today. The AI filters out unrelated news (common names). Not 100% coverage, but close.
 3. **Social media (later).** X has a paid API, LinkedIn doesn't allow reading other companies' pages, and Instagram allows only limited reads. Revisit once there are paying users. Riposte targets B2B SaaS, where launches almost always land on the website.
 
@@ -575,3 +575,14 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 
 - **Cause:** the first AI call could use the brief's whole 50-second budget. When Gemini was slow, it timed out with "aborted", which wasn't treated as retryable, so the faster fallback model never got a turn.
 - **Fix:** each try is now capped (about 60% of the budget for long jobs, the whole budget for short ones). A timeout counts as "busy" and moves on to the next model. Briefs get 80 seconds, and Content intel allows 90. A slow answer now shows "Google's AI was too slow this time. Please click again."
+
+## Knowledge base (12 Oct)
+
+- **What it does:** on Your product, marketers upload PDF and Word (.docx) files about their own product. Every AI step (signals, action kits, Prompt Studio, comparisons, content briefs, stories and trends, "why they're winning") now reads a summary of these files next to the four product fields.
+- **How a file is read:** the browser puts the file straight into a private Supabase Storage bucket (`knowledge`, one folder per user), because Vercel caps request size at about 4.5 MB. The server then reads the text: `unpdf` for PDFs, `mammoth` for Word. Fewer than about 40 words a page means a scanned file, so the PDF itself is sent to Gemini to read (OCR). Gemini also writes the kind of document, a 2-3 sentence summary and up to 8 key points.
+- **How the user knows it worked:** each file shows a check card: pages, word count, "read directly" or "read by Google's AI", the summary, key points, the first lines to compare with the file, and a "Looks good" or "Check this" badge with a plain warning (scanned, very little text, long file cut, or no summary because Google's AI was busy).
+- **What the AI sees:** `profiles.knowledge_summary`, all file summaries joined (capped at 4,500 characters so prompts stay fast), rebuilt after every upload and delete. Full text (up to 60,000 characters per file) is kept in `knowledge_docs.body` for later features.
+- **Limits:** 10 MB per file, 10 files per beta user (30 for admins). Shown on the welcome card.
+- **Briefs:** a new rule shapes a brief as an update or new angle when the marketer's own content already covers the topic.
+- **Setup:** run `supabase/migrations/0015_knowledge_base.sql` once in the Supabase SQL Editor. It creates the table, the column, the private bucket and its access rules.
+- **Tested:** real PDF and Word files read the same 672 words; an image-only PDF is flagged as scanned; wrong file types are refused with a clear message.

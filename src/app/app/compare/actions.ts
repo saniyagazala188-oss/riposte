@@ -14,7 +14,7 @@ export async function writeComparison(_prev: CheckState, formData: FormData): Pr
   const [{ data: competitor }, { data: profile }, { data: sources }, { data: signals }, { data: topics }, { data: prompts }, { data: existing }] =
     await Promise.all([
       supabase.from("competitors").select("id, name, domain").eq("id", competitorId).maybeSingle(),
-      supabase.from("profiles").select("product_name, product_pitch, ideal_customer, differentiators").eq("id", user.id).maybeSingle(),
+      supabase.from("profiles").select("product_name, product_pitch, ideal_customer, differentiators, knowledge_summary").eq("id", user.id).maybeSingle(),
       supabase.from("sources").select("id, type").eq("competitor_id", competitorId).in("type", ["pricing", "changelog"]),
       supabase
         .from("signals")

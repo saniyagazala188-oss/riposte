@@ -36,7 +36,7 @@ export async function explainAnswer(_prev: ExplainState, formData: FormData): Pr
   const id = String(formData.get("answer_id") ?? "");
   const [{ data: a }, { data: profile }] = await Promise.all([
     supabase.from("visibility_answers").select("id, answer, mentions").eq("id", id).maybeSingle(),
-    supabase.from("profiles").select("product_name, product_pitch, ideal_customer, differentiators").eq("id", user.id).maybeSingle(),
+    supabase.from("profiles").select("product_name, product_pitch, ideal_customer, differentiators, knowledge_summary").eq("id", user.id).maybeSingle(),
   ]);
   if (!a?.answer) return { status: "error", message: "Couldn't find that answer." };
   let reasons: Reason[];

@@ -1,6 +1,8 @@
 // AI visibility: who an AI search answer names, in what order, and which sites it used.
 // Pure functions, no network, so they can be tested.
 
+import { knowledgeBlock } from "@/lib/knowledge/context";
+
 export type Entity = { key: string; name: string; terms: string[] };
 export type Mention = {
   key: string;
@@ -120,6 +122,7 @@ export type Profile = {
   product_pitch: string | null;
   ideal_customer: string | null;
   differentiators?: string | null;
+  knowledge_summary?: string | null;
 };
 export type Reason = { name: string; known_for: string[]; you_match: "yes" | "partly" | "no"; gap: string };
 
@@ -148,7 +151,7 @@ export function buildReasonsPrompt(answer: string, profile: Profile | null): str
     ? `Name: ${profile.product_name}
 What it does: ${profile.product_pitch || "[not given]"}
 Who it's for: ${profile.ideal_customer || "[not given]"}
-What makes it different: ${profile.differentiators || "[not given]"}`
+What makes it different: ${profile.differentiators || "[not given]"}${knowledgeBlock(profile.knowledge_summary)}`
     : "[No product profile given]";
   return `Below is an answer an AI assistant gave to a buyer, and a short profile of OUR product.
 

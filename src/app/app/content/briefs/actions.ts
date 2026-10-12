@@ -51,7 +51,7 @@ export async function writeBrief(_prev: BriefState, formData: FormData): Promise
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("product_name, product_pitch, ideal_customer, differentiators")
+    .select("product_name, product_pitch, ideal_customer, differentiators, knowledge_summary")
     .eq("id", user.id)
     .maybeSingle();
 

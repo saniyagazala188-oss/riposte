@@ -2,6 +2,7 @@
 // Pure functions, no network, so they can be tested.
 
 import type { Profile } from "@/lib/signals/prompt";
+import { knowledgeBlock } from "@/lib/knowledge/context";
 
 export type Brief = {
   title: string;
@@ -63,7 +64,7 @@ THE MARKETER'S PRODUCT
 Product: ${profile.product_name || "(not given)"}
 What it does: ${profile.product_pitch || "(not given)"}
 Who it sells to: ${profile.ideal_customer || "(not given)"}
-What makes it different: ${profile.differentiators || "(not given)"}
+What makes it different: ${profile.differentiators || "(not given)"}${knowledgeBlock(profile.knowledge_summary)}
 
 THE SITUATION
 ${situation}
@@ -85,7 +86,8 @@ Return JSON:
 - cta: one sentence for the end of the piece.
 
 RULES
-- Describe the marketer's product only with what its profile says. If something is missing, write a placeholder in [square brackets].
+- Describe the marketer's product only with what its profile and their own content say. If something is missing, write a placeholder in [square brackets].
+- If their own content already covers this topic, say so in competitor_notes and shape the brief as an update or a new angle on that piece, not a repeat.
 - Never invent statistics, customers or quotes.
 - Simple English, no hype.`;
 }

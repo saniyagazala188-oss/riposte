@@ -14,7 +14,10 @@ export function geminiConfigured() {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-async function callOnce<T>(model: string, prompt: string, schema: object, timeoutMs: number): Promise<T> {
+// An optional file (e.g. a scanned PDF) is sent alongside the prompt, so Gemini can read it itself.
+export type InlineFile = { mimeType: string; base64: string };
+
+async function callOnce<T>(model: string, prompt: string, schema: object, timeoutMs: number, file?: InlineFile): Promise<T> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -23,7 +26,9 @@ async function callOnce<T>(model: string, prompt: string, schema: object, timeou
       signal: controller.signal,
       headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY ?? "" },
       body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        contents: [
+          { role: "user", parts: [...(file ? [{ inline_data: { mime_type: file.mimeType, data: file.base64 } }] : []), { text: prompt }] },
+        ],
         generationConfig: { temperature: 0.2, responseMimeType: "application/json", responseSchema: schema },
       }),
       cache: "no-store",
@@ -42,7 +47,11 @@ async function callOnce<T>(model: string, prompt: string, schema: object, timeou
   }
 }
 
-export async function generateJson<T>(prompt: string, schema: object, { timeoutMs = 30000 } = {}): Promise<T> {
+export async function generateJson<T>(
+  prompt: string,
+  schema: object,
+  { timeoutMs = 30000, file }: { timeoutMs?: number; file?: InlineFile } = {},
+): Promise<T> {
   if (!process.env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not set");
   const main = process.env.GEMINI_MODEL || "gemini-flash-latest";
   const fallback = process.env.GEMINI_FALLBACK_MODEL || "gemini-flash-lite-latest";
@@ -69,7 +78,7 @@ export async function generateJson<T>(prompt: string, schema: object, { timeoutM
     if (left < 3000) break;
     try {
       // One slow answer shouldn't use up the whole budget: cap each try, then move on.
-      return await callOnce<T>(step.model, prompt, schema, Math.min(left, perTry));
+      return await callOnce<T>(step.model, prompt, schema, Math.min(left, perTry), file);
     } catch (e) {
       lastError = isAbort(e) ? new Overloaded("Gemini took too long to answer") : e;
       if (!(lastError instanceof Overloaded) && !(lastError instanceof RateLimited)) throw lastError;

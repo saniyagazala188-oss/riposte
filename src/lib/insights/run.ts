@@ -22,7 +22,7 @@ const TREND_WINDOW_DAYS = 45;
 async function profileOf(db: SupabaseClient, userId: string): Promise<Profile> {
   const { data } = await db
     .from("profiles")
-    .select("product_name, product_pitch, ideal_customer, differentiators")
+    .select("product_name, product_pitch, ideal_customer, differentiators, knowledge_summary")
     .eq("id", userId)
     .maybeSingle();
   return (data as Profile) ?? { product_name: null, product_pitch: null, ideal_customer: null };

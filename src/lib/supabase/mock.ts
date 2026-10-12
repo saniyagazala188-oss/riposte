@@ -78,6 +78,13 @@ function builder(table: string) {
 export function createMockClient() {
   return {
     from: (table: string) => builder(table),
+    storage: {
+      from: () => ({
+        upload: async () => ({ data: null, error: null }),
+        download: async () => ({ data: null, error: { message: "no storage in preview" } }),
+        remove: async () => ({ data: null, error: null }),
+      }),
+    },
     auth: {
       getUser: async () => ({ data: { user: { id: "u1", email: "saniyagazala188@gmail.com" } }, error: null }),
       signOut: async () => ({ error: null }),

@@ -30,7 +30,7 @@ export async function runVisibility(
 
   const users = [...new Set(due.map((p) => p.user_id as string))];
   const [{ data: profiles }, { data: comps }] = await Promise.all([
-    db.from("profiles").select("id, product_name, product_pitch, ideal_customer, differentiators").in("id", users),
+    db.from("profiles").select("id, product_name, product_pitch, ideal_customer, differentiators, knowledge_summary").in("id", users),
     db.from("competitors").select("id, user_id, name, domain").in("user_id", users),
   ]);
   const entitiesOf = new Map(

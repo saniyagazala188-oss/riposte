@@ -2,6 +2,7 @@
 // Pure functions, no network, so they can be tested.
 
 import { changeEvidence, type ChangeInput, type Profile } from "@/lib/signals/prompt";
+import { knowledgeBlock } from "@/lib/knowledge/context";
 
 export const KINDS = [
   "battlecard", "talk_track", "comparison_page", "blog_post", "social_post",
@@ -82,7 +83,7 @@ THE MARKETER'S COMPANY
 Product: ${profile.product_name || "(not given)"}
 What it does: ${profile.product_pitch || "(not given)"}
 Who it sells to: ${profile.ideal_customer || "(not given)"}
-What makes it different: ${profile.differentiators || "(not given)"}
+What makes it different: ${profile.differentiators || "(not given)"}${knowledgeBlock(profile.knowledge_summary)}
 
 THE SIGNAL (already analysed)
 Competitor: ${s.competitorName}

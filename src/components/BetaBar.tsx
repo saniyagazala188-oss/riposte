@@ -9,7 +9,7 @@ export function BetaBar({
 }: {
   competitors: number;
   prompts: number;
-  limits: { competitors: number; trackedPrompts: number };
+  limits: { competitors: number; trackedPrompts: number; knowledgeFiles?: number };
 }) {
   const meter = (label: string, used: number, max: number) => (
     <span className={used >= max ? "font-semibold text-signal" : ""}>
@@ -27,6 +27,7 @@ export function BetaBar({
           <li>• Track up to {limits.trackedPrompts} AI search prompts</li>
           <li>• Every competitor checked each morning, plus Check now</li>
           <li>• Alerts by email, and a digest every Monday</li>
+          {limits.knowledgeFiles ? <li>• Upload up to {limits.knowledgeFiles} files about your product (PDF or Word)</li> : null}
         </ul>
         <p className="mt-3 text-muted">
           Start with <Link href="/app/product" className="font-semibold text-accent hover:underline">Your product</Link>, then

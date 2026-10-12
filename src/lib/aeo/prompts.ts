@@ -3,6 +3,7 @@
 // Pure functions, no network, so they can be tested.
 
 import type { Profile } from "@/lib/signals/prompt";
+import { knowledgeBlock } from "@/lib/knowledge/context";
 
 // How many prompts can be checked in AI search (keeps within the free Gemini quota).
 export const MAX_TRACKED = 30;
@@ -60,7 +61,10 @@ export function buildPromptStudioPrompt(
     `Product category and what it does: ${profile.product_pitch || "(not given)"}`,
     `Who it sells to: ${profile.ideal_customer || "(not given)"}`,
     `What makes it different: ${profile.differentiators || "(not given)"}`,
-  ].join("\n");
+    knowledgeBlock(profile.knowledge_summary),
+  ]
+    .filter(Boolean)
+    .join("\n");
   return `You are a senior AEO (answer engine optimisation) strategist. Turn the SEO keywords below into buyer prompts that people type into AI assistants like ChatGPT, Gemini and Perplexity. The marketer will track whether AI answers recommend their product for these prompts.
 
 THE MARKETER'S PRODUCT (use it to understand the category and buyers; never name it)
