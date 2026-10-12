@@ -3,27 +3,12 @@ import { card } from "@/components/styles";
 import { PageHeader } from "@/components/ui";
 import { ProductForm } from "./ProductForm";
 import { KnowledgeUpload } from "./KnowledgeUpload";
-import { deleteKnowledgeFile } from "./knowledge-actions";
+import { KnowledgeDocRow, type KnowledgeDoc } from "./KnowledgeDocRow";
 import { limitsFor } from "@/lib/access";
 import { mockEnabled } from "@/lib/supabase/mock";
 
 export const maxDuration = 90;
 
-type Doc = {
-  id: string;
-  created_at: string;
-  file_name: string;
-  file_type: "pdf" | "docx";
-  pages: number | null;
-  words: number;
-  method: "text" | "ocr";
-  status: "ready" | "warning";
-  warning: string | null;
-  doc_kind: string | null;
-  summary: string | null;
-  key_points: string[] | null;
-  excerpt: string | null;
-};
 
 export const metadata = { title: "Your product · Riposte" };
 
@@ -34,73 +19,6 @@ const USES = [
   { title: "Comparisons", body: "Your side of each comparison page comes only from here; anything missing becomes a [placeholder]." },
   { title: "Knowledge base", body: "Your uploaded files add detail to all of the above, and stop content briefs from suggesting topics you already cover." },
 ];
-
-function DocRow({ d }: { d: Doc }) {
-  const facts = [
-    d.file_type === "pdf" ? "PDF" : "Word",
-    d.pages ? `${d.pages} ${d.pages === 1 ? "page" : "pages"}` : null,
-    `${d.words.toLocaleString("en")} words`,
-  ].filter(Boolean);
-  const ok = d.status === "ready";
-  return (
-    <li className="rounded-xl border border-line bg-surface">
-      <details className="group">
-        <summary className="flex cursor-pointer list-none items-center gap-3 px-3 py-2.5 [&::-webkit-details-marker]:hidden">
-          <span
-            aria-hidden
-            className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-bg text-[10px] font-bold uppercase tracking-wide text-muted"
-          >
-            {d.file_type === "pdf" ? "PDF" : "DOC"}
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block truncate text-sm font-semibold">{d.file_name}</span>
-            <span className="block truncate text-xs text-muted">{facts.join(" · ")}</span>
-          </span>
-          <span
-            className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${ok ? "bg-accent-soft text-accent" : "bg-signal-soft text-signal"}`}
-          >
-            {ok ? "Looks good" : "Check this"}
-          </span>
-          <svg aria-hidden viewBox="0 0 20 20" className="h-4 w-4 shrink-0 text-muted transition-transform group-open:rotate-180">
-            <path d="M5 7.5l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </summary>
-        <div className="flex flex-col gap-3 border-t border-line px-3 pb-3 pt-3 text-sm">
-          {d.warning && <p className="rounded-lg bg-signal-soft px-3 py-2">{d.warning}</p>}
-          {d.summary && (
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                What Riposte understood{d.doc_kind ? ` · ${d.doc_kind}` : ""}
-              </p>
-              <p className="mt-1">{d.summary}</p>
-            </div>
-          )}
-          {d.key_points && d.key_points.length > 0 && (
-            <ul className="list-disc space-y-1 pl-5">
-              {d.key_points.map((k) => (
-                <li key={k}>{k}</li>
-              ))}
-            </ul>
-          )}
-          {d.excerpt && (
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                First lines · {d.method === "ocr" ? "read by Google's AI" : "read directly"}
-              </p>
-              <p className="mt-1 italic text-muted">&ldquo;{d.excerpt}&rdquo;</p>
-            </div>
-          )}
-          <form action={deleteKnowledgeFile}>
-            <input type="hidden" name="id" value={d.id} />
-            <button type="submit" className="text-sm font-semibold text-danger hover:underline">
-              Delete file
-            </button>
-          </form>
-        </div>
-      </details>
-    </li>
-  );
-}
 
 export default async function ProductPage() {
   const { supabase, user } = await requireUser();
@@ -114,7 +32,7 @@ export default async function ProductPage() {
     .select("id, created_at, file_name, file_type, pages, words, method, status, warning, doc_kind, summary, key_points, excerpt")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
-  const docs = (docRows ?? []) as Doc[];
+  const docs = (docRows ?? []) as KnowledgeDoc[];
   const limit = limitsFor(user.email).knowledgeFiles;
   const filled = [profile?.product_name, profile?.product_pitch, profile?.ideal_customer, profile?.differentiators].filter(Boolean).length;
 
@@ -152,10 +70,10 @@ export default async function ProductPage() {
               <>
                 <ul className="mt-3 flex max-h-[26rem] flex-col gap-2 overflow-y-auto pr-0.5">
                   {docs.map((d) => (
-                    <DocRow key={d.id} d={d} />
+                    <KnowledgeDocRow key={d.id} d={d} />
                   ))}
                 </ul>
-                <p className="mt-2 text-xs text-muted">Open a file to see what Riposte read from it.</p>
+                <p className="mt-2 text-xs text-muted">Click a file to see what Riposte read from it.</p>
               </>
             ) : (
               <p className="mt-3 text-sm text-muted">No files yet. After each upload you&apos;ll see what Riposte read, so you can check it worked.</p>
