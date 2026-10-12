@@ -1,17 +1,49 @@
-// News about competitors: a Google News search feed per competitor name, and grouping of
+// News about competitors: a GDELT news search feed per competitor name, and grouping of
 // articles that cover the same story. Pure functions, no network, so they can be tested.
 
 import type { FeedItem } from "@/lib/fetcher/extract";
 
-// Same address the database builds in migration 0016 (keep the two in step).
+// News comes from GDELT (api.gdeltproject.org), a free, open news database built for
+// programs to read. (Google News asks bots not to read its search feeds, so it isn't used.)
+// The search is the exact company name, English-language news, last 14 days, newest first.
 export function newsFeedUrl(company: string): string {
-  const q = company
-    .trim()
-    .replace(/%/g, "%25")
-    .replace(/&/g, "%26")
-    .replace(/"/g, "")
-    .replace(/ /g, "+");
-  return `https://news.google.com/rss/search?q=%22${q}%22+when:14d&hl=en-US&gl=US&ceid=US:en`;
+  const phrase = encodeURIComponent(`"${company.trim().replace(/"/g, "")}"`);
+  return `https://api.gdeltproject.org/api/v2/doc/doc?query=${phrase}%20sourcelang:english&mode=ArtList&format=RSS&timespan=14d&maxrecords=50&sort=DateDesc`;
+}
+
+export const isGdelt = (url: string) => url.startsWith("https://api.gdeltproject.org/");
+
+// The company name inside a news source address (GDELT, or the older Google News one).
+export function companyFromNewsUrl(url: string): string | null {
+  try {
+    const u = new URL(url);
+    const q = u.searchParams.get("query") ?? u.searchParams.get("q") ?? "";
+    const m = q.match(/"([^"]+)"/);
+    return m ? m[1].trim() : null;
+  } catch {
+    return null;
+  }
+}
+
+// Old Google News sources are moved to GDELT the next time they are checked.
+export function upgradeNewsUrl(url: string): string | null {
+  if (isGdelt(url)) return null;
+  const name = companyFromNewsUrl(url);
+  return name ? newsFeedUrl(name) : null;
+}
+
+// A page a person can open to see the same news (the feed itself isn't meant for reading).
+export function humanNewsUrl(url: string): string {
+  const name = companyFromNewsUrl(url);
+  return name ? `https://news.google.com/search?q=${encodeURIComponent(`"${name}"`)}` : url;
+}
+
+export function outletFromLink(link: string): string | null {
+  try {
+    return new URL(link).hostname.replace(/^www\./, "");
+  } catch {
+    return null;
+  }
 }
 
 export type NewsArticle = { title: string; outlet: string | null; link: string; date: string | null };
@@ -55,7 +87,9 @@ export function groupStories(items: FeedItem[], seenHeadlines: string[] = [], ma
   const stories: NewsStory[] = [];
   const sorted = [...items].sort((a, b) => (Date.parse(b.date ?? "") || 0) - (Date.parse(a.date ?? "") || 0));
   for (const it of sorted) {
-    const { headline, outlet } = splitTitle(it.title);
+    // GDELT titles are plain headlines; the outlet comes from the article's address.
+    const headline = it.title;
+    const outlet = outletFromLink(it.link);
     if (seenHeadlines.some((h) => sameStory(h, headline))) continue;
     const article = { title: headline, outlet, link: it.link, date: it.date };
     const home = stories.find((s) => sameStory(s.headline, headline));

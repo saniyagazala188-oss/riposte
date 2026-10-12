@@ -15,7 +15,7 @@ import {
   type FeedItem,
 } from "./extract";
 import { isAllowed, parseRobots, type Robots } from "./robots";
-import { groupStories } from "@/lib/news";
+import { groupStories, isGdelt, upgradeNewsUrl } from "@/lib/news";
 
 export type SourceRow = {
   id: string;
@@ -55,6 +55,16 @@ function robotsFor(origin: string): Promise<Robots | null> {
   return cached;
 }
 
+// ---------- GDELT asks for at most one request every 5 seconds ----------
+
+let gdeltQueue: Promise<void> = Promise.resolve();
+function gdeltTurn(): Promise<void> {
+  const turn = gdeltQueue.then(() => new Promise<void>((r) => setTimeout(r, 5500)));
+  const mine = gdeltQueue;
+  gdeltQueue = turn;
+  return mine;
+}
+
 // ---------- page-reading service (for pages built by JavaScript) ----------
 
 async function readWithReader(url: string): Promise<string[] | null> {
@@ -82,6 +92,8 @@ async function capture(source: SourceRow): Promise<Captured | CheckOutcome> {
   if (robots && !isAllowed(robots, target.pathname + target.search)) {
     return { sourceId: source.id, status: "robots", message: "This website asks bots not to read this page, so Riposte skips it." };
   }
+
+  if (source.type === "news" && isGdelt(source.url)) await gdeltTurn();
 
   let res;
   try {
@@ -150,8 +162,18 @@ async function capture(source: SourceRow): Promise<Captured | CheckOutcome> {
 
 // ---------- check one source and record the result ----------
 
-export async function checkSource(db: SupabaseClient, source: SourceRow): Promise<CheckOutcome> {
+export async function checkSource(db: SupabaseClient, input: SourceRow): Promise<CheckOutcome> {
   const now = new Date().toISOString();
+  let source = input;
+  // Older news sources pointed at Google News, which asks bots not to read it: move them to GDELT.
+  if (source.type === "news") {
+    const upgraded = upgradeNewsUrl(source.url);
+    if (upgraded) {
+      await db.from("sources").update({ url: upgraded }).eq("id", source.id);
+      await db.from("snapshots").delete().eq("source_id", source.id);
+      source = { ...source, url: upgraded };
+    }
+  }
   const captured = await capture(source).catch(
     (): CheckOutcome => ({ sourceId: source.id, status: "error", message: "Something went wrong reading this page." }),
   );

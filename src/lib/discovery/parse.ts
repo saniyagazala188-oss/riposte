@@ -10,7 +10,7 @@ export const SOURCE_LABELS: Record<SourceType, string> = {
   pricing: "Pricing page",
   sitemap: "Sitemap",
   other: "Other page",
-  news: "News coverage (Google News)",
+  news: "News coverage",
 };
 
 // Turns "https://www.Example.com/pricing" or "example.com" into "example.com".

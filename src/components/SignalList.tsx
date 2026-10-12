@@ -8,6 +8,7 @@ import { ActionItemCard, ACTION_FIELDS, type ActionItemRow } from "@/components/
 import { BuildKitButton } from "@/components/KitButtons";
 import { Tabs } from "@/components/ui-client";
 import { card } from "@/components/styles";
+import { humanNewsUrl } from "@/lib/news";
 
 export type SignalRow = {
   id: string;
@@ -151,8 +152,13 @@ export function SignalDetail({ s }: { s: SignalRow }) {
           <span className="ml-2 font-mono text-xs font-normal text-muted">detected {timeAgo(s.changes.detected_at)}</span>
         </span>
         {source && (
-          <a href={source.url} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-accent hover:underline">
-            {source.type === "news" ? "Open the news search ↗" : "Open their page ↗"}
+          <a
+            href={source.type === "news" ? humanNewsUrl(source.url) : source.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-semibold text-accent hover:underline"
+          >
+            {source.type === "news" ? "See more news ↗" : "Open their page ↗"}
           </a>
         )}
       </div>
