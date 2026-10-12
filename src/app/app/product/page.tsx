@@ -36,7 +36,15 @@ export default async function ProductPage() {
     .order("created_at", { ascending: false });
   const docs = (docRows ?? []) as KnowledgeDoc[];
   const limit = limitsFor(user.email).knowledgeFiles;
-  const filled = [profile?.product_name, profile?.product_pitch, profile?.ideal_customer, profile?.differentiators].filter(Boolean).length;
+  const steps = [
+    { label: "Product name", done: Boolean(profile?.product_name) },
+    { label: "What it does", done: Boolean(profile?.product_pitch) },
+    { label: "Who you sell to", done: Boolean(profile?.ideal_customer) },
+    { label: "What makes you different", done: Boolean(profile?.differentiators) },
+    { label: "At least one file in the knowledge base", done: docs.length > 0 },
+  ];
+  const filled = steps.filter((x) => x.done).length;
+  const missing = steps.filter((x) => !x.done).map((x) => x.label);
 
   return (
     <div>
@@ -84,11 +92,14 @@ export default async function ProductPage() {
           <section className={`${card} p-5`}>
             <div className="flex items-baseline justify-between">
               <h2 className="font-display text-lg font-bold">Profile</h2>
-              <span className={`text-sm font-semibold ${filled === 4 ? "text-accent" : "text-signal"}`}>{filled} of 4 filled</span>
+              <span className={`text-sm font-semibold ${filled === steps.length ? "text-accent" : "text-signal"}`}>
+                {filled} of {steps.length} done
+              </span>
             </div>
             <div className="mt-2 h-2 rounded-full bg-bg" aria-hidden>
-              <div className="h-2 rounded-full bg-accent" style={{ width: `${(filled / 4) * 100}%` }} />
+              <div className="h-2 rounded-full bg-accent" style={{ width: `${(filled / steps.length) * 100}%` }} />
             </div>
+            {missing.length > 0 && <p className="mt-2 text-xs text-muted">Still to add: {missing.join(", ")}.</p>}
             <details className="group mt-3">
               <summary className="cursor-pointer list-none text-sm font-semibold text-accent [&::-webkit-details-marker]:hidden">
                 Where Riposte uses this <span className="inline-block transition-transform group-open:rotate-90">›</span>
