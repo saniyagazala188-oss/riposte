@@ -549,9 +549,28 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - How it works: five steps, starting with **Tell it about your product**. "It explains the change" now mentions high, medium or low impact.
 - Signal feed row: impact level, and related changes joined into one connected move.
 
+## Pending list (updated 12 Oct)
+
+**Done since 10 Oct:** Profound demo submitted (result in about 14 days), Marketing Engineer application sent, knowledge base live and tested, news tracker built.
+
+**Riposte features**
+1. **News source that works.** Google News asks bots not to read its feeds, and GDELT answers "busy" (429) to Vercel's shared servers. Next: switch to NewsData.io with Saniya's own free key (about 200 requests a day), keeping GDELT as a backup when no key is set. Saniya signs up and adds `NEWSDATA_API_KEY` in Vercel.
+2. **Hiring signals.** Read competitors' job posts (Greenhouse, Lever and Ashby have free public job lists) to spot new markets and teams early.
+3. **Paid Gemini key.** Turns on web search for AI visibility and "Sites AI relies on", and stops "AI busy" messages once beta users arrive.
+4. **Social media.** Later, once there are paying users (X costs money, LinkedIn doesn't allow it).
+
+**Launch and marketing**
+5. **60-second LinkedIn clip.** Claude writes a 60-second script in Saniya's voice, she records it in one go, then Claude writes the post text.
+6. **LinkedIn launch post** with the clip and the waitlist link.
+7. **Analytics, voice study, keyword research, blog posts, publish** (the 5 steps below).
+8. **Custom domain** (later).
+
+**Small clean-ups**
+9. Remove the y7gb2nspvu test account in Admin.
+
 ## Next up: action points (agreed 10 Oct)
 
-**Now:** record and submit the Profound demo video. Everything below waits until that's done.
+**Now:** ~~record and submit the Profound demo video~~ (done 10 Oct).
 
 1. **Analytics.** Add Google Search Console verification and Google Analytics 4 through two Vercel settings. Track waitlist joins, sign-ups and logins as events. Submit the sitemap in Search Console.
 2. **Voice study.** Read Saniya's TestMu author page and past posts, so new posts sound like her.
