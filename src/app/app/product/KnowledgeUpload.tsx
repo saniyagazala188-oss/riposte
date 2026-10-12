@@ -40,11 +40,7 @@ export function KnowledgeUpload({ userId, direct, full }: { userId: string; dire
       const { error } = await supabase.storage.from("knowledge").upload(path, file, { contentType: MIME[kind], upsert: false });
       setUploading(false);
       if (error) {
-        return setProblem(
-          /bucket/i.test(error.message)
-            ? "File storage isn't set up yet (migration 0015)."
-            : "The upload didn't go through. Please check your connection and try again.",
-        );
+        return setProblem(`The upload didn't go through. Supabase said: "${error.message}"`);
       }
       fd.set("path", path);
     }
