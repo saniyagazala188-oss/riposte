@@ -56,7 +56,7 @@ export function KnowledgeUpload({ userId, direct, full }: { userId: string; dire
   const message = problem ?? (state.status === "error" ? state.message : null);
 
   return (
-    <div className="rounded-xl border border-dashed border-line bg-bg p-4">
+    <div className="rounded-xl border border-dashed border-line bg-bg p-3">
       <input
         ref={input}
         type="file"

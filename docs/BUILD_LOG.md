@@ -586,3 +586,4 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - **Briefs:** a new rule shapes a brief as an update or new angle when the marketer's own content already covers the topic.
 - **Setup:** run `supabase/migrations/0015_knowledge_base.sql` once in the Supabase SQL Editor. It creates the table, the column, the private bucket and its access rules.
 - **Tested:** real PDF and Word files read the same 672 words; an image-only PDF is flagged as scanned; wrong file types are refused with a clear message.
+- **Layout (same day):** the knowledge base now sits beside the form instead of below it. Each file is one compact row (type, name, pages and words, "Looks good" or "Check this") that opens to show the summary, key points, first lines and Delete. The list scrolls inside its card, and "Where Riposte uses this" folds away under Profile, so the page fits on one screen. Also fixed the page being slightly too wide on phones.

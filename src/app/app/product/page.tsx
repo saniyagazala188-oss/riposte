@@ -35,57 +35,69 @@ const USES = [
   { title: "Knowledge base", body: "Your uploaded files add detail to all of the above, and stop content briefs from suggesting topics you already cover." },
 ];
 
-function DocCard({ d }: { d: Doc }) {
+function DocRow({ d }: { d: Doc }) {
   const facts = [
     d.file_type === "pdf" ? "PDF" : "Word",
     d.pages ? `${d.pages} ${d.pages === 1 ? "page" : "pages"}` : null,
     `${d.words.toLocaleString("en")} words`,
-    d.method === "ocr" ? "read by Google's AI (scanned)" : "read directly",
   ].filter(Boolean);
+  const ok = d.status === "ready";
   return (
-    <li className="rounded-xl border border-line bg-surface p-4">
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <div className="min-w-0">
-          <p className="break-words font-semibold">{d.file_name}</p>
-          <p className="text-xs text-muted">{facts.join(" · ")}</p>
+    <li className="rounded-xl border border-line bg-surface">
+      <details className="group">
+        <summary className="flex cursor-pointer list-none items-center gap-3 px-3 py-2.5 [&::-webkit-details-marker]:hidden">
+          <span
+            aria-hidden
+            className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-bg text-[10px] font-bold uppercase tracking-wide text-muted"
+          >
+            {d.file_type === "pdf" ? "PDF" : "DOC"}
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-sm font-semibold">{d.file_name}</span>
+            <span className="block truncate text-xs text-muted">{facts.join(" · ")}</span>
+          </span>
+          <span
+            className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${ok ? "bg-accent-soft text-accent" : "bg-signal-soft text-signal"}`}
+          >
+            {ok ? "Looks good" : "Check this"}
+          </span>
+          <svg aria-hidden viewBox="0 0 20 20" className="h-4 w-4 shrink-0 text-muted transition-transform group-open:rotate-180">
+            <path d="M5 7.5l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </summary>
+        <div className="flex flex-col gap-3 border-t border-line px-3 pb-3 pt-3 text-sm">
+          {d.warning && <p className="rounded-lg bg-signal-soft px-3 py-2">{d.warning}</p>}
+          {d.summary && (
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                What Riposte understood{d.doc_kind ? ` · ${d.doc_kind}` : ""}
+              </p>
+              <p className="mt-1">{d.summary}</p>
+            </div>
+          )}
+          {d.key_points && d.key_points.length > 0 && (
+            <ul className="list-disc space-y-1 pl-5">
+              {d.key_points.map((k) => (
+                <li key={k}>{k}</li>
+              ))}
+            </ul>
+          )}
+          {d.excerpt && (
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                First lines · {d.method === "ocr" ? "read by Google's AI" : "read directly"}
+              </p>
+              <p className="mt-1 italic text-muted">&ldquo;{d.excerpt}&rdquo;</p>
+            </div>
+          )}
+          <form action={deleteKnowledgeFile}>
+            <input type="hidden" name="id" value={d.id} />
+            <button type="submit" className="text-sm font-semibold text-danger hover:underline">
+              Delete file
+            </button>
+          </form>
         </div>
-        <span
-          className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-            d.status === "ready" ? "bg-accent-soft text-accent" : "bg-signal-soft text-signal"
-          }`}
-        >
-          {d.status === "ready" ? "Looks good" : "Check this"}
-        </span>
-      </div>
-      {d.warning && <p className="mt-3 rounded-lg bg-signal-soft px-3 py-2 text-sm text-ink">{d.warning}</p>}
-      {d.summary && (
-        <div className="mt-3">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted">What Riposte understood{d.doc_kind ? ` · ${d.doc_kind}` : ""}</p>
-          <p className="mt-1 text-sm">{d.summary}</p>
-        </div>
-      )}
-      {d.key_points && d.key_points.length > 0 && (
-        <details className="mt-2 text-sm">
-          <summary className="cursor-pointer font-semibold text-accent">Key points ({d.key_points.length})</summary>
-          <ul className="mt-2 list-disc space-y-1 pl-5">
-            {d.key_points.map((k) => (
-              <li key={k}>{k}</li>
-            ))}
-          </ul>
-        </details>
-      )}
-      {d.excerpt && (
-        <div className="mt-3">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted">First lines, to compare with your file</p>
-          <p className="mt-1 text-sm italic text-muted">&ldquo;{d.excerpt}&rdquo;</p>
-        </div>
-      )}
-      <form action={deleteKnowledgeFile} className="mt-3">
-        <input type="hidden" name="id" value={d.id} />
-        <button type="submit" className="text-sm font-semibold text-danger hover:underline">
-          Delete
-        </button>
-      </form>
+      </details>
     </li>
   );
 }
@@ -113,7 +125,7 @@ export default async function ProductPage() {
         title="Tell Riposte what you sell"
         description="Every signal, draft and comparison is written for your product. The more specific this is, the sharper the advice."
       />
-      <div className="mt-5 grid items-start gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+      <div className="mt-5 grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <section className={`${card} p-5 sm:p-6`}>
           <ProductForm
             product_name={profile?.product_name ?? ""}
@@ -122,31 +134,33 @@ export default async function ProductPage() {
             differentiators={profile?.differentiators ?? ""}
           />
         </section>
-        <section className={`${card} p-5 sm:p-6 lg:col-start-1`}>
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="font-display text-lg font-bold">Knowledge base</h2>
-            <span className="text-sm text-muted">
-              {docs.length} of {limit} files
-            </span>
-          </div>
-          <p className="mt-1 text-sm text-muted">
-            Upload what you already have about your product: one-pagers, product pages, positioning docs, case studies, past blog posts.
-            Every signal, brief and comparison is then judged against your own content, not just the four fields above.
-          </p>
-          <div className="mt-4">
-            <KnowledgeUpload userId={user.id} direct={mockEnabled()} full={docs.length >= limit} />
-          </div>
-          {docs.length > 0 ? (
-            <ul className="mt-4 flex flex-col gap-3">
-              {docs.map((d) => (
-                <DocCard key={d.id} d={d} />
-              ))}
-            </ul>
-          ) : (
-            <p className="mt-4 text-sm text-muted">No files yet. After each upload you&apos;ll see what Riposte read, so you can check it worked.</p>
-          )}
-        </section>
-        <aside className="flex flex-col gap-4 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+        <aside className="flex min-w-0 flex-col gap-4">
+          <section className={`${card} p-5`}>
+            <div className="flex items-baseline justify-between gap-2">
+              <h2 className="font-display text-lg font-bold">Knowledge base</h2>
+              <span className="text-sm text-muted">
+                {docs.length} of {limit} files
+              </span>
+            </div>
+            <p className="mt-1 text-sm text-muted">
+              Add one-pagers, positioning docs, case studies or past posts. Riposte judges every change against your own content too.
+            </p>
+            <div className="mt-3">
+              <KnowledgeUpload userId={user.id} direct={mockEnabled()} full={docs.length >= limit} />
+            </div>
+            {docs.length > 0 ? (
+              <>
+                <ul className="mt-3 flex max-h-[26rem] flex-col gap-2 overflow-y-auto pr-0.5">
+                  {docs.map((d) => (
+                    <DocRow key={d.id} d={d} />
+                  ))}
+                </ul>
+                <p className="mt-2 text-xs text-muted">Open a file to see what Riposte read from it.</p>
+              </>
+            ) : (
+              <p className="mt-3 text-sm text-muted">No files yet. After each upload you&apos;ll see what Riposte read, so you can check it worked.</p>
+            )}
+          </section>
           <section className={`${card} p-5`}>
             <div className="flex items-baseline justify-between">
               <h2 className="font-display text-lg font-bold">Profile</h2>
@@ -155,17 +169,19 @@ export default async function ProductPage() {
             <div className="mt-2 h-2 rounded-full bg-bg" aria-hidden>
               <div className="h-2 rounded-full bg-accent" style={{ width: `${(filled / 4) * 100}%` }} />
             </div>
-          </section>
-          <section className={`${card} p-5`}>
-            <h2 className="font-display text-lg font-bold">Where Riposte uses this</h2>
-            <ul className="mt-3 flex flex-col gap-3 text-sm">
-              {USES.map((u) => (
-                <li key={u.title}>
-                  <p className="font-semibold">{u.title}</p>
-                  <p className="text-muted">{u.body}</p>
-                </li>
-              ))}
-            </ul>
+            <details className="group mt-3">
+              <summary className="cursor-pointer list-none text-sm font-semibold text-accent [&::-webkit-details-marker]:hidden">
+                Where Riposte uses this <span className="inline-block transition-transform group-open:rotate-90">›</span>
+              </summary>
+              <ul className="mt-3 flex flex-col gap-3 text-sm">
+                {USES.map((u) => (
+                  <li key={u.title}>
+                    <p className="font-semibold">{u.title}</p>
+                    <p className="text-muted">{u.body}</p>
+                  </li>
+                ))}
+              </ul>
+            </details>
           </section>
         </aside>
       </div>
