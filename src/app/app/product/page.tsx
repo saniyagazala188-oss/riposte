@@ -13,11 +13,13 @@ export const maxDuration = 90;
 export const metadata = { title: "Your product · Riposte" };
 
 const USES = [
-  { title: "Signals", body: "Every competitor change is judged against who you sell to: the same price rise can be noise or a threat." },
-  { title: "Action kits", body: "Battlecards, talk tracks and posts pivot to what makes you different, not generic lines." },
+  { title: "Signals", body: "Every competitor change is judged against your product and buyers: the same price rise can be noise or a threat." },
+  { title: "Action kits", body: "Battlecards, talk tracks and posts lead with what makes you different, not generic lines." },
+  { title: "Content intel", body: "Briefs use your angle, and build on topics you already cover instead of repeating them." },
+  { title: "Comparisons", body: "Your side of each comparison page comes only from your profile and files; anything missing becomes a [placeholder]." },
   { title: "Prompt Studio", body: "Buyer prompts match your category, buyers and the niches you want to win." },
-  { title: "Comparisons", body: "Your side of each comparison page comes only from here; anything missing becomes a [placeholder]." },
-  { title: "Knowledge base", body: "Your uploaded files add detail to all of the above, and stop content briefs from suggesting topics you already cover." },
+  { title: "AI visibility", body: "\"Why they're winning\" compares what AI says about competitors with what you claim." },
+  { title: "Knowledge base", body: "Your uploaded files add detail to all of the above." },
 ];
 
 export default async function ProductPage() {
