@@ -5,7 +5,8 @@ import { addSource, type FormState } from "@/app/app/actions";
 import { SOURCE_LABELS, type SourceType } from "@/lib/discovery/parse";
 import { inputClass, primaryButton } from "@/components/styles";
 
-const TYPES = Object.keys(SOURCE_LABELS) as SourceType[];
+// News sources are added automatically for every competitor, so they are not offered here.
+const TYPES = (Object.keys(SOURCE_LABELS) as SourceType[]).filter((t) => t !== "news");
 
 export function AddSourceForm({ competitorId }: { competitorId: string }) {
   const [state, action, pending] = useActionState<FormState, FormData>(addSource, { status: "idle" });
