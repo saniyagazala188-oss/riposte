@@ -88,23 +88,29 @@ async function readWithReader(url: string): Promise<string[] | null> {
 
 async function capture(source: SourceRow): Promise<Captured | CheckOutcome> {
   const target = new URL(source.url);
+  const gdelt = source.type === "news" && isGdelt(source.url);
+  if (gdelt && !robotsCache.has(target.origin)) await gdeltTurn(); // reading its robots.txt counts as a request too
   const robots = await robotsFor(target.origin);
   if (robots && !isAllowed(robots, target.pathname + target.search)) {
     return { sourceId: source.id, status: "robots", message: "This website asks bots not to read this page, so Riposte skips it." };
   }
 
-  if (source.type === "news" && isGdelt(source.url)) await gdeltTurn();
-
   let res;
-  try {
-    res = await fetchPage(source.url, { large: source.type === "sitemap" || source.type === "feed" || source.type === "news" });
-  } catch {
-    res = null;
+  // GDELT allows one request every 5 seconds and answers 429 when busy: wait our turn, retry twice.
+  for (let attempt = 0; attempt < (gdelt ? 3 : 1); attempt++) {
+    if (gdelt) await gdeltTurn();
+    try {
+      res = await fetchPage(source.url, { large: source.type === "sitemap" || source.type === "feed" || source.type === "news" });
+    } catch {
+      res = null;
+    }
+    if (!gdelt || (res && res.status !== 429)) break;
   }
 
   if (source.type === "feed" || source.type === "news" || source.type === "sitemap") {
     if (!res) return { sourceId: source.id, status: "error", message: "The website didn't respond in time." };
     if (res.status === 404 || res.status === 410) return { sourceId: source.id, status: "not_found", message: "This address no longer exists." };
+    if (gdelt && res.status === 429) return { sourceId: source.id, status: "error", message: "The news service was busy. Riposte will try again on the next check." };
     if (!res.ok) return { sourceId: source.id, status: "blocked", message: `The website refused the request (status ${res.status}).` };
 
     if (source.type === "feed" || source.type === "news") {
