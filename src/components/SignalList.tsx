@@ -43,6 +43,11 @@ const CATEGORY: Record<string, string> = {
   content: "Content",
   positioning: "Positioning",
   other: "Other",
+  partnership: "Partnership",
+  recognition: "Recognition",
+  funding: "Funding",
+  leadership: "Leadership change",
+  trouble: "Trouble",
 };
 
 function StatusButton({ id, status, label, pending, primary }: { id: string; status: string; label: string; pending: string; primary?: boolean }) {
@@ -147,7 +152,7 @@ export function SignalDetail({ s }: { s: SignalRow }) {
         </span>
         {source && (
           <a href={source.url} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-accent hover:underline">
-            Open their page ↗
+            {source.type === "news" ? "Open the news search ↗" : "Open their page ↗"}
           </a>
         )}
       </div>

@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-12T20:15:00+05:30",
+    title: "News and recognition tracker",
+    body: "Every competitor now has a News source that reads Google News, which covers tech press and press release wires like PR Newswire and Business Wire. Articles about the same story become one card, labelled Launch, Partnership, Recognition (Gartner, Forrester, awards), Funding, Leadership change, Trouble or Pricing. News about something else with the same name is marked as noise. As always, each card says why it matters for you and what to do, and recognition cards give sales a ready reply.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-12T19:00:00+05:30",
     title: "Knowledge base: judged against your own content",
     body: "Upload your one-pagers, positioning docs, case studies and past posts (PDF or Word, up to 10 MB, 10 files in the beta). After each upload a check card shows the pages and words read, a short summary, the first lines and any warning, so you can see it worked. Scanned PDFs are read by Google's AI. Every signal, action kit, brief, comparison and AI search answer now uses your files, and briefs build on topics you've already covered instead of repeating them.",

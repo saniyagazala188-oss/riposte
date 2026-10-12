@@ -161,6 +161,37 @@ export function mockTables(): Record<string, Row[]> {
       action_items: items,
     };
   });
+  // A news story: analyst recognition reported by two outlets.
+  signals.unshift({
+    id: "sig_news",
+    user_id,
+    created_at: ago(0.5),
+    title: "Crayon named a Leader in the Forrester Wave for competitive intelligence",
+    what_changed:
+      "Crayon says it was named a Leader in the 2026 Forrester Wave for competitive intelligence platforms. PR Newswire and Business Wire carried the announcement.",
+    so_what:
+      "Prospects comparing tools will see this badge in Crayon's sales decks. Small teams may read it as 'the safe choice', even though Crayon is built and priced for larger teams.",
+    action: "Give sales a reply: 'Forrester ranks enterprise platforms; we're built for teams without an analyst', plus your price and setup time.",
+    impact: "high",
+    category: "recognition",
+    noise: false,
+    status: "new",
+    competitor_id: "c1",
+    competitors: cname("c1"),
+    changes: {
+      kind: "news",
+      detected_at: ago(0.5),
+      page_url: "https://news.google.com/articles/a",
+      added: [
+        { title: "Crayon Named a Leader in The Forrester Wave: Competitive Intelligence Platforms, Q4 2026", outlet: "PR Newswire", link: "https://news.google.com/articles/a", date: new Date(Date.now() - 20 * 3600e3).toUTCString() },
+        { title: "Crayon named Leader in Forrester Wave for competitive intelligence", outlet: "Business Wire", link: "https://news.google.com/articles/b", date: new Date(Date.now() - 18 * 3600e3).toUTCString() },
+      ],
+      removed: [],
+      sources: { type: "news", url: "https://news.google.com/rss/search?q=%22Crayon%22+when:14d" },
+    },
+    action_items: [],
+  } as unknown as (typeof signals)[number]);
+
   // More actions for other competitors, to fill the board.
   for (let k = 0; k < 10; k++) {
     const cid = `c${1 + (k % 4)}`;

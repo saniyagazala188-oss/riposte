@@ -20,6 +20,7 @@ import { findStories, findTrends } from "@/lib/insights/run";
 import { titlesForTopics } from "@/lib/content/stats";
 import { buildTopicPrompt, cleanTopics, TOPIC_SCHEMA } from "@/lib/content/topics";
 import { nameFromDomain, normalizeDomain, type SourceType } from "@/lib/discovery/parse";
+import { newsFeedUrl } from "@/lib/news";
 
 export type FormState = { status: "idle" | "saved" | "error"; message?: string };
 
@@ -75,6 +76,9 @@ export async function addCompetitor(_prev: FormState, formData: FormData): Promi
       .from("sources")
       .insert(found.map((f) => ({ competitor_id: competitor.id, type: f.type, url: f.url, discovered: true })));
   }
+  // Every competitor also gets a news source: Google News for its name (saved on its own,
+  // so the pages above are kept even if the news setup (migration 0016) isn't run yet).
+  await supabase.from("sources").insert({ competitor_id: competitor.id, type: "news", url: newsFeedUrl(name), discovered: true });
   if (note) await supabase.from("competitors").update({ discovery_note: note }).eq("id", competitor.id);
 
   // Run the first check in the background, so the feed isn't empty after setup.
@@ -96,10 +100,15 @@ export async function addCompetitor(_prev: FormState, formData: FormData): Promi
 export async function rediscover(formData: FormData) {
   const { supabase } = await requireUser();
   const id = String(formData.get("competitor_id") ?? "");
-  const { data: competitor } = await supabase.from("competitors").select("id, domain").eq("id", id).maybeSingle();
+  const { data: competitor } = await supabase.from("competitors").select("id, domain, name").eq("id", id).maybeSingle();
   if (!competitor) return;
 
   const { found, note } = await discoverSources(competitor.domain);
+  const { count: hasNews } = await supabase
+    .from("sources")
+    .select("id", { count: "exact", head: true })
+    .eq("competitor_id", competitor.id)
+    .eq("type", "news");
   if (found.length) {
     await supabase
       .from("sources")
@@ -107,6 +116,9 @@ export async function rediscover(formData: FormData) {
         found.map((f) => ({ competitor_id: competitor.id, type: f.type, url: f.url, discovered: true })),
         { onConflict: "competitor_id,url", ignoreDuplicates: true },
       );
+  }
+  if (!hasNews) {
+    await supabase.from("sources").insert({ competitor_id: competitor.id, type: "news", url: newsFeedUrl(competitor.name), discovered: true });
   }
   await supabase.from("competitors").update({ discovery_note: note }).eq("id", competitor.id);
   revalidatePath(`/app/competitors/${competitor.id}`);
@@ -332,7 +344,7 @@ type KitSignal = {
   impact: string;
   category: string;
   competitors: { name: string } | null;
-  changes: { kind: "content" | "new_posts" | "new_pages"; added: unknown[]; removed: unknown[]; sources: { type: PageType; url: string } | null } | null;
+  changes: { kind: "content" | "new_posts" | "new_pages" | "rewrite" | "news"; added: unknown[]; removed: unknown[]; sources: { type: PageType; url: string } | null } | null;
 };
 
 export async function buildActionKit(_prev: CheckState, formData: FormData): Promise<CheckState> {

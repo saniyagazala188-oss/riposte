@@ -15,6 +15,7 @@ import {
   type FeedItem,
 } from "./extract";
 import { isAllowed, parseRobots, type Robots } from "./robots";
+import { groupStories } from "@/lib/news";
 
 export type SourceRow = {
   id: string;
@@ -84,19 +85,25 @@ async function capture(source: SourceRow): Promise<Captured | CheckOutcome> {
 
   let res;
   try {
-    res = await fetchPage(source.url, { large: source.type === "sitemap" || source.type === "feed" });
+    res = await fetchPage(source.url, { large: source.type === "sitemap" || source.type === "feed" || source.type === "news" });
   } catch {
     res = null;
   }
 
-  if (source.type === "feed" || source.type === "sitemap") {
+  if (source.type === "feed" || source.type === "news" || source.type === "sitemap") {
     if (!res) return { sourceId: source.id, status: "error", message: "The website didn't respond in time." };
     if (res.status === 404 || res.status === 410) return { sourceId: source.id, status: "not_found", message: "This address no longer exists." };
     if (!res.ok) return { sourceId: source.id, status: "blocked", message: `The website refused the request (status ${res.status}).` };
 
-    if (source.type === "feed") {
+    if (source.type === "feed" || source.type === "news") {
       const items = parseFeed(res.text);
-      if (!items) return { sourceId: source.id, status: "error", message: "This address isn't a readable blog feed anymore." };
+      if (!items) {
+        return {
+          sourceId: source.id,
+          status: "error",
+          message: source.type === "news" ? "The news feed couldn't be read this time." : "This address isn't a readable blog feed anymore.",
+        };
+      }
       return { kind: "feed", items };
     }
 
@@ -176,6 +183,12 @@ export async function checkSource(db: SupabaseClient, source: SourceRow): Promis
   if (!previous || previous.method !== method) {
     // First check (or the reading method changed): this becomes the starting point.
     status = "baseline";
+    // News is different: a brand-new competitor should still show this week's biggest stories.
+    if (captured.kind === "feed" && source.type === "news" && !previous) {
+      const cutoff = Date.now() - 3 * 24 * 60 * 60 * 1000;
+      const recent = captured.items.filter((i) => (Date.parse(i.date ?? "") || 0) >= cutoff);
+      if (recent.length) await recordNews(db, source, recent, 3);
+    }
   } else if (previous.content_hash !== hash) {
     const before: string[] =
       captured.kind === "lines"
@@ -185,7 +198,11 @@ export async function checkSource(db: SupabaseClient, source: SourceRow): Promis
           : (previous.items as string[]) ?? [];
     const diff = diffSets(before, values);
 
-    if (captured.kind === "feed") {
+    if (captured.kind === "feed" && source.type === "news") {
+      const newIds = new Set(diff.added);
+      const fresh = captured.items.filter((i) => newIds.has(i.id));
+      if (fresh.length && (await recordNews(db, source, fresh))) status = "changed";
+    } else if (captured.kind === "feed") {
       const newIds = new Set(diff.added);
       const newPosts = captured.items.filter((i) => newIds.has(i.id));
       if (newPosts.length) {
@@ -260,6 +277,32 @@ export async function checkSource(db: SupabaseClient, source: SourceRow): Promis
     .eq("id", source.id);
 
   return { sourceId: source.id, status };
+}
+
+// News: one change per story, leaving out stories already reported in the last two weeks.
+async function recordNews(db: SupabaseClient, source: SourceRow, fresh: FeedItem[], maxStories = 8): Promise<number> {
+  const since = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
+  const { data: recent } = await db
+    .from("changes")
+    .select("added")
+    .eq("competitor_id", source.competitor_id)
+    .eq("kind", "news")
+    .gte("detected_at", since)
+    .limit(100);
+  const seen = (recent ?? []).flatMap((r) => ((r.added as { title?: string }[] | null) ?? []).map((a) => a.title ?? "")).filter(Boolean);
+  const stories = groupStories(fresh, seen, maxStories);
+  for (const story of stories) {
+    await db.from("changes").insert({
+      user_id: source.user_id,
+      competitor_id: source.competitor_id,
+      source_id: source.id,
+      kind: "news",
+      page_url: story.articles[0]?.link ?? null,
+      added: story.articles,
+      removed: [],
+    });
+  }
+  return stories.length;
 }
 
 async function pruneSnapshots(db: SupabaseClient, sourceId: string) {

@@ -4,7 +4,7 @@ import { timeAgo } from "@/lib/time";
 
 export type ChangeRow = {
   id: string;
-  kind: "content" | "new_posts" | "new_pages" | "rewrite";
+  kind: "content" | "new_posts" | "new_pages" | "rewrite" | "news";
   page_url?: string | null;
   detected_at: string;
   added: unknown[];
@@ -26,6 +26,30 @@ export function ChangeBody({ change: c }: { change: Pick<ChangeRow, "kind" | "ad
   const removed = c.removed ?? [];
   return (
     <>
+      {c.kind === "news" && (
+        <div className="mt-2 text-sm">
+          <p className="font-medium">
+            {added.length === 1 ? "1 article" : `${added.length} articles`} about this story
+          </p>
+          <ul className="mt-1 flex flex-col gap-1.5">
+            {(added as { title: string; outlet?: string | null; link: string; date?: string | null }[]).slice(0, SHOW).map((a) => (
+              <li key={a.link || a.title} className="min-w-0">
+                <a href={a.link} target="_blank" rel="noopener noreferrer" className="break-words text-accent hover:underline">
+                  {a.title}
+                </a>
+                {(a.outlet || a.date) && (
+                  <span className="text-muted">
+                    {" "}
+                    · {[a.outlet, a.date && !Number.isNaN(Date.parse(a.date)) ? timeAgo(new Date(a.date).toISOString()) : null].filter(Boolean).join(" · ")}
+                  </span>
+                )}
+              </li>
+            ))}
+            <More total={added.length} />
+          </ul>
+        </div>
+      )}
+
       {c.kind === "new_posts" && (
         <div className="mt-2 text-sm">
           <p className="font-medium">

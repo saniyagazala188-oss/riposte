@@ -10,7 +10,7 @@ type PendingChange = {
   id: string;
   user_id: string;
   competitor_id: string;
-  kind: "content" | "new_posts" | "new_pages" | "rewrite";
+  kind: "content" | "new_posts" | "new_pages" | "rewrite" | "news";
   page_url: string | null;
   added: unknown[];
   removed: unknown[];
