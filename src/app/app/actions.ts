@@ -14,7 +14,7 @@ import { buildKitPrompt, cleanKit, KIT_SCHEMA } from "@/lib/actions/prompt";
 import { SOURCE_LABELS as PAGE_LABELS, type SourceType as PageType } from "@/lib/discovery/parse";
 import { sendAlerts, sendDigests } from "@/lib/notify/alerts";
 import { emailConfigured, sendEmail, sendSlack } from "@/lib/notify/send";
-import { SITE_URL } from "@/lib/notify/templates";
+import { SITE_URL, testEmail } from "@/lib/notify/templates";
 import { loadContent } from "@/lib/content/load";
 import { findStories, findTrends } from "@/lib/insights/run";
 import { titlesForTopics } from "@/lib/content/stats";
@@ -321,11 +321,7 @@ export async function sendTest(_prev: CheckState, formData: FormData): Promise<C
       if (!result.sent) return { status: "error", message: "Turn on the weekly digest and add a competitor first." };
       return { status: "done", message: `This week's digest is on its way to ${profile.email}.` };
     }
-    await sendEmail(profile.email, {
-      subject: "Riposte email alerts are working",
-      html: `<p>This is a test from Riposte. High-impact competitor changes will arrive at this address.</p><p><a href="${SITE_URL}/app">Open your feed</a></p>`,
-      text: `This is a test from Riposte. High-impact competitor changes will arrive at this address. ${SITE_URL}/app`,
-    });
+    await sendEmail(profile.email, testEmail(profile.email));
     return { status: "done", message: `Sent to ${profile.email}. Check your inbox (and spam, the first time).` };
   } catch (e) {
     return { status: "error", message: `Couldn't send: ${(e as Error).message}` };

@@ -35,6 +35,7 @@ ${body}
 <tr><td style="padding:16px 24px 24px;border-top:1px solid ${LINE};font-size:12px;color:${MUTED}">
 <a href="${SITE_URL}/app" style="color:${ACCENT}">Open your feed</a> ·
 <a href="${SITE_URL}/app/settings" style="color:${MUTED}">Change what Riposte sends you</a>
+<p style="margin:8px 0 0">You get this because email alerts are on for your Riposte account. Riposte · competitive intelligence for marketers · <a href="${SITE_URL}" style="color:${MUTED}">useriposte.com</a></p>
 </td></tr>
 </table></td></tr></table></body></html>`;
 }
@@ -48,6 +49,31 @@ function signalBlock(s: SignalForMessage) {
 <p style="margin:0 0 6px;font-size:14px;line-height:1.5"><strong>Why it matters:</strong> ${esc(s.so_what)}</p>
 <p style="margin:0;font-size:14px;line-height:1.5"><strong>Do this:</strong> ${esc(s.action)}</p>
 </td></tr>`;
+}
+
+// The "Send test email" message: a real, designed email (a bare one-liner looks like spam).
+export function testEmail(email: string) {
+  const html = layout(
+    "Your alerts are set up",
+    `Riposte will email ${email} when a competitor change matters for your product.`,
+    `<tr><td style="padding:16px 24px;border-top:1px solid ${LINE};font-size:14px;line-height:1.6">
+<p style="margin:0 0 8px"><strong>What you'll get:</strong></p>
+<p style="margin:0 0 6px">· <strong>High-impact alerts</strong> the morning Riposte finds them: what changed, why it matters to you, and what to do.</p>
+<p style="margin:0 0 12px">· <strong>A weekly digest</strong> every Monday with everything from the week.</p>
+<p style="margin:0;color:${MUTED}">Tip: if this landed in spam, mark it "Not spam" so future alerts reach your inbox.</p>
+</td></tr>`,
+  );
+  const text = `Your alerts are set up.
+
+Riposte will email ${email} when a competitor change matters for your product.
+
+What you'll get:
+- High-impact alerts the morning Riposte finds them: what changed, why it matters to you, and what to do.
+- A weekly digest every Monday with everything from the week.
+
+Open your feed: ${SITE_URL}/app
+Change what Riposte sends you: ${SITE_URL}/app/settings`;
+  return { subject: "Your Riposte alerts are set up", html, text };
 }
 
 export function alertEmail(signals: SignalForMessage[]) {

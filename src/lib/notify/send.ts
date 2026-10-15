@@ -19,6 +19,10 @@ export async function sendEmail(to: string, msg: { subject: string; html: string
       subject: msg.subject,
       html: msg.html,
       text: msg.text,
+      // Replies go to a real inbox, and mail apps get a one-click way to manage alerts.
+      // Both help emails reach the inbox instead of spam.
+      ...(process.env.EMAIL_REPLY_TO ? { reply_to: process.env.EMAIL_REPLY_TO } : {}),
+      headers: { "List-Unsubscribe": `<${(process.env.NEXT_PUBLIC_SITE_URL || "https://useriposte.com").replace(/\/$/, "")}/app/settings>` },
     }),
     cache: "no-store",
   });
