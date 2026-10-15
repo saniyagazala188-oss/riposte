@@ -8,7 +8,7 @@ import { inputClass, primaryButton, secondaryButton } from "@/components/styles"
 type Mode = "login" | "signup" | "link" | "reset";
 type Status = "idle" | "busy" | "sent" | "error";
 
-const GOOGLE = process.env.NEXT_PUBLIC_GOOGLE_LOGIN === "on";
+const GOOGLE = ["on", "true", "1", "yes"].includes((process.env.NEXT_PUBLIC_GOOGLE_LOGIN ?? "").trim().toLowerCase());
 
 // Log in with email + password, sign up (one confirmation email), get a one-time link,
 // or reset a forgotten password (email link, then choose a new one on /reset-password).
