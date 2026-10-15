@@ -1,7 +1,7 @@
 import "server-only";
 import { fallbackCandidates, isSameSite, parseHomepage, type Found, type SourceType } from "./parse";
 
-export const USER_AGENT = "RiposteBot/0.1 (+https://riposte-eta.vercel.app)";
+export const USER_AGENT = "RiposteBot/0.1 (+https://useriposte.com)";
 const TIMEOUT_MS = 6000;
 const MAX_BYTES = 1_500_000;
 const MAX_BYTES_XML = 8_000_000; // sitemaps with image and video entries can be several MB

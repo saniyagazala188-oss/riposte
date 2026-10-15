@@ -1,6 +1,6 @@
 // Email and Slack message templates. Pure functions, so they can be tested.
 
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://riposte-eta.vercel.app").replace(/\/$/, "");
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://useriposte.com").replace(/\/$/, "");
 
 export type SignalForMessage = {
   id: string;

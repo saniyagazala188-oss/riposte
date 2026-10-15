@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-15T18:50:00+05:30",
+    title: "Riposte has its own address: useriposte.com",
+    body: "Riposte now lives at useriposte.com. Links in emails, Slack messages, the blog, the sitemap and invites all point to the new address. The old riposte-eta.vercel.app address still works.",
+    kind: "launch",
+  },
+  {
     at: "2026-10-12T20:15:00+05:30",
     title: "News and recognition tracker",
     body: "Every competitor now has a News source that searches GDELT, a free, open news database covering thousands of news sites, including tech and business press and press release wires. Articles about the same story become one card, labelled Launch, Partnership, Recognition (Gartner, Forrester, awards), Funding, Leadership change, Trouble or Pricing. News about something else with the same name is marked as noise. As always, each card says why it matters for you and what to do, and recognition cards give sales a ready reply.",

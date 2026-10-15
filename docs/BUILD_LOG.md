@@ -618,3 +618,9 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - **Not yet:** hiring signals (careers pages / job boards), social media.
 - **Switched to GDELT (same day):** the first live test showed Google News's robots.txt asks bots not to read its search feeds, and Riposte respects robots.txt. News now comes from the GDELT DOC API (`api.gdeltproject.org`, free, made for programs, RSS output, exact-name search, English, last 14 days). Existing Google News sources are moved to GDELT automatically on their next check (old snapshots cleared, so it starts fresh). GDELT asks for one request every 5 seconds, so news checks queue up 5.5 seconds apart. Outlet names come from the article address. The card's "See more news" link opens a normal Google News search page for people.
 - **GDELT 429 fix (same day):** the first GDELT test answered 429 (too many requests) because Riposte read GDELT's robots.txt and the feed back to back. Now the robots.txt read waits its turn too, and a 429 is retried twice, 5.5 seconds apart, before showing "The news service was busy. Riposte will try again on the next check."
+
+## Own domain: useriposte.com (15 Oct)
+
+- **Bought:** `useriposte.com` on Vercel ($11.25/yr, auto-renew on), connected to the riposte project (Production, valid configuration). riposte.app, .com, .io and .ai were all taken. Written as **UseRiposte.com** in posts so it reads clearly.
+- **Code:** the default `SITE_URL` (site, emails, Slack, blog, sitemap, robots, llms.txt, invites) and the bot user agent now use `https://useriposte.com`. Login redirects already use the address the person is on, so sign-in works on both addresses.
+- **Still to do:** Supabase Auth → URL Configuration (Site URL + redirect URL for the new domain), then Resend domain verification and Supabase custom SMTP so sign-up emails come from the domain.

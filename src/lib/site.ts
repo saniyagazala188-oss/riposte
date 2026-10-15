@@ -1,6 +1,6 @@
 // Facts about the public site, used in metadata, schema and the about page.
 
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://riposte-eta.vercel.app").replace(/\/$/, "");
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://useriposte.com").replace(/\/$/, "");
 export const SITE_NAME = "Riposte";
 export const SITE_TAGLINE = "Competitive intelligence for marketers";
 

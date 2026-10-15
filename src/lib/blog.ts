@@ -45,7 +45,7 @@ function read(file: string): Post {
   };
   renderer.link = ({ href, tokens }) => {
     const text = renderer.parser.parseInline(tokens);
-    const external = /^https?:\/\//.test(href) && !href.startsWith(process.env.NEXT_PUBLIC_SITE_URL || "https://riposte-eta.vercel.app");
+    const external = /^https?:\/\//.test(href) && !href.startsWith(process.env.NEXT_PUBLIC_SITE_URL || "https://useriposte.com");
     return `<a href="${href}"${external ? ' target="_blank" rel="noopener noreferrer"' : ""}>${text}</a>`;
   };
   const html = marked.parse(content, { renderer, async: false }) as string;
