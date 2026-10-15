@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-15T23:50:00+05:30",
+    title: "Continue with Google",
+    body: "You can now sign up and log in with your Google account in one click, on the login page at useriposte.com. Email and password still work as before.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-15T19:45:00+05:30",
     title: "Forgot your password? Reset it, plus designed sign-in emails",
     body: "The login page now has \"Forgot your password?\". Riposte emails a reset link, and the link opens a page to choose a new password, then takes you straight to your feed. Sign-up, login link, password reset and change-of-email emails now have a proper Riposte design: logo, a clear button, what happens next, and a note on what to do if you didn't ask for it.",
