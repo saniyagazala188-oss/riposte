@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-16T01:25:00+05:30",
+    title: "Emails now come from useriposte.com",
+    body: "Sign-up, login link and password reset emails come from noreply@useriposte.com in a proper Riposte design, and alerts and weekly digests come from alerts@useriposte.com. They're less likely to land in spam, and every user now gets their alerts.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-15T23:50:00+05:30",
     title: "Continue with Google",
     body: "You can now sign up and log in with your Google account in one click, on the login page at useriposte.com. Email and password still work as before.",
