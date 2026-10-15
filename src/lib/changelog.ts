@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-15T19:45:00+05:30",
+    title: "Forgot your password? Reset it, plus designed sign-in emails",
+    body: "The login page now has \"Forgot your password?\". Riposte emails a reset link, and the link opens a page to choose a new password, then takes you straight to your feed. Sign-up, login link, password reset and change-of-email emails now have a proper Riposte design: logo, a clear button, what happens next, and a note on what to do if you didn't ask for it.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-15T18:50:00+05:30",
     title: "Riposte has its own address: useriposte.com",
     body: "Riposte now lives at useriposte.com. Links in emails, Slack messages, the blog, the sitemap and invites all point to the new address. The old riposte-eta.vercel.app address still works.",

@@ -5,12 +5,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { inputClass, primaryButton, secondaryButton } from "@/components/styles";
 
-type Mode = "login" | "signup" | "link";
+type Mode = "login" | "signup" | "link" | "reset";
 type Status = "idle" | "busy" | "sent" | "error";
 
 const GOOGLE = process.env.NEXT_PUBLIC_GOOGLE_LOGIN === "on";
 
-// Log in with email + password, sign up (one confirmation email), or get a one-time link.
+// Log in with email + password, sign up (one confirmation email), get a one-time link,
+// or reset a forgotten password (email link, then choose a new one on /reset-password).
 export function LoginForm() {
   const params = useSearchParams();
   const router = useRouter();
@@ -65,11 +66,27 @@ export function LoginForm() {
       setStatus("sent");
       return;
     }
+    if (mode === "reset") {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+      });
+      if (error) {
+        setStatus("error");
+        setMessage(/rate|seconds/i.test(error.message) ? "Too many emails just now. Wait a minute and try again." : error.message);
+      } else setStatus("sent");
+      return;
+    }
     const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: redirect() } });
     if (error) {
       setStatus("error");
       setMessage(error.message);
     } else setStatus("sent");
+  }
+
+  function switchTo(m: Mode) {
+    setMode(m);
+    setMessage("");
+    setStatus("idle");
   }
 
   async function google() {
@@ -82,11 +99,17 @@ export function LoginForm() {
       <div className="rounded-xl border border-line bg-accent-soft p-5 text-sm">
         <p className="font-semibold">Check your inbox.</p>
         <p className="mt-1 text-muted">
-          {mode === "signup" ? "We sent a confirmation link to " : "We sent a login link to "}
+          {mode === "signup"
+            ? "We sent a confirmation link to "
+            : mode === "reset"
+              ? "We sent a password reset link to "
+              : "We sent a login link to "}
           <span className="font-medium text-ink">{email}</span>.{" "}
           {mode === "signup"
             ? "Open it once to confirm your email. After that, you log in with your email and password."
-            : "Open it on this device to sign in."}
+            : mode === "reset"
+              ? "Open it on this device, then choose a new password."
+              : "Open it on this device to sign in."}
         </p>
         <p className="mt-2 text-xs text-muted">Not there? Check spam or promotions.</p>
       </div>
@@ -95,7 +118,7 @@ export function LoginForm() {
 
   return (
     <div className="flex flex-col gap-4">
-      {mode !== "link" && (
+      {mode !== "link" && mode !== "reset" && (
         <div className="grid grid-cols-2 rounded-lg bg-bg p-1 text-sm" role="tablist">
           {(["login", "signup"] as const).map((m) => (
             <button
@@ -123,7 +146,7 @@ export function LoginForm() {
         </p>
       )}
 
-      {GOOGLE && mode !== "link" && (
+      {GOOGLE && mode !== "link" && mode !== "reset" && (
         <>
           <button type="button" onClick={google} className={`${secondaryButton} w-full py-2.5 text-base`}>
             Continue with Google
@@ -146,7 +169,7 @@ export function LoginForm() {
           placeholder="you@company.com"
           className={inputClass}
         />
-        {mode !== "link" && (
+        {mode !== "link" && mode !== "reset" && (
           <>
             <label htmlFor="password" className="text-sm font-semibold">
               Password
@@ -171,25 +194,38 @@ export function LoginForm() {
               ? "Log in"
               : mode === "signup"
                 ? "Create account"
-                : "Email me a login link"}
+                : mode === "reset"
+                  ? "Email me a reset link"
+                  : "Email me a login link"}
         </button>
         {message && <p className="text-sm text-danger">{message}</p>}
       </form>
 
-      <p className="text-center text-sm text-muted">
-        {mode === "link" ? (
-          <button type="button" className="font-semibold text-accent hover:underline" onClick={() => setMode("login")}>
+      {mode === "reset" && (
+        <p className="-mt-1 text-sm text-muted">Enter the email you use for Riposte. We&apos;ll send a link to choose a new password.</p>
+      )}
+
+      <div className="flex flex-col items-center gap-1 text-sm text-muted">
+        {mode === "link" || mode === "reset" ? (
+          <button type="button" className="font-semibold text-accent hover:underline" onClick={() => switchTo("login")}>
             Back to password login
           </button>
         ) : (
           <>
-            Forgot your password, or never set one?{" "}
-            <button type="button" className="font-semibold text-accent hover:underline" onClick={() => setMode("link")}>
-              Email me a link
-            </button>
+            {mode === "login" && (
+              <button type="button" className="font-semibold text-accent hover:underline" onClick={() => switchTo("reset")}>
+                Forgot your password?
+              </button>
+            )}
+            <span>
+              Or skip the password:{" "}
+              <button type="button" className="font-semibold text-accent hover:underline" onClick={() => switchTo("link")}>
+                email me a login link
+              </button>
+            </span>
           </>
         )}
-      </p>
+      </div>
     </div>
   );
 }

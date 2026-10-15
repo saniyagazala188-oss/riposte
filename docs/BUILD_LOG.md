@@ -624,3 +624,13 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - **Bought:** `useriposte.com` on Vercel ($11.25/yr, auto-renew on), connected to the riposte project (Production, valid configuration). riposte.app, .com, .io and .ai were all taken. Written as **UseRiposte.com** in posts so it reads clearly.
 - **Code:** the default `SITE_URL` (site, emails, Slack, blog, sitemap, robots, llms.txt, invites) and the bot user agent now use `https://useriposte.com`. Login redirects already use the address the person is on, so sign-in works on both addresses.
 - **Still to do:** Supabase Auth → URL Configuration (Site URL + redirect URL for the new domain), then Resend domain verification and Supabase custom SMTP so sign-up emails come from the domain.
+- **Tested (same day):** signing in with an email link on useriposte.com lands in the feed. Supabase Site URL set to `https://useriposte.com`, redirect URL `https://useriposte.com/**` added (old riposte-eta callback kept).
+
+## Password reset and designed sign-in emails (15 Oct)
+
+- **Why:** "Email me a link" signed people in but never offered a new password, so a forgotten password wasn't really fixed.
+- **Login page:** "Forgot your password?" (login tab) sends a Supabase recovery email (`resetPasswordForEmail`, redirect `/auth/callback?next=/reset-password`). "Or skip the password: email me a login link" stays as a separate option. Google button and tabs are hidden while resetting.
+- **Callback:** `/auth/callback` now accepts a `next` page (only paths on this site, never another site) and recovery tokens; recovery defaults to `/reset-password`.
+- **New page `/reset-password`:** "Choose a new password" (typed twice, at least 8 characters), then opens the feed. If the link expired, it says so and links back to login.
+- **Email templates:** `supabase/email-templates/` has branded HTML for Confirm signup, Magic Link, Reset Password and Change Email (Riposte logo, teal button, "what happens next" note, copy-paste fallback link, "didn't ask for this?" line). Built by `scripts/build-email-templates.py`. They're pasted into Supabase → Authentication → Email Templates. Emails still come from Supabase's sender until custom SMTP (Resend on useriposte.com) is set up.
+- **Google sign-in:** the button only appears when `NEXT_PUBLIC_GOOGLE_LOGIN=on`. It was never switched on; it needs a Google Cloud OAuth client and the Supabase Google provider first (pending).
