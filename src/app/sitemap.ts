@@ -12,5 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...posts.map((p) => ({ url: `${SITE_URL}/blog/${p.slug}`, lastModified: p.updated, changeFrequency: "monthly" as const, priority: 0.7 })),
     { url: `${SITE_URL}/changelog`, lastModified: latest, changeFrequency: "weekly", priority: 0.5 },
     { url: `${SITE_URL}/about`, lastModified: latest, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${SITE_URL}/privacy`, lastModified: latest, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${SITE_URL}/terms`, lastModified: latest, changeFrequency: "yearly", priority: 0.2 },
   ];
 }

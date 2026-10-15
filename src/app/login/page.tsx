@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Logo } from "@/components/Logo";
@@ -23,6 +24,11 @@ export default async function LoginPage() {
             <LoginForm />
           </Suspense>
         </div>
+        <p className="mt-4 text-center text-xs text-muted">
+          By continuing, you agree to the{" "}
+          <Link href="/terms" className="underline hover:text-ink">terms</Link> and{" "}
+          <Link href="/privacy" className="underline hover:text-ink">privacy policy</Link>.
+        </p>
       </div>
     </main>
   );

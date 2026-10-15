@@ -53,12 +53,18 @@ export function SiteFooter() {
           © {new Date().getFullYear()} Riposte · Founded by Saniya Gazala with
           ❤️ · Built with Claude 🤝
         </span>
-        <nav className="flex gap-4" aria-label="Footer">
+        <nav className="flex flex-wrap gap-4" aria-label="Footer">
           {NAV.map((n) => (
             <Link key={n.href} href={n.href} className="hover:text-ink">
               {n.label}
             </Link>
           ))}
+          <Link href="/privacy" className="hover:text-ink">
+            Privacy
+          </Link>
+          <Link href="/terms" className="hover:text-ink">
+            Terms
+          </Link>
         </nav>
       </div>
     </footer>
