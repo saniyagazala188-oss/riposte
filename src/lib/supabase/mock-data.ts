@@ -161,6 +161,52 @@ export function mockTables(): Record<string, Row[]> {
       action_items: items,
     };
   });
+  // A real signal from the live feed (Oct 2026), used for launch screenshots.
+  const vpKit = [
+    ["battlecard", "Update the Visualping battlecard: no $3,000 contract, no prompt writing", "Battlecard in Notion", "PMM", "now"],
+    ["social_post", "LinkedIn post: 'Less alert noise shouldn't cost $3,000 a year'", "LinkedIn", "PMM", "this_week"],
+    ["comparison_page", "Add the new $3,000 tier to the 'Riposte vs Visualping' page", "Website /compare", "Content & SEO", "this_week"],
+  ].map(([kind, title, channel, owner, priority], k) => {
+    const it = {
+      id: `avp${k}`, position: k, kind, title,
+      why: "They're moving upmarket to solve alert noise. Your answer: impact and drafts out of the box.",
+      channel, owner, priority,
+      draft: k === 0
+        ? "Visualping's new top plan starts at $3,000/yr and asks buyers to write custom AI prompts to filter changes.\n\nWhat to say: Riposte ranks every change by impact and drafts the response for you, with no prompts to write and a free beta."
+        : "First draft…",
+      status: "open", done_at: null, created_at: ago(17), signal_id: "sig_vp", competitor_id: "c3", user_id,
+    };
+    kits.push({ ...it, competitors: cname("c3"), signals: { title: "Visualping adds $3,000/yr plan with custom AI prompt filtering" } });
+    return it;
+  });
+  signals.unshift({
+    id: "sig_vp",
+    user_id,
+    created_at: ago(17),
+    title: "Visualping adds $3,000/yr plan with custom AI prompt filtering",
+    what_changed:
+      'Visualping introduced a high-tier offering starting at "$3,000 /yr" over "Business features plus:", featuring "Premium AI" with custom prompts to filter important changes, "Dedicated service", and "Page starter packs". It removed bullet points listing generic features like "Bulk import" and basic "AI analysis".',
+    so_what:
+      "Visualping is attempting to solve false alerts and move upmarket with custom AI filtering, directly competing for buyers who want less alert noise. However, they charge $3,000 annually and require buyers to write custom prompts, whereas Riposte automatically categorizes impact and drafts full action kits out of the box.",
+    action:
+      "Update the Visualping battlecard to highlight that Riposte automatically delivers actionable drafts and Gemini visibility without requiring a $3,000 contract or manual prompt engineering.",
+    impact: "high",
+    category: "pricing",
+    noise: false,
+    status: "new",
+    competitor_id: "c3",
+    competitors: cname("c3"),
+    changes: {
+      kind: "content",
+      detected_at: ago(17),
+      page_url: "https://visualping.io/pricing",
+      added: ["$3,000 /yr", "Business features plus:", "Premium AI: custom prompts to filter important changes", "Dedicated service", "Page starter packs"],
+      removed: ["Bulk import", "AI analysis"],
+      sources: { type: "pricing", url: "https://visualping.io/pricing" },
+    },
+    action_items: vpKit,
+  } as unknown as (typeof signals)[number]);
+
   // A news story: analyst recognition reported by two outlets.
   signals.unshift({
     id: "sig_news",
@@ -256,7 +302,7 @@ export function mockTables(): Record<string, Row[]> {
       dimension: dims[k % 6],
       text: `What is the best ${topic.toLowerCase()} option for a ${["solo product marketer", "content lead at a B2B SaaS startup", "team under $500 a month", "sales enablement manager", "agency tracking 20 clients"][k % 5]} who needs answers fast? (${k + 1})`,
       source: k === 9 && t === 3 ? "manual" : "ai",
-      tracked: k < 2,
+      tracked: k === 0 && t < 5,
       position: t * 10 + k,
       created_at: ago(5),
     })),
@@ -268,7 +314,7 @@ export function mockTables(): Record<string, Row[]> {
       user_id,
       prompt_id: p.id,
       run_at: ago(1),
-      engine: "gemini-no-search",
+      engine: "gemini",
       answer: "Here are strong options:\n\n1. **Klue** – best for enterprise enablement.\n2. **Crayon** – broad website tracking.\n3. **Kompyte** – affordable for small teams.\n4. **Visualping** – simple page change alerts.",
       queries: ["best competitive intelligence tool startup", "competitor monitoring software small team"],
       mentions: [
@@ -284,11 +330,15 @@ export function mockTables(): Record<string, Row[]> {
               { key: "c4", name: "Kompyte", position: 3, known_for: [], you_match: "no", gap: "" },
             ]),
         ...(i % 3 === 0 ? [{ key: "other", name: "Contently", position: 4 }] : []),
-        ...(i === 4 ? [{ key: "you", name: "Riposte", position: 5 }] : []),
+        ...(i < 3 ? [{ key: "c3", name: "Visualping", position: 3 + (i % 3 === 0 ? 1 : 0) }] : []),
       ],
-      citations: [{ domain: "g2.com", title: "g2.com" }, { domain: "klue.com", title: "klue.com" }, { domain: "crayon.co", title: "crayon.co" }],
-      you_mentioned: i === 4,
-      you_position: i === 4 ? 5 : null,
+      citations: [
+        { domain: "klue.com", title: "klue.com" },
+        { domain: ["g2.com", "productmarketingalliance.com", "crayon.co", "g2.com", "producthunt.com"][i % 5], title: "source" },
+        ...(i % 2 === 0 ? [{ domain: "productmarketingalliance.com", title: "source" }] : []),
+      ],
+      you_mentioned: false,
+      you_position: null,
       search_entry: null,
     }));
 
