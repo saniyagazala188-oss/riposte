@@ -2,6 +2,10 @@ import Link from "next/link";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { WaitlistForm } from "@/components/WaitlistForm";
 import { createClient } from "@/lib/supabase/server";
+import { SITE_URL } from "@/lib/site";
+
+// The home page's main address, so search engines treat useriposte.com/ as the one version.
+export const metadata = { alternates: { canonical: `${SITE_URL}/` } };
 
 const problems = [
   {
