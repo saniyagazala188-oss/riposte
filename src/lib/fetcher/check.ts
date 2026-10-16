@@ -15,7 +15,8 @@ import {
   type FeedItem,
 } from "./extract";
 import { isAllowed, parseRobots, type Robots } from "./robots";
-import { groupStories, isGdelt, upgradeNewsUrl } from "@/lib/news";
+import { companyFromNewsUrl, groupStories, isGdelt, upgradeNewsUrl } from "@/lib/news";
+import { newsDataConfigured, newsFor } from "@/lib/news/newsdata";
 
 export type SourceRow = {
   id: string;
@@ -87,6 +88,14 @@ async function readWithReader(url: string): Promise<string[] | null> {
 // ---------- capture one page ----------
 
 async function capture(source: SourceRow): Promise<Captured | CheckOutcome> {
+  // News: NewsData.io when its key is set (a proper news API, works from Vercel); GDELT otherwise.
+  if (source.type === "news" && newsDataConfigured()) {
+    const company = companyFromNewsUrl(source.url);
+    if (!company) return { sourceId: source.id, status: "error", message: "This news source has no company name." };
+    const news = await newsFor(company);
+    if (!news.ok) return { sourceId: source.id, status: "error", message: news.message };
+    return { kind: "feed", items: news.items };
+  }
   const target = new URL(source.url);
   const gdelt = source.type === "news" && isGdelt(source.url);
   if (gdelt && !robotsCache.has(target.origin)) await gdeltTurn(); // reading its robots.txt counts as a request too
@@ -178,6 +187,13 @@ export async function checkSource(db: SupabaseClient, input: SourceRow): Promise
       await db.from("sources").update({ url: upgraded }).eq("id", source.id);
       await db.from("snapshots").delete().eq("source_id", source.id);
       source = { ...source, url: upgraded };
+    }
+    // First check on NewsData.io: start fresh, so old GDELT results don't all look like new stories.
+    if (newsDataConfigured() && !source.url.includes("via=newsdata")) {
+      const marked = `${source.url}${source.url.includes("?") ? "&" : "?"}via=newsdata`;
+      await db.from("sources").update({ url: marked }).eq("id", source.id);
+      await db.from("snapshots").delete().eq("source_id", source.id);
+      source = { ...source, url: marked };
     }
   }
   const captured = await capture(source).catch(
