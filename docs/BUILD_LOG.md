@@ -646,3 +646,4 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 ## Paid Gemini (16 Oct)
 
 - Billing linked to the Gemini API project in Google AI Studio: "Gemini API Paid Tier activated". India uses prepaid credits: ₹500 bought (non-refundable, expire in a year), auto-reload off. Same key, no Vercel change. Higher rate limits, Grounding with Google Search available, and paid-tier data isn't used by Google to improve its products, so the privacy policy's free-tier warning was removed (updated 16 Oct). Next: test AI visibility, set a budget alert.
+- **Tested (16 Oct, 18:05):** AI visibility now works on the paid key: all 5 prompts answered with Google Search grounding (Klue and Crayon named in 4/5, Visualping 3/5; the AI-visibility prompt named Profound #1). Riposte 0/5, as expected for a new product. The client error seen just before was a stale page after a deploy at the same minute; a hard refresh fixed it.
