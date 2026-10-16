@@ -169,7 +169,11 @@ export function mockTables(): Record<string, Row[]> {
   ].map(([kind, title, channel, owner, priority], k) => {
     const it = {
       id: `avp${k}`, position: k, kind, title,
-      why: "They're moving upmarket to solve alert noise. Your answer: impact and drafts out of the box.",
+      why: [
+        "Sales will hear 'Visualping now has AI filtering'. Give them the answer before the next call.",
+        "Buyers tired of alert noise are looking right now. Show them it doesn't take a $3,000 plan.",
+        "Your comparison page still shows their old plans. Prospects comparing prices will notice.",
+      ][k],
       channel, owner, priority,
       draft: k === 0
         ? "Visualping's new top plan starts at $3,000/yr and asks buyers to write custom AI prompts to filter changes.\n\nWhat to say: Riposte ranks every change by impact and drafts the response for you, with no prompts to write and a free beta."
