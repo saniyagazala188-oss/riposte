@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { SOURCE_LABELS, type SourceType } from "@/lib/discovery/parse";
+import { companyFromNewsUrl, humanNewsUrl } from "@/lib/news";
 import { clearHistory, deleteCompetitor, rediscover, removeSource, updateFrequency } from "@/app/app/actions";
 import { ConfirmSubmit, SubmitButton } from "@/components/FormButtons";
 import { card, eyebrow, secondaryButton } from "@/components/styles";
@@ -221,9 +222,15 @@ export default async function CompetitorPage({
                           {SOURCE_LABELS[x.type]}
                           <span className="ml-2 text-xs font-normal text-muted">{x.discovered ? "found automatically" : "added by you"}</span>
                         </p>
-                        <a href={x.url} target="_blank" rel="noopener noreferrer" className="block truncate font-mono text-xs text-accent hover:underline">
-                          {x.url}
-                        </a>
+                        {x.type === "news" ? (
+                          <a href={humanNewsUrl(x.url)} target="_blank" rel="noopener noreferrer" className="block truncate text-xs text-accent hover:underline">
+                            News sites and press releases that mention &quot;{companyFromNewsUrl(x.url) ?? competitor.name}&quot;
+                          </a>
+                        ) : (
+                          <a href={x.url} target="_blank" rel="noopener noreferrer" className="block truncate font-mono text-xs text-accent hover:underline">
+                            {x.url}
+                          </a>
+                        )}
                         <SourceStatus s={x} />
                       </div>
                       <form action={removeSource}>

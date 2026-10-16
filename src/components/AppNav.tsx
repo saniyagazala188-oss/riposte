@@ -7,6 +7,12 @@ import { useEffect, useState } from "react";
 // 24×24 line icons (Lucide-style), drawn with the current text colour.
 const ICONS: Record<string, React.ReactNode> = {
   feed: <path d="M22 12h-4l-3 9L9 3l-3 9H2" />,
+  news: (
+    <>
+      <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" />
+      <path d="M18 14h-8M15 18h-5M10 6h8v4h-8z" />
+    </>
+  ),
   actions: (
     <>
       <path d="m9 11 3 3L22 4" />
@@ -90,6 +96,7 @@ export function navGroups(counts: { toReview: number; openActions: number }, adm
       label: "Monitor",
       items: [
         { href: "/app", label: "Feed", icon: "feed", badge: counts.toReview },
+        { href: "/app/news", label: "News & more", icon: "news" },
         { href: "/app/actions", label: "Actions", icon: "actions", badge: counts.openActions },
         { href: "/app/competitors", label: "Competitors", icon: "competitors" },
       ],

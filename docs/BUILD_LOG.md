@@ -653,3 +653,10 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 
 - **Why:** Google News blocks bots and GDELT answers "busy" (429) to Vercel's shared servers, so news never arrived.
 - **How:** when `NEWSDATA_API_KEY` is set (free plan: 200 requests a day, news 12 hours delayed), news sources use NewsData.io's `latest` endpoint: exact company name in quotes, English, duplicates dropped (`src/lib/news/newsdata.ts`). The source keeps its address (the company name is read from it); on the first NewsData check it gets a `via=newsdata` marker and its old snapshots are cleared, so the first check is a fresh start (up to 3 stories from the last 3 days), not a flood. Without the key, GDELT is still used. Errors and the daily limit show a plain message on the source and try again next check.
+
+## News & more page (17 Oct)
+
+- **Why:** news signals were mixed into the feed with website changes, so a big moment (a Gartner Leader spot, a funding round) could get lost between pricing tweaks and blog posts. Saniya's idea: a dedicated page. Hiring signals were dropped for now (not relevant enough yet).
+- **Page `/app/news`** ("News & more", in the sidebar under Feed): news signals only (signals whose change is a news story, via `changes!inner`), noise left out, newest first, same list + detail view as the feed. Tabs with counts: All, Launches (product), Partnerships, Awards & recognition, Funding, Leadership, Trouble, Mentions (everything else). Competitor filter, paging, and a helpful empty message per tab. News still appears in the feed too.
+- **Competitor page:** the news source row now reads "News sites and press releases that mention "Klue"" and links to a normal news search, instead of showing the raw GDELT address.
+- **Demo mode:** the mock database now honours embedded filters (`changes.kind`) and `not in`, so the page previews correctly.

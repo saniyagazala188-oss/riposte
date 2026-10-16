@@ -8,6 +8,10 @@ type Filter = (r: Row) => boolean;
 
 export const mockEnabled = () => process.env.RIPOSTE_MOCK === "1" && process.env.NODE_ENV !== "production";
 
+function dig(r: Row, path: string): unknown {
+  return path.split(".").reduce<unknown>((o, k) => (o && typeof o === "object" ? (o as Row)[k] : undefined), r);
+}
+
 function builder(table: string) {
   const filters: Filter[] = [];
   let sort: { col: string; asc: boolean }[] = [];
@@ -37,14 +41,19 @@ function builder(table: string) {
       if (opts?.head) head = true;
       return api;
     },
-    eq: (c: string, v: unknown) => (c.includes(".") || filters.push((r) => r[c] === v), api),
+    // "changes.kind" filters on an embedded row, like Supabase's !inner joins.
+    eq: (c: string, v: unknown) => (filters.push((r) => (c.includes(".") ? dig(r, c) === v : r[c] === v)), api),
     neq: (c: string, v: unknown) => (filters.push((r) => r[c] !== v), api),
     in: (c: string, v: unknown[]) => (filters.push((r) => v.includes(r[c])), api),
     gt: (c: string, v: string) => (filters.push((r) => String(r[c]) > v), api),
     gte: (c: string, v: string) => (filters.push((r) => String(r[c]) >= v), api),
     lt: (c: string, v: string) => (filters.push((r) => String(r[c]) < v), api),
     lte: (c: string, v: string) => (filters.push((r) => String(r[c]) <= v), api),
-    not: (c: string) => (filters.push((r) => r[c] != null), api),
+    not: (c: string, op?: string, v?: unknown) =>
+      (filters.push((r) =>
+        op === "in" && typeof v === "string" ? !v.replace(/[()]/g, "").split(",").includes(String(r[c])) : r[c] != null,
+      ),
+      api),
     is: (c: string, v: unknown) => (filters.push((r) => (r[c] ?? null) === v), api),
     ilike: (c: string, v: string) => {
       const needle = v.replace(/%/g, "").toLowerCase();

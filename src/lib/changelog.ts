@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-17T01:30:00+05:30",
+    title: "News & more: competitors in the news, sorted",
+    body: "A new page under Feed shows only news about your competitors, sorted into Launches, Partnerships, Awards & recognition, Funding, Leadership, Trouble and Mentions, so big moments like a Gartner or Forrester placement don't get lost between website changes. Each story still says why it matters for you and what to do.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-17T00:40:00+05:30",
     title: "Competitor news now arrives reliably",
     body: "News about your competitors now comes from NewsData.io, a news service built for apps. The old sources kept refusing Riposte's daily checks. Each story still becomes one card that says why it matters and what to do.",
