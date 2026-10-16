@@ -78,9 +78,9 @@ export default function PrivacyPage() {
                   <strong>Vercel</strong>: hosts the website and runs the daily checks.
                 </li>
                 <li>
-                  <strong>Google (Gemini API)</strong>: the AI that reads changes and your files and writes the explanations. While
-                  Riposte is in beta it may use Google&apos;s free Gemini tier, and Google&apos;s terms for that tier allow Google
-                  to use what is sent to improve its products. So please don&apos;t upload anything confidential during the beta.
+                  <strong>Google (Gemini API)</strong>: the AI that reads changes and your files and writes the explanations.
+                  Riposte uses Google&apos;s paid Gemini API, where Google doesn&apos;t use what Riposte sends to improve its
+                  products.
                 </li>
                 <li>
                   <strong>Google sign-in</strong>, if you choose it.

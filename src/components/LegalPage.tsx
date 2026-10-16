@@ -1,7 +1,7 @@
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 
 export const CONTACT_EMAIL = "saniyagazala188@gmail.com";
-export const LEGAL_UPDATED = "15 October 2026";
+export const LEGAL_UPDATED = "16 October 2026";
 
 export type LegalSection = { heading: string; body: React.ReactNode };
 
