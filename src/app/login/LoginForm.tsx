@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { inputClass, primaryButton, secondaryButton } from "@/components/styles";
+import { track } from "@/lib/analytics";
 
 type Mode = "login" | "signup" | "link" | "reset";
 type Status = "idle" | "busy" | "sent" | "error";
@@ -47,6 +48,7 @@ export function LoginForm() {
         );
         return;
       }
+      track("login", { method: "password" });
       router.replace("/app");
       router.refresh();
       return;
@@ -58,6 +60,7 @@ export function LoginForm() {
         setMessage(error.message);
         return;
       }
+      track("sign_up", { method: "email" });
       if (data.session) {
         router.replace("/app");
         router.refresh();
@@ -91,6 +94,7 @@ export function LoginForm() {
 
   async function google() {
     const supabase = createClient();
+    track("login", { method: "google" });
     await supabase?.auth.signInWithOAuth({ provider: "google", options: { redirectTo: redirect() } });
   }
 

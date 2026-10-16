@@ -660,3 +660,10 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - **Page `/app/news`** ("News & more", in the sidebar under Feed): news signals only (signals whose change is a news story, via `changes!inner`), noise left out, newest first, same list + detail view as the feed. Tabs with counts: All, Launches (product), Partnerships, Awards & recognition, Funding, Leadership, Trouble, Mentions (everything else). Competitor filter, paging, and a helpful empty message per tab. News still appears in the feed too.
 - **Competitor page:** the news source row now reads "News sites and press releases that mention "Klue"" and links to a normal news search, instead of showing the raw GDELT address.
 - **Demo mode:** the mock database now honours embedded filters (`changes.kind`) and `not in`, so the page previews correctly.
+
+## Search Console, Analytics and launch checks (17 Oct)
+
+- **Google Search Console:** domain property `useriposte.com`, verified with a TXT record (empty name) in Vercel DNS. Sitemap `sitemap.xml` submitted (first status "Couldn't fetch", normal for a new property; the sitemap loads fine).
+- **Google Analytics 4:** property "Riposte", web stream for https://useriposte.com, measurement ID `G-Z5CWL8R3NW` (not a secret; `NEXT_PUBLIC_GA_ID` can override it). Loaded with `next/script` on the live site only (`src/components/Analytics.tsx`). Page views come from GA's enhanced measurement (it follows page changes). Events: `join_waitlist`, `sign_up` (email), `login` (password or google).
+- **Privacy policy** updated (17 Oct): Google Analytics cookies and Google Analytics as a service; still no advertising cookies.
+- **Fixed before launch:** the waitlist "you're on the list" message was garbled by an earlier text replacement ("youWe'll email you when early access opens.apos;ll…"). Now: "You're on the list. I approve new people every few days, and you'll get an email when you're in."

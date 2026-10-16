@@ -59,8 +59,9 @@ export default function PrivacyPage() {
           body: (
             <p>
               Only to run Riposte for you: to log you in, check the competitor pages you chose, explain changes for your product,
-              send the alerts you switched on, and improve the product from your feedback. Riposte does not sell your data, does not
-              show ads, and does not use advertising or tracking cookies. The only cookies are the ones that keep you logged in.
+              send the alerts you switched on, and improve the product from your feedback. Riposte does not sell your data and does not
+              show ads. It uses cookies to keep you logged in, and Google Analytics cookies to count visits and see which pages
+              people use (for example, how many people join the waitlist). No advertising cookies.
             </p>
           ),
         },
@@ -84,6 +85,10 @@ export default function PrivacyPage() {
                 </li>
                 <li>
                   <strong>Google sign-in</strong>, if you choose it.
+                </li>
+                <li>
+                  <strong>Google Analytics</strong>: counts visits and actions like joining the waitlist. It sees pages viewed and
+                  general device and location info, not the content of your account.
                 </li>
                 <li>
                   <strong>Resend</strong> sends emails, and <strong>Slack</strong> receives alerts only if you connect it.

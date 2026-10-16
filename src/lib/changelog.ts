@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-17T01:50:00+05:30",
+    title: "Analytics and Search Console",
+    body: "Riposte now uses Google Analytics to count visits, waitlist joins and sign-ups, and is set up in Google Search Console so its pages can be found in search. The privacy policy explains both. Also fixed a garbled message people saw after joining the waitlist.",
+    kind: "launch",
+  },
+  {
     at: "2026-10-17T01:30:00+05:30",
     title: "News & more: competitors in the news, sorted",
     body: "A new page under Feed shows only news about your competitors, sorted into Launches, Partnerships, Awards & recognition, Funding, Leadership, Trouble and Mentions, so big moments like a Gartner or Forrester placement don't get lost between website changes. Each story still says why it matters for you and what to do.",

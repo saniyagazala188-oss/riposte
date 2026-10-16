@@ -1,17 +1,21 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { track } from "@/lib/analytics";
 import { joinWaitlist, type WaitlistState } from "@/app/actions";
 
 const initial: WaitlistState = { status: "idle" };
 
 export function WaitlistForm({ id = "waitlist-email" }: { id?: string }) {
   const [state, action, pending] = useActionState(joinWaitlist, initial);
+  useEffect(() => {
+    if (state.status === "joined") track("join_waitlist");
+  }, [state.status]);
 
   if (state.status === "joined") {
     return (
       <p className="rounded-xl border border-line bg-accent-soft px-4 py-3 text-sm">
-        <span className="font-semibold">You&apos;re on the list.</span> I approve new people every few days and youWe&apos;ll email you when early access opens.apos;ll get an email when youWe&apos;ll email you when early access opens.apos;re in.
+        <span className="font-semibold">You&apos;re on the list.</span> I approve new people every few days, and you&apos;ll get an email when you&apos;re in.
       </p>
     );
   }
