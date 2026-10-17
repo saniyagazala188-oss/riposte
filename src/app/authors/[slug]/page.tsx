@@ -78,7 +78,7 @@ export default async function AuthorPage({ params }: { params: Promise<{ slug: s
               <div className="relative overflow-hidden rounded-[2rem] border-4 border-surface bg-surface shadow-[0_30px_60px_-30px_rgba(14,60,58,0.55)]">
                 {a.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={a.image} alt={a.imageAlt} width={280} height={320} className="block h-80 w-64 object-cover sm:w-72" />
+                  <img src={a.image} alt={a.imageAlt} width={280} height={320} className="block h-80 w-64 object-cover object-top sm:w-72" />
                 ) : (
                   <div className="flex h-80 w-64 items-center justify-center bg-[linear-gradient(160deg,var(--accent),#0a4f4b)] sm:w-72">
                     <span className="font-display text-7xl font-extrabold text-accent-ink">{a.initials}</span>

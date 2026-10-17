@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-17T22:20:00+05:30",
+    title: "Author pages",
+    body: "Every blog post now links to its author's page: a photo, a short intro, experience, learning journey, skills, courses and every post they wrote. Each author is one file, so new authors can be added and edited easily, with any links or extra sections they want.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-17T20:00:00+05:30",
     title: "A new blog design",
     body: "Blog posts now have a cover image, a reading bar, numbered sections, a table of contents that follows you, share buttons, app screenshots in a browser frame, tip and example boxes, \"read next\" links, a bottom line, open-and-close FAQs and related posts. Image call-to-action cards can be changed from one file. The blog page has a featured post, cards with images and topic filters, and this changelog is grouped by week with filters. The site header now has a clear line under it and stays at the top.",

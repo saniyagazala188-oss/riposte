@@ -2,7 +2,7 @@
 name: "Saniya Gazala"
 role: "Founder, Riposte · Product marketer"
 headline: "I'm a product marketer who builds. I started as a developer, moved into content and SEO, and now I build the marketing tools I wish I'd had."
-image: ""
+image: "/authors/saniya-gazala.jpg"
 imageAlt: "Saniya Gazala"
 location: "Bengaluru, India"
 links:
