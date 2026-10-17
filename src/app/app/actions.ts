@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { requireUser } from "@/lib/auth";
 import { limitsFor } from "@/lib/access";
+import { resolveChannel } from "@/lib/youtube";
 import { discoverSources } from "@/lib/discovery";
 import { checkSources, type SourceRow } from "@/lib/fetcher/check";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -24,7 +25,7 @@ import { newsFeedUrl } from "@/lib/news";
 
 export type FormState = { status: "idle" | "saved" | "error"; message?: string };
 
-const SOURCE_TYPES: SourceType[] = ["changelog", "blog", "feed", "pricing", "sitemap", "other"];
+const SOURCE_TYPES: SourceType[] = ["changelog", "blog", "feed", "pricing", "sitemap", "other", "youtube"];
 
 // ---------- Your product ----------
 
@@ -71,11 +72,15 @@ export async function addCompetitor(_prev: FormState, formData: FormData): Promi
   }
 
   const { found, note } = await discoverSources(domain);
-  if (found.length) {
+  // YouTube is saved on its own, so the pages are kept even if the YouTube setup (migration 0017) isn't run yet.
+  const pages = found.filter((f) => f.type !== "youtube");
+  const youtube = found.find((f) => f.type === "youtube");
+  if (pages.length) {
     await supabase
       .from("sources")
-      .insert(found.map((f) => ({ competitor_id: competitor.id, type: f.type, url: f.url, discovered: true })));
+      .insert(pages.map((f) => ({ competitor_id: competitor.id, type: f.type, url: f.url, discovered: true })));
   }
+  if (youtube) await supabase.from("sources").insert({ competitor_id: competitor.id, type: "youtube", url: youtube.url, discovered: true });
   // Every competitor also gets a news source: Google News for its name (saved on its own,
   // so the pages above are kept even if the news setup (migration 0016) isn't run yet).
   await supabase.from("sources").insert({ competitor_id: competitor.id, type: "news", url: newsFeedUrl(name), discovered: true });
@@ -109,13 +114,20 @@ export async function rediscover(formData: FormData) {
     .select("id", { count: "exact", head: true })
     .eq("competitor_id", competitor.id)
     .eq("type", "news");
-  if (found.length) {
+  const pages = found.filter((f) => f.type !== "youtube");
+  const youtube = found.find((f) => f.type === "youtube");
+  if (pages.length) {
     await supabase
       .from("sources")
       .upsert(
-        found.map((f) => ({ competitor_id: competitor.id, type: f.type, url: f.url, discovered: true })),
+        pages.map((f) => ({ competitor_id: competitor.id, type: f.type, url: f.url, discovered: true })),
         { onConflict: "competitor_id,url", ignoreDuplicates: true },
       );
+  }
+  if (youtube) {
+    await supabase
+      .from("sources")
+      .upsert({ competitor_id: competitor.id, type: "youtube", url: youtube.url, discovered: true }, { onConflict: "competitor_id,url", ignoreDuplicates: true });
   }
   if (!hasNews) {
     await supabase.from("sources").insert({ competitor_id: competitor.id, type: "news", url: newsFeedUrl(competitor.name), discovered: true });
@@ -160,6 +172,24 @@ export async function addSource(_prev: FormState, formData: FormData): Promise<F
   const type = String(formData.get("type") ?? "") as SourceType;
   let url = String(formData.get("url") ?? "").trim();
   if (!SOURCE_TYPES.includes(type)) return { status: "error", message: "Choose what kind of page this is." };
+  if (type === "youtube") {
+    const channel = await resolveChannel(url);
+    if (!channel) return { status: "error", message: "Paste their YouTube channel link, like https://www.youtube.com/@acme." };
+    const { count: has } = await supabase
+      .from("sources")
+      .select("id", { count: "exact", head: true })
+      .eq("competitor_id", competitor_id)
+      .eq("type", "youtube");
+    if (has) return { status: "error", message: "This competitor already has a YouTube channel. Remove it first to add another." };
+    const { error } = await supabase.from("sources").insert({ competitor_id, type, url: channel.url, discovered: false });
+    if (error) {
+      if (error.code === "23505") return { status: "error", message: "This channel is already in the list." };
+      if (error.code === "23514") return { status: "error", message: "YouTube isn't switched on yet: run the 0017_youtube.sql setup in Supabase." };
+      return { status: "error", message: "Couldn't add this channel. Please try again." };
+    }
+    revalidatePath(`/app/competitors/${competitor_id}`);
+    return { status: "saved" };
+  }
   if (url && !/^https?:\/\//i.test(url)) url = `https://${url}`;
   try {
     const parsed = new URL(url);
@@ -340,7 +370,7 @@ type KitSignal = {
   impact: string;
   category: string;
   competitors: { name: string } | null;
-  changes: { kind: "content" | "new_posts" | "new_pages" | "rewrite" | "news"; added: unknown[]; removed: unknown[]; sources: { type: PageType; url: string } | null } | null;
+  changes: { kind: "content" | "new_posts" | "new_pages" | "rewrite" | "news" | "video"; added: unknown[]; removed: unknown[]; sources: { type: PageType; url: string } | null } | null;
 };
 
 export async function buildActionKit(_prev: CheckState, formData: FormData): Promise<CheckState> {

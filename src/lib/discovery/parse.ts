@@ -1,7 +1,7 @@
 // Pure helpers for finding a competitor's key pages.
 // No network calls here, so these can be tested on sample HTML.
 
-export type SourceType = "changelog" | "blog" | "feed" | "pricing" | "sitemap" | "other" | "news";
+export type SourceType = "changelog" | "blog" | "feed" | "pricing" | "sitemap" | "other" | "news" | "youtube";
 
 export const SOURCE_LABELS: Record<SourceType, string> = {
   changelog: "Release notes / changelog",
@@ -11,6 +11,7 @@ export const SOURCE_LABELS: Record<SourceType, string> = {
   sitemap: "Sitemap",
   other: "Other page",
   news: "News coverage",
+  youtube: "YouTube channel",
 };
 
 // Turns "https://www.Example.com/pricing" or "example.com" into "example.com".

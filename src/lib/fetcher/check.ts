@@ -17,6 +17,8 @@ import {
 import { isAllowed, parseRobots, type Robots } from "./robots";
 import { companyFromNewsUrl, groupStories, isGdelt, upgradeNewsUrl } from "@/lib/news";
 import { newsDataConfigured, newsFor } from "@/lib/news/newsdata";
+import { latestVideos } from "@/lib/youtube";
+import { channelIdFromUrl } from "@/lib/youtube/parse";
 
 export type SourceRow = {
   id: string;
@@ -88,6 +90,14 @@ async function readWithReader(url: string): Promise<string[] | null> {
 // ---------- capture one page ----------
 
 async function capture(source: SourceRow): Promise<Captured | CheckOutcome> {
+  // YouTube: the official API when its key is set, the channel's public feed otherwise.
+  if (source.type === "youtube") {
+    const id = channelIdFromUrl(source.url);
+    if (!id) return { sourceId: source.id, status: "error", message: "This isn't a YouTube channel address. Remove it and paste the channel link again." };
+    const videos = await latestVideos(id);
+    if (!videos.ok) return { sourceId: source.id, status: "error", message: videos.message };
+    return { kind: "feed", items: videos.items };
+  }
   // News: NewsData.io when its key is set (a proper news API, works from Vercel); GDELT otherwise.
   if (source.type === "news" && newsDataConfigured()) {
     const company = companyFromNewsUrl(source.url);
@@ -233,6 +243,12 @@ export async function checkSource(db: SupabaseClient, input: SourceRow): Promise
       const recent = captured.items.filter((i) => (Date.parse(i.date ?? "") || 0) >= cutoff);
       if (recent.length) await recordNews(db, source, recent, 3);
     }
+    // Same for YouTube: show the last week's videos (up to 3) straight away.
+    if (captured.kind === "feed" && source.type === "youtube" && !previous) {
+      const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      const recent = captured.items.filter((i) => (Date.parse(i.date ?? "") || 0) >= cutoff).slice(0, 3);
+      if (recent.length) await recordVideos(db, source, recent);
+    }
   } else if (previous.content_hash !== hash) {
     const before: string[] =
       captured.kind === "lines"
@@ -242,7 +258,13 @@ export async function checkSource(db: SupabaseClient, input: SourceRow): Promise
           : (previous.items as string[]) ?? [];
     const diff = diffSets(before, values);
 
-    if (captured.kind === "feed" && source.type === "news") {
+    if (captured.kind === "feed" && source.type === "youtube") {
+      // Only videos published since the last check (a re-ordered list isn't news).
+      const newIds = new Set(diff.added);
+      const since = Date.now() - 14 * 24 * 60 * 60 * 1000;
+      const fresh = captured.items.filter((i) => newIds.has(i.id) && (Date.parse(i.date ?? "") || Date.now()) >= since);
+      if (fresh.length && (await recordVideos(db, source, fresh))) status = "changed";
+    } else if (captured.kind === "feed" && source.type === "news") {
       const newIds = new Set(diff.added);
       const fresh = captured.items.filter((i) => newIds.has(i.id));
       if (fresh.length && (await recordNews(db, source, fresh))) status = "changed";
@@ -347,6 +369,22 @@ async function recordNews(db: SupabaseClient, source: SourceRow, fresh: FeedItem
     });
   }
   return stories.length;
+}
+
+// YouTube: one change for the new videos found in one check.
+async function recordVideos(db: SupabaseClient, source: SourceRow, videos: FeedItem[]): Promise<number> {
+  const list = videos.slice(0, 10);
+  if (!list.length) return 0;
+  await db.from("changes").insert({
+    user_id: source.user_id,
+    competitor_id: source.competitor_id,
+    source_id: source.id,
+    kind: "video",
+    page_url: list[0].link || null,
+    added: list,
+    removed: [],
+  });
+  return list.length;
 }
 
 async function pruneSnapshots(db: SupabaseClient, sourceId: string) {

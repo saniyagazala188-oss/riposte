@@ -2,6 +2,7 @@ import { requireUser } from "@/lib/auth";
 import { SignalBrowser, SIGNAL_SELECT, type SignalRow } from "@/components/SignalList";
 import { Empty, LinkTabs, PageHeader, Pager, pageNum, withParams } from "@/components/ui";
 import { ParamSelect } from "@/components/ui-client";
+import { NewsSwitch } from "@/components/NewsSwitch";
 
 export const metadata = { title: "News & more · Riposte" };
 
@@ -80,6 +81,7 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
         title="Competitors in the news"
         description="Launches, partnerships, awards, funding, leadership changes and trouble, from news sites and press releases. Checked every morning, each story explained for your product."
       />
+      <NewsSwitch active="news" />
 
       <LinkTabs
         className="mt-6"

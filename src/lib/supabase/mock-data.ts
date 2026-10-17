@@ -242,6 +242,40 @@ export function mockTables(): Record<string, Row[]> {
     action_items: [],
   } as unknown as (typeof signals)[number]);
 
+  // YouTube channels for three competitors, and one video signal.
+  for (const [cid, handle] of [["c1", "UCcrayon000000000000000a"], ["c2", "UCklue00000000000000000b"], ["c3", "UCvisualping0000000000cc"]] as const) {
+    sources.push({ ...sources.find((x) => x.competitor_id === cid)!, id: `syt_${cid}`, type: "youtube", url: `https://www.youtube.com/channel/${handle}`, discovered: true });
+  }
+  signals.unshift({
+    id: "sig_video",
+    user_id,
+    created_at: ago(0.3),
+    title: "Klue posts a 12-minute demo of its new Compete Agent",
+    what_changed:
+      "Klue published \"Meet Compete Agent: AI that builds your battlecards\" on YouTube, a 12-minute demo showing the agent drafting a battlecard from win-loss notes, plus a 45-second Short teasing it.",
+    so_what:
+      "Your buyers will see AI-drafted battlecards as table stakes. Klue shows the draft but not what happens next; your edge is that every change comes with owners and ready responses, not just a battlecard.",
+    action: "Record a 60-second screen video showing one competitor change turning into an action kit, and share it with sales as a reply to the Klue demo.",
+    impact: "high",
+    category: "product",
+    noise: false,
+    status: "new",
+    competitor_id: "c2",
+    competitors: cname("c2"),
+    changes: {
+      kind: "video",
+      detected_at: ago(0.3),
+      page_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      added: [
+        { id: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", videoId: "dQw4w9WgXcQ", title: "Meet Compete Agent: AI that builds your battlecards", link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", date: new Date(Date.now() - 15 * 3600e3).toISOString(), views: 1840 },
+        { id: "https://www.youtube.com/watch?v=9bZkp7q19f0", videoId: "9bZkp7q19f0", title: "Battlecards in 45 seconds", link: "https://www.youtube.com/watch?v=9bZkp7q19f0", date: new Date(Date.now() - 13 * 3600e3).toISOString(), views: 920, short: true },
+      ],
+      removed: [],
+      sources: { type: "youtube", url: "https://www.youtube.com/channel/UCklue00000000000000000b" },
+    },
+    action_items: [],
+  } as unknown as (typeof signals)[number]);
+
   // More actions for other competitors, to fill the board.
   for (let k = 0; k < 10; k++) {
     const cid = `c${1 + (k % 4)}`;

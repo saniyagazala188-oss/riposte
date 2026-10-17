@@ -13,6 +13,12 @@ const ICONS: Record<string, React.ReactNode> = {
       <path d="M18 14h-8M15 18h-5M10 6h8v4h-8z" />
     </>
   ),
+  social: (
+    <>
+      <rect x="2" y="5" width="20" height="14" rx="4" />
+      <path d="m10 9 5 3-5 3z" />
+    </>
+  ),
   actions: (
     <>
       <path d="m9 11 3 3L22 4" />
@@ -97,6 +103,7 @@ export function navGroups(counts: { toReview: number; openActions: number }, adm
       items: [
         { href: "/app", label: "Feed", icon: "feed", badge: counts.toReview },
         { href: "/app/news", label: "News & more", icon: "news" },
+        { href: "/app/social", label: "Social media", icon: "social" },
         { href: "/app/actions", label: "Actions", icon: "actions", badge: counts.openActions },
         { href: "/app/competitors", label: "Competitors", icon: "competitors" },
       ],

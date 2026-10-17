@@ -244,8 +244,8 @@ export default async function CompetitorPage({
               )}
             </section>
             <div className="flex flex-col gap-4">
-              <section className={`${card} p-5`}>
-                <h2 className="font-display text-lg font-bold">Add a page</h2>
+              <section id="add-page" className={`${card} scroll-mt-6 p-5`}>
+                <h2 className="font-display text-lg font-bold">Add a page or channel</h2>
                 <div className="mt-3">
                   <AddSourceForm competitorId={competitor.id} />
                 </div>

@@ -4,7 +4,7 @@ import { timeAgo } from "@/lib/time";
 
 export type ChangeRow = {
   id: string;
-  kind: "content" | "new_posts" | "new_pages" | "rewrite" | "news";
+  kind: "content" | "new_posts" | "new_pages" | "rewrite" | "news" | "video";
   page_url?: string | null;
   detected_at: string;
   added: unknown[];
@@ -45,6 +45,46 @@ export function ChangeBody({ change: c }: { change: Pick<ChangeRow, "kind" | "ad
                 )}
               </li>
             ))}
+            <More total={added.length} />
+          </ul>
+        </div>
+      )}
+
+      {c.kind === "video" && (
+        <div className="mt-2 text-sm">
+          <p className="font-medium">
+            {added.length === 1 ? "1 new video" : `${added.length} new videos`} on YouTube
+          </p>
+          <ul className="mt-2 flex flex-col gap-2.5">
+            {(added as { videoId?: string; title: string; link: string; date?: string | null; views?: number | null; short?: boolean }[])
+              .slice(0, SHOW)
+              .map((v) => (
+                <li key={v.link || v.title} className="flex min-w-0 gap-3">
+                  {v.videoId && (
+                    <a href={v.link} target="_blank" rel="noopener noreferrer" className="shrink-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={`https://i.ytimg.com/vi/${v.videoId}/mqdefault.jpg`}
+                        alt=""
+                        loading="lazy"
+                        width={120}
+                        height={68}
+                        className="h-[68px] w-[120px] rounded-lg border border-line object-cover"
+                      />
+                    </a>
+                  )}
+                  <span className="min-w-0">
+                    <a href={v.link} target="_blank" rel="noopener noreferrer" className="break-words font-medium text-accent hover:underline">
+                      {v.title}
+                    </a>
+                    <span className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-muted">
+                      {v.short && <span className="rounded-full bg-signal-soft px-2 py-0.5 font-semibold text-signal">Short</span>}
+                      {v.date && !Number.isNaN(Date.parse(v.date)) && <span>{timeAgo(new Date(v.date).toISOString())}</span>}
+                      {v.views != null && <span>{v.views.toLocaleString("en")} views</span>}
+                    </span>
+                  </span>
+                </li>
+              ))}
             <More total={added.length} />
           </ul>
         </div>

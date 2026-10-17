@@ -1,5 +1,6 @@
 import "server-only";
 import { fallbackCandidates, isSameSite, parseHomepage, type Found, type SourceType } from "./parse";
+import { findChannelLink } from "@/lib/youtube/parse";
 
 export const USER_AGENT = "RiposteBot/0.1 (+https://useriposte.com)";
 const TIMEOUT_MS = 6000;
@@ -54,6 +55,7 @@ export type DiscoveryResult = { found: Found[]; note: string | null };
 export async function discoverSources(domain: string): Promise<DiscoveryResult> {
   const found = new Map<SourceType, string>();
   let note: string | null = null;
+  let youtubeLink: string | null = null;
 
   // 1. Read the homepage and look for links.
   try {
@@ -62,6 +64,7 @@ export async function discoverSources(domain: string): Promise<DiscoveryResult> 
       const finalUrl = new URL(home.url);
       if (isSameSite(finalUrl, domain)) {
         for (const f of parseHomepage(home.text, home.url, domain)) found.set(f.type, f.url);
+        youtubeLink = findChannelLink(home.text); // usually in the footer's social icons
       }
     } else {
       note = `The homepage answered with status ${home.status}, so some pages may be missing.`;
@@ -91,6 +94,13 @@ export async function discoverSources(domain: string): Promise<DiscoveryResult> 
   );
   for (const r of checks) {
     if (r.status === "fulfilled" && r.value && !found.has(r.value.type)) found.set(r.value.type, r.value.url);
+  }
+
+  // 3. Their YouTube channel, if the homepage links to one.
+  if (youtubeLink) {
+    const { resolveChannel } = await import("@/lib/youtube");
+    const channel = await resolveChannel(youtubeLink).catch(() => null);
+    if (channel) found.set("youtube", channel.url);
   }
 
   if (found.size === 0 && !note) note = "No pages found automatically. Add them yourself below.";

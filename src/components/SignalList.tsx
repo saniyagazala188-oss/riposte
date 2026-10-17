@@ -158,7 +158,7 @@ export function SignalDetail({ s }: { s: SignalRow }) {
             rel="noopener noreferrer"
             className="text-sm font-semibold text-accent hover:underline"
           >
-            {source.type === "news" ? "See more news ↗" : "Open their page ↗"}
+            {source.type === "news" ? "See more news ↗" : source.type === "youtube" ? "Open their channel ↗" : "Open their page ↗"}
           </a>
         )}
       </div>
