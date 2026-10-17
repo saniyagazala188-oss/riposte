@@ -17,7 +17,8 @@ export function SiteHeader({
   hideAuth?: boolean;
 }) {
   return (
-    <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4">
+    <header className="sticky top-0 z-40 border-b border-line bg-surface/85 backdrop-blur supports-[backdrop-filter]:bg-surface/75">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3.5">
       <Logo />
       <nav
         className="flex flex-wrap items-center gap-0.5 text-sm sm:gap-1"
@@ -41,6 +42,7 @@ export function SiteHeader({
           </Link>
         )}
       </nav>
+      </div>
     </header>
   );
 }
