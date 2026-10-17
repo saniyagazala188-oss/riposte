@@ -137,7 +137,9 @@ export default async function AuthorPage({ params }: { params: Promise<{ slug: s
       </section>
 
       <div className="blog-canvas">
-        <main className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:py-16 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <main className="mx-auto max-w-6xl px-4 py-12 sm:py-16">
+          {/* The sidebar only sticks within this block, so it stops before "Posts by". */}
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
           <div className="flex min-w-0 flex-col gap-8">
             {a.html && (
               <section className="rounded-3xl border border-line bg-surface px-5 py-7 sm:px-10 sm:py-9">
@@ -253,8 +255,10 @@ export default async function AuthorPage({ params }: { params: Promise<{ slug: s
             )}
           </aside>
 
+          </div>
+
           {posts.length > 0 && (
-            <section id="posts" className="scroll-mt-24 lg:col-span-2">
+            <section id="posts" className="mt-14 scroll-mt-24">
               <h2 className="font-display text-2xl font-bold sm:text-3xl">Posts by {first}</h2>
               <ul className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {posts.map((p) => (

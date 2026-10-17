@@ -1,7 +1,7 @@
 ---
 name: "Saniya Gazala"
-role: "Product marketer"
-headline: "I'm a product marketer who builds. I started as a developer, moved into content and SEO, and now I build the marketing tools I wish I'd had."
+role: "Product marketer · Marketing engineer"
+headline: "I'm a product marketer who loves building things that solve real problems. Think of me as a marketing engineer: I spot the problem, then I build the tool that fixes it."
 image: "/authors/saniya-gazala.jpg"
 imageAlt: "Saniya Gazala"
 location: "Bengaluru, India"
