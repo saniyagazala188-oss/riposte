@@ -55,7 +55,7 @@ export default function BlogIndex() {
             </span>
             <span>
               By{" "}
-              <Link href="/about" className="font-semibold text-ink hover:underline">
+              <Link href={`/authors/${AUTHOR.slug}`} className="font-semibold text-ink hover:underline" rel="author">
                 {AUTHOR.name}
               </Link>
             </span>
