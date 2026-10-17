@@ -5,6 +5,7 @@ import { Empty, PageHeader, Pager, pageNum, withParams } from "@/components/ui";
 import { ParamSelect } from "@/components/ui-client";
 import { NewsSwitch } from "@/components/NewsSwitch";
 import { FindChannels } from "./FindChannels";
+import { timeAgo } from "@/lib/time";
 
 export const metadata = { title: "Social media · Riposte" };
 
@@ -46,13 +47,31 @@ export default async function SocialPage({ searchParams }: { searchParams: Promi
 
   const [{ data: competitorRows }, { data: channelRows }, { data: rows, count: total }] = await Promise.all([
     supabase.from("competitors").select("id, name").order("name"),
-    supabase.from("sources").select("competitor_id, url, last_status, last_error").eq("type", "youtube"),
+    supabase.from("sources").select("id, competitor_id, url, last_status, last_error").eq("type", "youtube"),
     list.order("created_at", { ascending: false }).range((page - 1) * PER_PAGE, page * PER_PAGE - 1),
   ]);
   const competitors = competitorRows ?? [];
   const channels = new Map((channelRows ?? []).map((c) => [c.competitor_id as string, c]));
   const signals = (rows ?? []) as unknown as SignalRow[];
   const watching = competitors.filter((c) => channels.has(c.id));
+
+  // "Latest on their channels": the newest videos from each channel's last check, shown straight
+  // away (no AI), so the page isn't empty while waiting for new uploads.
+  type Video = { videoId?: string; title: string; link: string; date?: string | null; views?: number | null; short?: boolean };
+  const sourceIds = (channelRows ?? []).map((c) => c.id as string);
+  const { data: snaps } = sourceIds.length
+    ? await supabase.from("snapshots").select("source_id, items, fetched_at").in("source_id", sourceIds).order("fetched_at", { ascending: false }).limit(60)
+    : { data: [] as { source_id: string; items: unknown; fetched_at: string }[] };
+  const latestBySource = new Map<string, Video[]>();
+  for (const s of snaps ?? []) if (!latestBySource.has(s.source_id as string)) latestBySource.set(s.source_id as string, ((s.items as Video[] | null) ?? []).slice(0, 3));
+  const latest = (channelRows ?? [])
+    .filter((ch) => !params.c || ch.competitor_id === params.c)
+    .map((ch) => ({
+      competitor: competitors.find((c) => c.id === ch.competitor_id)?.name ?? "",
+      channel: ch.url as string,
+      videos: latestBySource.get(ch.id as string) ?? [],
+    }))
+    .filter((x) => x.videos.length);
   const missing = competitors.filter((c) => !channels.has(c.id));
 
   const link = (change: Partial<Params>) => withParams("/app/social", { c: params.c, ...change });
@@ -149,6 +168,52 @@ export default async function SocialPage({ searchParams }: { searchParams: Promi
             </p>
           )}
         </div>
+      )}
+
+      {latest.length > 0 && (
+        <section className="mt-5" aria-labelledby="latest-videos">
+          <h2 id="latest-videos" className="text-sm font-semibold">
+            Latest on their channels
+          </h2>
+          <div className="mt-2 flex flex-col gap-3">
+            {latest.map((row) => (
+              <div key={row.channel} className="rounded-2xl border border-line bg-surface p-3">
+                <div className="flex items-center justify-between gap-2 px-1">
+                  <p className="text-sm font-semibold">{row.competitor}</p>
+                  <a href={row.channel} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-accent hover:underline">
+                    Open channel ↗
+                  </a>
+                </div>
+                <ul className="mt-2 grid gap-3 sm:grid-cols-3">
+                  {row.videos.map((v) => (
+                    <li key={v.link}>
+                      <a href={v.link} target="_blank" rel="noopener noreferrer" className="group block">
+                        {v.videoId && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={`https://i.ytimg.com/vi/${v.videoId}/mqdefault.jpg`}
+                            alt=""
+                            loading="lazy"
+                            width={320}
+                            height={180}
+                            className="aspect-video w-full rounded-xl border border-line object-cover"
+                          />
+                        )}
+                        <span className="mt-1.5 line-clamp-2 block text-sm font-medium leading-snug group-hover:text-accent">{v.title}</span>
+                        <span className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-muted">
+                          {v.short && <span className="rounded-full bg-signal-soft px-2 font-semibold text-signal">Short</span>}
+                          {v.date && !Number.isNaN(Date.parse(v.date)) && <span>{timeAgo(new Date(v.date).toISOString())}</span>}
+                          {v.views != null && <span>{v.views.toLocaleString("en")} views</span>}
+                        </span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-muted">New videos from here on become signals below, explained for your product.</p>
+        </section>
       )}
 
       <div className="mt-5">

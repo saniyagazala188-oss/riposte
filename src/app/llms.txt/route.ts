@@ -19,6 +19,7 @@ Made by ${AUTHOR.name}, a product marketer based in Bengaluru, India. Built in p
 - [Blog](${SITE_URL}/blog): guides on competitive intelligence, content and AI search
 - [Changelog](${SITE_URL}/changelog): every step of the build, with dates
 - [Authors](${SITE_URL}/authors): who writes the blog
+- [Blog RSS feed](${SITE_URL}/blog/rss.xml): every post, newest first
 
 ## Authors
 

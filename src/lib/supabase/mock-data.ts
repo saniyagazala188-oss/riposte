@@ -246,6 +246,11 @@ export function mockTables(): Record<string, Row[]> {
   for (const [cid, handle] of [["c1", "UCcrayon000000000000000a"], ["c2", "UCklue00000000000000000b"], ["c3", "UCvisualping0000000000cc"]] as const) {
     sources.push({ ...sources.find((x) => x.competitor_id === cid)!, id: `syt_${cid}`, type: "youtube", url: `https://www.youtube.com/channel/${handle}`, discovered: true });
   }
+  const vids = (n: string[]) => n.map((t, k) => ({ id: `https://www.youtube.com/watch?v=v${k}${t.length}`, videoId: ["dQw4w9WgXcQ", "9bZkp7q19f0", "kJQP7kiw5Fk"][k % 3], title: t, link: `https://www.youtube.com/watch?v=v${k}${t.length}`, date: new Date(Date.now() - (2 + k * 5) * 86400e3).toISOString(), views: 3200 - k * 900, short: k === 2 }));
+  (snapshots as unknown[]).push(
+    { id: "snyt1", user_id, source_id: "syt_c2", fetched_at: ago(0.2), method: "direct", content_hash: "x", lines: null, items: vids(["Meet Compete Agent: AI that builds your battlecards", "Win-loss interviews that actually change deals", "Battlecards in 45 seconds"]), char_count: 1 },
+    { id: "snyt2", user_id, source_id: "syt_c1", fetched_at: ago(0.2), method: "direct", content_hash: "x", lines: null, items: vids(["Field Agent for Slack: a walkthrough", "State of CI 2026 webinar", "How sellers use battlecards"]), char_count: 1 },
+  );
   signals.unshift({
     id: "sig_video",
     user_id,

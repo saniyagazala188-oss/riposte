@@ -8,6 +8,7 @@ import { Analytics } from "@/components/Analytics";
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://useriposte.com"),
   title: "Riposte",
+  alternates: { types: { "application/rss+xml": [{ url: "/blog/rss.xml", title: "Riposte blog" }] } },
   description:
     "Competitive intelligence for marketers: what your competitors changed, what it means for you, and what to do about it.",
 };
