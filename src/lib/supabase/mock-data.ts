@@ -176,7 +176,7 @@ export function mockTables(): Record<string, Row[]> {
       ][k],
       channel, owner, priority,
       draft: k === 0
-        ? "Visualping's new top plan starts at $3,000/yr and asks buyers to write custom AI prompts to filter changes.\n\nWhat to say: Riposte ranks every change by impact and drafts the response for you, with no prompts to write and a free beta."
+        ? "Battlecard: Visualping (updated)\n\nWhat changed\nNew top plan from $3,000/yr: Premium AI with custom prompts to filter changes, dedicated service and page starter packs.\n\nWhen it comes up\n\"Visualping has AI that filters out the noise now.\"\n\nWhat to say\nTheir filtering only works after you write and maintain your own prompts, on a $3,000 a year plan. Riposte ranks every change by impact for your product and drafts the response, with nothing to set up.\n\nProof to show\nOne real signal from your feed, with its action kit."
         : "First draft…",
       status: "open", done_at: null, created_at: ago(17), signal_id: "sig_vp", competitor_id: "c3", user_id,
     };
