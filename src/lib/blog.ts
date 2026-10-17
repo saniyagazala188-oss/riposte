@@ -28,6 +28,7 @@ export type PostMeta = {
   cta: string | null; // CTA at the end of the post, from content/ctas.json; null = none
   related: string[]; // slugs to show first under "Keep reading"
   layout: BlogLayout; // which page design to use
+  featured: boolean; // shown as the big card on /blog
 };
 
 export type BlogLayout = "classic" | "magazine";
@@ -183,6 +184,7 @@ function read(file: string): Post {
     verdict: data.verdict ? (marked.parseInline(String(data.verdict), { async: false }) as string) : "",
     cta: data.cta === false || data.cta === "none" ? null : String(data.cta ?? "beta"),
     related: Array.isArray(data.related) ? data.related.map(String) : [],
+    featured: data.featured === true,
     layout: data.layout === "magazine" || data.layout === "classic" ? data.layout : blogSettings().layout,
     html,
     headings,

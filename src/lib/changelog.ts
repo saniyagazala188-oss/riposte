@@ -14,7 +14,7 @@ export const CHANGELOG: ChangeEntry[] = [
   {
     at: "2026-10-17T20:00:00+05:30",
     title: "A new blog design",
-    body: "Blog posts now have a cover image, a reading bar, numbered sections, a table of contents that follows you, share buttons, app screenshots in a browser frame, tip and example boxes, \"read next\" links, a bottom line, open-and-close FAQs and related posts. Image call-to-action cards can be changed from one file. The site header now has a clear line under it and stays at the top.",
+    body: "Blog posts now have a cover image, a reading bar, numbered sections, a table of contents that follows you, share buttons, app screenshots in a browser frame, tip and example boxes, \"read next\" links, a bottom line, open-and-close FAQs and related posts. Image call-to-action cards can be changed from one file. The blog page has a featured post, cards with images and topic filters. The site header now has a clear line under it and stays at the top.",
     kind: "feature",
   },
   {

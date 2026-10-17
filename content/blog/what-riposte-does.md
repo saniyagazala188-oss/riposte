@@ -19,6 +19,7 @@ faqs:
 cover: "/blog/covers/what-riposte-does.jpg"
 coverAlt: "The Riposte feed showing competitor changes"
 verdict: "Riposte watches your competitors every morning, explains what each change means for **your** product, and drafts your response. You spend your time deciding, not checking pages."
+featured: true
 related: ["riposte-action-kits", "riposte-ai-visibility", "why-i-built-riposte"]
 ---
 
