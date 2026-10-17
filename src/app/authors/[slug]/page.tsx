@@ -42,6 +42,14 @@ export default async function AuthorPage({ params }: { params: Promise<{ slug: s
   if (!a) notFound();
   const posts = allPosts().filter((p) => p.author === a.slug);
   const first = a.name.split(" ")[0];
+  // Topics they write about, from their posts' tags, most used first.
+  const topics = Object.entries(
+    posts.flatMap((p) => p.tags).reduce<Record<string, number>>((m, t) => ((m[t] = (m[t] ?? 0) + 1), m), {}),
+  )
+    .sort((x, y) => y[1] - x[1])
+    .map(([t]) => t)
+    .slice(0, 5);
+  const current = a.experience.find((j) => /present/i.test(j.dates ?? ""));
 
   return (
     <div className="min-h-dvh">
@@ -164,6 +172,39 @@ export default async function AuthorPage({ params }: { params: Promise<{ slug: s
           </div>
 
           <aside className="flex flex-col gap-5 lg:sticky lg:top-24 lg:self-start">
+            {/* Plain facts in one place: easy for readers to scan and for AI answers to quote. */}
+            <Card title="Quick facts">
+              <dl className="flex flex-col gap-3 text-sm">
+                {current && (
+                  <div>
+                    <dt className="text-xs text-muted">Works on</dt>
+                    <dd className="font-semibold">
+                      {current.role}, {current.company}
+                    </dd>
+                  </div>
+                )}
+                {a.location && (
+                  <div>
+                    <dt className="text-xs text-muted">Based in</dt>
+                    <dd className="font-semibold">{a.location}</dd>
+                  </div>
+                )}
+                {topics.length > 0 && (
+                  <div>
+                    <dt className="text-xs text-muted">Writes about</dt>
+                    <dd className="font-semibold">{topics.join(", ")}</dd>
+                  </div>
+                )}
+                {posts.length > 0 && (
+                  <div>
+                    <dt className="text-xs text-muted">On this blog</dt>
+                    <dd className="font-semibold">
+                      {posts.length} {posts.length === 1 ? "post" : "posts"}, latest {formatDate(posts[0].updated)}
+                    </dd>
+                  </div>
+                )}
+              </dl>
+            </Card>
             {a.skills.length > 0 && (
               <Card title="Skills">
                 <ul className="flex flex-wrap gap-2">
@@ -249,7 +290,14 @@ export default async function AuthorPage({ params }: { params: Promise<{ slug: s
         data={{
           "@context": "https://schema.org",
           "@graph": [
-            { "@type": "ProfilePage", url: a.url, name: `${a.name} · Riposte`, mainEntity: authorSchema(a) },
+            {
+              "@type": "ProfilePage",
+              url: a.url,
+              name: `${a.name} · Riposte`,
+              ...(posts[0] ? { dateModified: posts[0].updated } : {}),
+              mainEntity: authorSchema(a),
+              hasPart: posts.map((p) => ({ "@type": "BlogPosting", headline: p.title, url: `${SITE_URL}/blog/${p.slug}` })),
+            },
             {
               "@type": "BreadcrumbList",
               itemListElement: [

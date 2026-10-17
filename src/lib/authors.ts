@@ -107,5 +107,8 @@ export function authorSchema(a: Author) {
     ...(a.skills.length ? { knowsAbout: a.skills } : {}),
     ...(a.education.length ? { alumniOf: a.education.map((e) => ({ "@type": "EducationalOrganization", name: e.place ?? e.title })) } : {}),
     ...(a.location ? { homeLocation: { "@type": "Place", name: a.location } } : {}),
+    ...(a.experience[0] && /present/i.test(a.experience[0].dates ?? "")
+      ? { worksFor: { "@type": "Organization", name: a.experience[0].company, ...(a.experience[0].company === "Riposte" ? { url: SITE_URL } : {}) } }
+      : {}),
   };
 }

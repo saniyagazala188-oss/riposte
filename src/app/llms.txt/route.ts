@@ -1,4 +1,5 @@
 import { allPosts } from "@/lib/blog";
+import { allAuthors } from "@/lib/authors";
 import { AUTHOR, SITE_URL } from "@/lib/site";
 
 // llms.txt: a plain-text guide to the site for AI tools.
@@ -18,6 +19,13 @@ Founded by ${AUTHOR.name}, a product marketer based in Bengaluru, India. Built i
 - [Blog](${SITE_URL}/blog): guides on competitive intelligence, content and AI search
 - [Changelog](${SITE_URL}/changelog): every step of the build, with dates
 - [About the founder](${SITE_URL}/about)
+- [Authors](${SITE_URL}/authors): who writes the blog
+
+## Authors
+
+${allAuthors()
+  .map((a) => `- [${a.name}](${a.url}): ${a.role}${a.location ? `, ${a.location}` : ""}. ${a.headline}`)
+  .join("\n")}
 
 ## Blog posts
 
