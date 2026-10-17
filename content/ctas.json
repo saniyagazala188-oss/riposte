@@ -1,0 +1,29 @@
+{
+  "beta": {
+    "eyebrow": "Free, invite-only beta",
+    "title": "Know what your competitors changed, and what to do about it",
+    "subtitle": "Riposte checks their pricing, blog, changelog and news every morning, explains what matters for your product, and drafts your response.",
+    "button": "Join the waitlist",
+    "link": "/#waitlist",
+    "image": "/blog/ctas/beta.jpg",
+    "imageAlt": "The Riposte feed showing a high impact competitor change"
+  },
+  "action-kits": {
+    "eyebrow": "Action kits",
+    "title": "Every important change comes with a plan",
+    "subtitle": "What to do, who owns it, when, and a first draft written for your product.",
+    "button": "Try Riposte free",
+    "link": "/#waitlist",
+    "image": "/blog/ctas/action-kits.jpg",
+    "imageAlt": "A Riposte action kit with three actions and drafts"
+  },
+  "ai-visibility": {
+    "eyebrow": "AI visibility",
+    "title": "See who ChatGPT and Gemini recommend to your buyers",
+    "subtitle": "Track the questions your buyers ask AI, which brands get named, and which sites AI trusts.",
+    "button": "Try Riposte free",
+    "link": "/#waitlist",
+    "image": "/blog/ctas/ai-visibility.jpg",
+    "imageAlt": "The Riposte AI visibility page"
+  }
+}

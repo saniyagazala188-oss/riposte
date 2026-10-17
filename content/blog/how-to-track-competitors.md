@@ -4,7 +4,7 @@ metaTitle: "How to Track Competitors: A Weekly System for Marketers"
 description: "A simple system to track competitor pricing, launches and content every week, spot what really changed, and turn it into actions your team can ship."
 summary: "Track 3 to 5 competitors, not 20. Watch five pages for each: pricing, release notes, blog feed, sitemap and homepage. Compare each page with its last version, ignore noise like dates and banners, and judge every real change against your own product and buyers. Then turn each change into one action with an owner. Automate the checking so your time goes into the response."
 date: "2026-10-05"
-updated: "2026-10-05"
+updated: "2026-10-17"
 keywords: ["how to track competitors", "competitor monitoring", "competitive intelligence for marketers", "track competitor pricing changes"]
 tags: ["Competitive intelligence", "Product marketing"]
 faqs:
@@ -16,6 +16,10 @@ faqs:
     a: "Daily is enough for most B2B markets. Competitors rarely change pricing or positioning by the hour, and a daily check catches everything that matters while keeping the noise down."
   - q: "What is the difference between competitor monitoring and competitive intelligence?"
     a: "Monitoring tells you that something changed. Competitive intelligence tells you what it means for your product and what to do about it. Most teams have the first and miss the second."
+cover: "/blog/covers/how-to-track-competitors.jpg"
+coverAlt: "A list of competitors being watched in Riposte"
+verdict: "Watch a few competitors properly, compare only the content that matters, judge every change against your own product, and give each one an owner. Automate the checking, and keep the thinking for yourself."
+related: ["competitor-search-intent-change", "why-i-built-riposte", "riposte-action-kits"]
 ---
 
 Every Monday, I used to spend two to three hours on competitor research. I put each competitor's domain into an SEO tool, downloaded their recent pages, and compared them with last week's export in a spreadsheet. If a page showed up again, we assumed it had been "optimized". Nobody checked what actually changed.
@@ -36,11 +40,16 @@ For each competitor, find these pages once:
 - **Sitemap:** every page on their site, so you see new comparison pages and guides.
 - **Homepage:** the headline and positioning they lead with.
 
+:::tip Where to find them
 Most sites link these in the footer. The sitemap usually lives at `/sitemap.xml`, and the blog feed at `/feed` or `/rss.xml`.
+:::
 
 ## 3. Compare with the last version, and ignore the noise
 
 The useful question is not "did this page change?" but "what changed?". Keep a copy of each page, and compare only the main content with the last copy. Ignore things that change all the time: dates, view counts, cookie banners, menus and rotating logos. Otherwise every page looks changed every day, and you stop trusting your own tracking.
+
+:::read competitor-search-intent-change
+
 
 ## 4. Judge every change against your own product
 
@@ -54,6 +63,12 @@ A price rise from $49 to $59 can be noise for one company and a big opening for 
 
 This is the step most teams skip. A change only matters if someone does something about it. For each signal, decide one action, such as updating a battlecard, briefing sales, refreshing a comparison page or writing a post. Give it an owner and a deadline.
 
+:::cta beta
+
+
 ## 6. Automate the checking, keep the thinking
 
 Steps 2 and 3 are repetitive, so a system should do them for you. Your time should go into steps 4 and 5. That is why I built [Riposte](/): it checks competitor pages every morning, explains each change against your product, and drafts the response with an owner, so the Monday routine becomes a short review.
+
+![Competitors in Riposte](/blog/screens/competitors.jpg "Riposte finds each competitor's pricing, changelog, blog feed and sitemap on its own")
+

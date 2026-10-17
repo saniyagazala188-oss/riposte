@@ -4,7 +4,7 @@ metaTitle: "Keep Comparison Pages Up to Date With Riposte"
 description: "Comparison pages go stale the day a competitor changes pricing. Riposte writes fair 'you vs them' pages and flags them out of date when competitors change."
 summary: "Riposte writes a fair comparison page for each competitor from your product profile and what it reads on their site: a criteria table with pricing first, who should choose which, a verdict and FAQs. When the competitor changes pricing, product or positioning, the page is flagged out of date. One click updates it, and the rows that changed are highlighted so you know what to check."
 date: "2026-10-05"
-updated: "2026-10-05"
+updated: "2026-10-17"
 keywords: ["comparison page", "vs page", "competitor comparison page", "alternatives page SEO"]
 tags: ["Product", "SEO"]
 faqs:
@@ -14,6 +14,10 @@ faqs:
     a: "No. Competitor facts come only from their own pages. Anything not found says 'Not published', and anything missing about your product becomes a [placeholder]."
   - q: "Can I publish the page as it is?"
     a: "Review it first. Copy it as Markdown into your website, fill any placeholders, and check the facts against the linked sources."
+cover: "/blog/covers/riposte-living-comparison-pages.jpg"
+coverAlt: "A Riposte comparison page flagged as out of date"
+verdict: "A comparison page is only useful while it is true. Riposte writes an honest one, watches the competitor every day, and tells you the moment a row goes stale."
+related: ["riposte-action-kits", "riposte-ai-visibility", "what-riposte-does"]
 ---
 
 Comparison pages are some of the most valuable pages on a B2B website. Buyers search "Product A vs Product B" when they're close to deciding, and AI assistants lean on these pages when they compare tools. I built many of them as a product marketer.
@@ -30,12 +34,19 @@ For each competitor, Riposte writes a fair comparison from two sources: your pro
 - "Choose us if" and "Choose them if" sections.
 - A short verdict and FAQs.
 
-The rules are strict. Competitor prices and plan names are quoted exactly as their site states them. If something isn't on their site, the page says "Not published". If something about your own product is missing, it becomes a [placeholder]. And the page must say where the competitor is stronger. Honest pages are the ones buyers and AI trust.
+:::tip Honest pages win
+Competitor prices and plan names are quoted exactly as their site states them. If something isn't on their site, the page says "Not published". If something about your own product is missing, it becomes a [placeholder]. And the page must say where the competitor is stronger. Honest pages are the ones buyers and AI trust.
+:::
 
 ## How it stays true
 
 Every morning, Riposte checks your competitors. When one changes its pricing, product or positioning, the comparison page is marked **out of date**, with a list of what changed. You also see a banner on your feed. Click **Update the page**, and the rows that changed are highlighted, for example the Pricing row moving from $49 to $59.
 
+![A comparison page flagged as out of date](/blog/screens/compare.jpg "Out of date: what changed on their site since the page was written")
+
+
 ## What to do with it
 
-Copy the page as Markdown into your website or CMS, fill the placeholders and publish. Pair it with an [action kit](/blog/riposte-action-kits) so sales hears about the change too. See [every Riposte feature](/blog/what-riposte-does).
+Copy the page as Markdown into your website or CMS, fill the placeholders and publish. Pair it with an action kit so sales hears about the change too.
+
+:::read riposte-action-kits

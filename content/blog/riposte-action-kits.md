@@ -4,7 +4,7 @@ metaTitle: "Riposte Action Kits: Turn Competitor Changes Into Actions"
 description: "Most competitor tools stop at the alert. Riposte action kits say what to create, who owns it, where to share it and how urgent it is, with a first draft."
 summary: "An action kit turns one competitor signal into a response plan. For each signal, Riposte suggests two to four things to create, such as a battlecard update, a sales talk track or a comparison page update. Each action has an owner, a channel to share it in, an urgency (today, this week or later) and a first draft to copy. All actions collect on one Actions page."
 date: "2026-10-05"
-updated: "2026-10-05"
+updated: "2026-10-17"
 keywords: ["competitive response plan", "battlecard update", "sales talk track", "competitor alert action"]
 tags: ["Product", "Sales enablement"]
 faqs:
@@ -14,6 +14,11 @@ faqs:
     a: "They are first drafts. They use your product profile and leave [placeholders] where a fact is missing, so you fill in real details before sharing."
   - q: "Who can own an action?"
     a: "Actions are assigned to roles such as PMM, Sales, Content and SEO, Product, Leadership or Customer success, so the right person picks them up."
+cover: "/blog/covers/riposte-action-kits.jpg"
+coverAlt: "The Riposte Actions board with a battlecard draft open"
+verdict: "Knowing about a competitor change is the easy part. An action kit turns it into a short plan with owners and first drafts, so the response ships in days, not weeks."
+cta: "action-kits"
+related: ["riposte-living-comparison-pages", "what-riposte-does", "how-to-track-competitors"]
 ---
 
 Here is a moment every product marketer knows. You find out a competitor raised its price. Now what? Someone has to update the battlecard, tell sales what to say, and fix the comparison page. Usually that someone is you, and usually it happens a week late.
@@ -30,6 +35,9 @@ When Riposte finds a change, it writes a signal: what changed, why it matters to
 - **Urgency:** today, this week or later.
 - **A first draft**, ready to copy.
 
+![An action kit with three actions](/blog/screens/actions.jpg "Each action has an owner, a deadline, where to share it and a first draft")
+
+
 ## An example
 
 Say a competitor raises its Pro plan from $49 to $59 a month. The action kit might suggest:
@@ -40,9 +48,17 @@ Say a competitor raises its Pro plan from $49 to $59 a month. The action kit mig
 
 The drafts use what you told Riposte about your product and buyers. Anything Riposte doesn't know, like your own price, is left as a [placeholder], so nothing made up slips through.
 
+:::important Drafts are a starting point
+Edit them, cut what doesn't fit, and decide what actually ships. The draft just saves you from the blank page.
+:::
+
+
 ## One place for every response
 
 All actions from all kits collect on the **Actions** page, sorted into Today, This week, Later and Done. Pick one, copy the draft, share it where it says and mark it done. When every action in a kit is done, the signal is marked reviewed, and the Monday digest lists the responses your team shipped.
+
+:::read riposte-living-comparison-pages
+
 
 ## Why this matters
 
