@@ -163,12 +163,11 @@ function Magazine({ post, toc, more, url }: { post: Post; toc: Toc; more: Post[]
             <div id="post-body" className="prose-riposte blog-b mt-10" dangerouslySetInnerHTML={{ __html: post.html }} />
             <BottomLine post={post} />
             <Faqs post={post} />
-            {post.cta && <div className="prose-riposte mt-14 xl:hidden" dangerouslySetInnerHTML={{ __html: ctaHtml(post.cta) }} />}
-            <AuthorBox className="mt-12 xl:hidden" />
           </article>
 
-          <aside className="hidden xl:block">
-            <div className="sticky top-24 flex flex-col gap-5">
+          {/* One author card and one CTA in the page: beside the post on wide screens, under it on smaller ones. */}
+          <aside className="lg:col-start-2 xl:col-start-auto">
+            <div className="grid gap-5 sm:grid-cols-2 xl:sticky xl:top-24 xl:grid-cols-1">
               <AuthorBox compact />
               {post.cta && <div className="prose-riposte" dangerouslySetInnerHTML={{ __html: ctaHtml(post.cta, true) }} />}
             </div>
@@ -338,7 +337,7 @@ function AuthorBox({ className = "", compact = false }: { className?: string; co
             {AUTHOR.name}
           </Link>
         </p>
-        <p className={`text-sm text-muted ${compact ? "mt-1 line-clamp-4" : ""}`}>{AUTHOR.short}</p>
+        <p className={`text-sm text-muted ${compact ? "mt-1 xl:line-clamp-4" : ""}`}>{AUTHOR.short}</p>
       </div>
     </aside>
   );

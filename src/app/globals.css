@@ -124,7 +124,7 @@ h3 {
 }
 
 /* Blog posts: numbered sections, screenshots, boxes, CTAs, tables */
-.prose-riposte h2:has(.blog-h2-n) {
+.prose-riposte h2.blog-h2 {
   display: flex;
   align-items: baseline;
   gap: 0.75rem;
@@ -135,12 +135,13 @@ h3 {
   line-height: 1.2;
   letter-spacing: -0.01em;
 }
-.prose-riposte > h2:has(.blog-h2-n):first-child {
+.prose-riposte > h2.blog-h2:first-child {
   margin-top: 0;
   padding-top: 0;
   border-top: 0;
 }
-.blog-h2-n {
+.prose-riposte h2.blog-h2::before {
+  content: attr(data-n);
   flex: none;
   display: inline-grid;
   place-items: center;
@@ -435,7 +436,7 @@ h3 {
 }
 
 /* Magazine layout: section labels instead of number badges */
-.blog-b h2:has(.blog-h2-n) {
+.blog-b h2.blog-h2 {
   flex-direction: column;
   align-items: flex-start;
   gap: 0.45rem;
@@ -444,7 +445,7 @@ h3 {
   border-top: 0;
   font-size: 1.9rem;
 }
-.blog-b h2:has(.blog-h2-n)::after {
+.blog-b h2.blog-h2::after {
   content: "";
   width: 3rem;
   height: 3px;
@@ -452,7 +453,8 @@ h3 {
   background: var(--accent);
   margin-top: 0.35rem;
 }
-.blog-b .blog-h2-n {
+.blog-b h2.blog-h2::before {
+  content: "Section " attr(data-n);
   display: inline-block;
   min-width: 0;
   height: auto;
@@ -463,9 +465,6 @@ h3 {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--signal);
-}
-.blog-b .blog-h2-n::before {
-  content: "Section ";
 }
 .blog-cta-compact {
   grid-template-columns: 1fr;

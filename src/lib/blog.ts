@@ -135,13 +135,14 @@ function read(file: string): Post {
   renderer.heading = ({ tokens, depth }) => {
     let text = renderer.parser.parseInline(tokens);
     if (depth !== 2) return `<h${depth} id="${slugify(text)}">${text}</h${depth}>`;
-    // Section headings get a number. "## 3. Something" keeps its own number.
+    // Section headings get a number, drawn by CSS from data-n so the heading text stays clean for
+    // search engines and AI. "## 3. Something" keeps its own number.
     const own = text.match(/^(\d+)[.)]\s+/);
     const n = String(own ? Number(own[1]) : headings.length + 1).padStart(2, "0");
     if (own) text = text.slice(own[0].length);
     const id = slugify(decode(text));
     headings.push({ id, text: decode(text.replace(/<[^>]+>/g, "")), n });
-    return `<h2 id="${id}"><span class="blog-h2-n" aria-hidden="true">${n}</span><span>${text}</span></h2>`;
+    return `<h2 id="${id}" class="blog-h2" data-n="${n}"><span>${text}</span></h2>`;
   };
   renderer.link = ({ href, tokens }) => {
     const text = renderer.parser.parseInline(tokens);
