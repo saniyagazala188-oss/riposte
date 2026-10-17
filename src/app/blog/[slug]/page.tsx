@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { allPosts, formatDate, getPost, relatedPosts, type Post } from "@/lib/blog";
 import { ctaHtml } from "@/lib/ctas";
 import { AUTHOR, SITE_URL, organizationSchema, personSchema } from "@/lib/site";
+import { authorSchema, getAuthor, DEFAULT_AUTHOR, type Author } from "@/lib/authors";
+import { AuthorAvatar } from "@/components/AuthorAvatar";
 import { JsonLd, SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { BlogToc } from "@/components/BlogToc";
 import { ReadingProgress, ShareLinks } from "@/components/BlogExtras";
@@ -26,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: post.metaTitle,
     description: post.description,
     keywords: post.keywords,
-    authors: [{ name: AUTHOR.name, url: `${SITE_URL}/about` }],
+    authors: [{ name: authorOf(post)?.name ?? AUTHOR.name, url: authorOf(post)?.url ?? `${SITE_URL}/about` }],
     alternates: { canonical: url },
     openGraph: {
       title: post.metaTitle,
@@ -35,7 +37,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       type: "article",
       publishedTime: post.date,
       modifiedTime: post.updated,
-      authors: [AUTHOR.name],
+      authors: [authorOf(post)?.name ?? AUTHOR.name],
       siteName: "Riposte",
       images,
     },
@@ -94,7 +96,7 @@ function Classic({ post, toc, more }: { post: Post; toc: Toc; more: Post[] }) {
             <BottomLine post={post} />
             <Faqs post={post} />
             {post.cta && <div className="prose-riposte mt-14" dangerouslySetInnerHTML={{ __html: ctaHtml(post.cta) }} />}
-            <AuthorBox className="mt-12" />
+            <AuthorBox post={post} className="mt-12" />
           </div>
           {toc.length > 2 && (
             <aside className="hidden lg:block">
@@ -168,7 +170,7 @@ function Magazine({ post, toc, more, url }: { post: Post; toc: Toc; more: Post[]
           {/* One author card and one CTA in the page: beside the post on wide screens, under it on smaller ones. */}
           <aside className="lg:col-start-2 xl:col-start-auto">
             <div className="grid gap-5 sm:grid-cols-2 xl:sticky xl:top-24 xl:grid-cols-1">
-              <AuthorBox compact />
+              <AuthorBox post={post} compact />
               {post.cta && <div className="prose-riposte" dangerouslySetInnerHTML={{ __html: ctaHtml(post.cta, true) }} />}
             </div>
           </aside>
@@ -236,15 +238,22 @@ function Tags({ post }: { post: Post }) {
   );
 }
 
+function authorOf(post: Post): Author | undefined {
+  return getAuthor(post.author) ?? getAuthor(DEFAULT_AUTHOR);
+}
+
 function Byline({ post, center = false }: { post: Post; center?: boolean }) {
+  const a = authorOf(post);
   return (
     <div className={`flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted ${center ? "justify-center" : "mt-6"}`}>
-      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent font-display text-sm font-bold text-accent-ink" aria-hidden>
-        SG
-      </span>
-      <Link href="/about" className="font-semibold text-ink hover:underline">
-        {AUTHOR.name}
-      </Link>
+      {a ? (
+        <Link href={`/authors/${a.slug}`} className="flex items-center gap-3 font-semibold text-ink hover:underline" rel="author">
+          <AuthorAvatar name={a.name} initials={a.initials} image={a.image} size={36} />
+          {a.name}
+        </Link>
+      ) : (
+        <span className="font-semibold text-ink">{AUTHOR.name}</span>
+      )}
       <span aria-hidden>·</span>
       <time dateTime={post.date}>{formatDate(post.date)}</time>
       {post.updated !== post.date && (
@@ -326,18 +335,24 @@ function Faqs({ post }: { post: Post }) {
   );
 }
 
-function AuthorBox({ className = "", compact = false }: { className?: string; compact?: boolean }) {
+function AuthorBox({ post, className = "", compact = false }: { post: Post; className?: string; compact?: boolean }) {
+  const a = authorOf(post);
+  if (!a) return null;
   return (
     <aside className={`flex ${compact ? "flex-col" : "flex-wrap items-center"} gap-4 rounded-2xl border border-line bg-surface p-5 ${className}`}>
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent font-display text-lg font-bold text-accent-ink">SG</div>
+      <AuthorAvatar name={a.name} initials={a.initials} image={a.image} size={52} />
       <div className="min-w-0 flex-1">
         <p className="text-xs font-semibold uppercase tracking-widest text-muted">Written by</p>
         <p className="font-semibold">
-          <Link href="/about" className="hover:underline">
-            {AUTHOR.name}
+          <Link href={`/authors/${a.slug}`} className="hover:underline" rel="author">
+            {a.name}
           </Link>
         </p>
-        <p className={`text-sm text-muted ${compact ? "mt-1 xl:line-clamp-4" : ""}`}>{AUTHOR.short}</p>
+        <p className="text-xs text-muted">{a.role}</p>
+        <p className={`mt-1.5 text-sm text-muted ${compact ? "xl:line-clamp-4" : ""}`}>{a.headline}</p>
+        <Link href={`/authors/${a.slug}`} className="mt-2 inline-block text-sm font-semibold text-accent hover:underline">
+          More about {a.name.split(" ")[0]} →
+        </Link>
       </div>
     </aside>
   );
@@ -396,7 +411,7 @@ function Schema({ post, url }: { post: Post; url: string }) {
             mainEntityOfPage: url,
             url,
             ...(post.cover ? { image: `${SITE_URL}${post.cover}` } : {}),
-            author: personSchema,
+            author: authorOf(post) ? authorSchema(authorOf(post)!) : personSchema,
             publisher: organizationSchema,
           },
           ...(post.faqs.length

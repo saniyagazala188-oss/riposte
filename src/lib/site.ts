@@ -18,7 +18,7 @@ export const personSchema = {
   "@type": "Person",
   name: AUTHOR.name,
   jobTitle: "Founder, Riposte",
-  url: `${SITE_URL}/about`,
+  url: `${SITE_URL}/authors/${AUTHOR.slug}`,
   sameAs: [AUTHOR.linkedin],
   address: { "@type": "PostalAddress", addressLocality: "Bengaluru", addressCountry: "IN" },
 };

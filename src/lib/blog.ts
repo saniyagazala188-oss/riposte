@@ -4,6 +4,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import { marked } from "marked";
 import { ctaHtml } from "./ctas";
+import { DEFAULT_AUTHOR } from "./authors";
 
 // Blog posts live as Markdown files in content/blog. See content/blog/README.md for how to write one.
 
@@ -29,6 +30,7 @@ export type PostMeta = {
   related: string[]; // slugs to show first under "Keep reading"
   layout: BlogLayout; // which page design to use
   featured: boolean; // shown as the big card on /blog
+  author: string; // author file name in content/authors, without .md
 };
 
 export type BlogLayout = "classic" | "magazine";
@@ -185,6 +187,7 @@ function read(file: string): Post {
     cta: data.cta === false || data.cta === "none" ? null : String(data.cta ?? "beta"),
     related: Array.isArray(data.related) ? data.related.map(String) : [],
     featured: data.featured === true,
+    author: data.author ? String(data.author) : DEFAULT_AUTHOR,
     layout: data.layout === "magazine" || data.layout === "classic" ? data.layout : blogSettings().layout,
     html,
     headings,

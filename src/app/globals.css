@@ -497,3 +497,44 @@ h3 {
     radial-gradient(45% 30% at 100% 55%, color-mix(in srgb, var(--signal-soft) 90%, transparent), transparent 70%),
     var(--bg);
 }
+
+/* Author page story: the journey list becomes a timeline */
+.author-story h2 {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+}
+.author-story h2 + * {
+  margin-top: 0.8em;
+}
+.author-story ul {
+  list-style: none;
+  padding-left: 1.4rem;
+  border-left: 2px dashed var(--line);
+  margin-left: 0.4rem;
+}
+.author-story ul li {
+  position: relative;
+}
+.author-story ul li::before {
+  content: "";
+  position: absolute;
+  left: calc(-1.4rem - 7px);
+  top: 0.55em;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 3px solid var(--surface);
+}
+.author-story ul li:last-child::before {
+  background: var(--signal);
+}
+.author-story ul li + li {
+  margin-top: 0.9em;
+}
+.author-story strong {
+  color: var(--accent);
+}
+.prose-riposte.author-story > h2:first-child {
+  margin-top: 0;
+}
