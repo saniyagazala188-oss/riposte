@@ -12,7 +12,7 @@ Start with "Your product", then add up to 5 competitors. Riposte checks them eve
 
 I'd love to hear what you think. There's a "Give feedback" link in the menu, and I read every answer.
 
-${AUTHOR.name.split(" ")[0]}, founder of Riposte`;
+${AUTHOR.name.split(" ")[0]}, from Riposte`;
   const html = text
     .split("\n\n")
     .map((p) => `<p>${p.replace(url, `<a href="${url}">${url}</a>`).replace(/\n/g, "<br>")}</p>`)

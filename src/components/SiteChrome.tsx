@@ -6,7 +6,7 @@ import { Logo } from "@/components/Logo";
 const NAV = [
   { href: "/blog", label: "Blog" },
   { href: "/changelog", label: "Changelog" },
-  { href: "/about", label: "About" },
+  { href: "/authors/saniya-gazala", label: "About" },
 ];
 
 export function SiteHeader({
@@ -52,7 +52,7 @@ export function SiteFooter() {
     <footer className="border-t border-line">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-6 text-sm text-muted">
         <span>
-          © {new Date().getFullYear()} Riposte · Founded by Saniya Gazala with
+          © {new Date().getFullYear()} Riposte · Made by Saniya Gazala with
           ❤️ · Built with Claude 🤝
         </span>
         <nav className="flex flex-wrap gap-4" aria-label="Footer">

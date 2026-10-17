@@ -116,7 +116,7 @@ export const CHANGELOG: ChangeEntry[] = [
   {
     at: "2026-10-05T23:25:00+05:30",
     title: "Blog, changelog and about in the app menu",
-    body: "The app's side menu now links to the blog, this changelog and the founder page, and the site header shows them on phones too.",
+    body: "The app's side menu now links to the blog, this changelog and the about page, and the site header shows them on phones too.",
     kind: "fix",
   },
   {
@@ -133,7 +133,7 @@ export const CHANGELOG: ChangeEntry[] = [
   },
   {
     at: "2026-10-05T22:41:00+05:30",
-    title: "Blog, changelog and founder page",
+    title: "Blog, changelog and about page",
     body: "A blog with SEO and AEO built in (quick answer box, FAQs, article and FAQ schema), this changelog, an about page, plus sitemap, robots and llms.txt.",
     kind: "feature",
   },

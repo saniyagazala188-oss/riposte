@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: post.metaTitle,
     description: post.description,
     keywords: post.keywords,
-    authors: [{ name: authorOf(post)?.name ?? AUTHOR.name, url: authorOf(post)?.url ?? `${SITE_URL}/about` }],
+    authors: [{ name: authorOf(post)?.name ?? AUTHOR.name, url: authorOf(post)?.url ?? `${SITE_URL}/authors/${AUTHOR.slug}` }],
     alternates: { canonical: url },
     openGraph: {
       title: post.metaTitle,

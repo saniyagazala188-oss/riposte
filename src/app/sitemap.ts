@@ -14,7 +14,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/authors`, lastModified: latest, changeFrequency: "monthly", priority: 0.4 },
     ...allAuthors().map((a) => ({ url: a.url, lastModified: latest, changeFrequency: "monthly" as const, priority: 0.5 })),
     { url: `${SITE_URL}/changelog`, lastModified: latest, changeFrequency: "weekly", priority: 0.5 },
-    { url: `${SITE_URL}/about`, lastModified: latest, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/privacy`, lastModified: latest, changeFrequency: "yearly", priority: 0.2 },
     { url: `${SITE_URL}/terms`, lastModified: latest, changeFrequency: "yearly", priority: 0.2 },
   ];

@@ -129,7 +129,7 @@ export function navGroups(counts: { toReview: number; openActions: number }, adm
         { href: "/app/feedback", label: "Give feedback", icon: "feedback" },
         { href: "/blog", label: "Blog", icon: "blog" },
         { href: "/changelog", label: "Changelog", icon: "changelog" },
-        { href: "/about", label: "About the founder", icon: "about" },
+        { href: "/authors/saniya-gazala", label: "About Saniya", icon: "about" },
       ],
     },
   ];

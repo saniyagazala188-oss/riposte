@@ -1,6 +1,6 @@
 ---
 name: "Saniya Gazala"
-role: "Founder, Riposte · Product marketer"
+role: "Product marketer"
 headline: "I'm a product marketer who builds. I started as a developer, moved into content and SEO, and now I build the marketing tools I wish I'd had."
 image: "/authors/saniya-gazala.jpg"
 imageAlt: "Saniya Gazala"
@@ -20,7 +20,7 @@ highlights:
   - value: "40+"
     label: "updates shipped in public"
 experience:
-  - role: "Founder"
+  - role: "Product marketer & builder"
     company: "Riposte"
     dates: "Oct 2026 – Present"
     summary: "Building Riposte in public: competitor tracking for marketers that explains every change and drafts the response."
@@ -70,6 +70,18 @@ skills: ["Product marketing", "Competitive intelligence", "Sales enablement", "P
 I'm Saniya. I've spent six years moving between building things and explaining them. I started out writing code, then fell into content and SEO, and spent my last role as the product marketing manager for KaneAI at TestMu AI (LambdaTest).
 
 Riposte came straight out of that job. Every Monday I spent two to three hours checking what competitors had changed, by hand, in spreadsheets. Even when I found something important, nothing told me what to do about it. So I built the tool I wanted: one that checks every morning, explains what matters for my product and drafts the response.
+
+## Why I built Riposte
+
+In my last role, I could always find out what a competitor had changed. What I couldn't find was the time to turn it into something useful while it still mattered: the battlecard, the reply for sales, the comparison page, the post. That's where most competitive intelligence dies, somewhere between knowing and responding. Riposte is built for that gap.
+
+## Where I want to take it
+
+- **For small teams first.** Product marketers, content leads and founders without an analyst or a big budget should still know, every morning, what changed and what to do about it.
+- **Every competitor signal in one place.** Today Riposte watches websites, pricing, blogs, changelogs, news and AI answers. Next comes YouTube, and later social media, so nothing important happens where you aren't looking.
+- **Advice that fits your product.** The more Riposte knows about you, through your product profile and your own documents, the sharper every draft gets. No generic templates.
+- **People stay in charge.** Riposte does the checking and the first draft. You decide what matters and what ships.
+- **Built in public, with the people who use it.** The beta is free, and what I build next comes from what beta users tell me.
 
 ## My learning journey
 

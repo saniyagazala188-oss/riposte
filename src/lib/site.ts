@@ -7,7 +7,7 @@ export const SITE_TAGLINE = "Competitive intelligence for marketers";
 export const AUTHOR = {
   slug: "saniya-gazala",
   name: "Saniya Gazala",
-  role: "Founder of Riposte · Product marketer",
+  role: "Product marketer",
   location: "Bengaluru, India",
   linkedin: "https://www.linkedin.com/in/saniya-gazala-627889186",
   short:
@@ -17,7 +17,7 @@ export const AUTHOR = {
 export const personSchema = {
   "@type": "Person",
   name: AUTHOR.name,
-  jobTitle: "Founder, Riposte",
+  jobTitle: "Product marketer",
   url: `${SITE_URL}/authors/${AUTHOR.slug}`,
   sameAs: [AUTHOR.linkedin],
   address: { "@type": "PostalAddress", addressLocality: "Bengaluru", addressCountry: "IN" },

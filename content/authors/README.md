@@ -11,7 +11,7 @@ To put a post under their name, add `author: "jane-doe"` to the post's settings.
 | Setting | What it is |
 | --- | --- |
 | `name` | Full name |
-| `role` | One line under the name, e.g. "Founder, Riposte · Product marketer" |
+| `role` | One line under the name, e.g. "Product marketer" |
 | `headline` | One or two sentences about them, shown big at the top and on every post they wrote |
 | `image` | Their photo: put it in `public/authors/` and write `/authors/jane-doe.jpg`. Leave it `""` to show initials |
 | `location` | City, country |
