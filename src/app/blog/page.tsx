@@ -92,6 +92,12 @@ export default function BlogIndex() {
                     </Link>
                   </h2>
                   <p className="mt-3 leading-relaxed text-muted">{featured.description}</p>
+                  {featured.summary && (
+                    <div className="mt-4 rounded-xl border-l-4 border-accent bg-accent-soft px-4 py-3">
+                      <p className="text-[11px] font-semibold uppercase tracking-widest text-accent">Quick answer</p>
+                      <p className="mt-1 line-clamp-4 text-sm leading-relaxed">{featured.summary}</p>
+                    </div>
+                  )}
                   <p className="mt-auto flex items-center justify-between gap-3 pt-6 text-sm">
                     <span className="text-muted">
                       <time dateTime={featured.date}>{formatDate(featured.date)}</time> · {featured.readingMinutes} min read
