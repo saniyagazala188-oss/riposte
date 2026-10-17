@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-17T20:00:00+05:30",
+    title: "A new blog design",
+    body: "Blog posts now have a cover image, a reading bar, numbered sections, a table of contents that follows you, share buttons, app screenshots in a browser frame, tip and example boxes, \"read next\" links, a bottom line, open-and-close FAQs and related posts. Image call-to-action cards can be changed from one file. The site header now has a clear line under it and stays at the top.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-17T01:50:00+05:30",
     title: "Analytics and Search Console",
     body: "Riposte now uses Google Analytics to count visits, waitlist joins and sign-ups, and is set up in Google Search Console so its pages can be found in search. The privacy policy explains both. Also fixed a garbled message people saw after joining the waitlist.",
