@@ -6,7 +6,8 @@ import { after } from "next/server";
 import { requireUser } from "@/lib/auth";
 import { limitsFor } from "@/lib/access";
 import { resolveChannel } from "@/lib/youtube";
-import { discoverSources } from "@/lib/discovery";
+import { discoverSources, fetchPage } from "@/lib/discovery";
+import { findChannelLink } from "@/lib/youtube/parse";
 import { checkSources, type SourceRow } from "@/lib/fetcher/check";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { processChanges } from "@/lib/signals/process";
@@ -100,6 +101,55 @@ export async function addCompetitor(_prev: FormState, formData: FormData): Promi
 
   revalidatePath("/app", "layout");
   redirect(`/app/competitors/${competitor.id}?added=1`);
+}
+
+// Social media: look for every competitor's YouTube channel on their homepage (for competitors
+// added before YouTube existed), save what's found and check it straight away.
+export async function findYouTubeChannels(_prev: FormState, _formData: FormData): Promise<FormState> {
+  const { supabase, user } = await requireUser();
+  const userId = user.id;
+  const [{ data: competitors }, { data: existing }] = await Promise.all([
+    supabase.from("competitors").select("id, domain, name"),
+    supabase.from("sources").select("competitor_id").eq("type", "youtube"),
+  ]);
+  const has = new Set((existing ?? []).map((s) => s.competitor_id as string));
+  const todo = (competitors ?? []).filter((c) => !has.has(c.id)).slice(0, 12);
+  if (!todo.length) return { status: "saved", message: "Every competitor already has a channel." };
+
+  const found: { name: string; id: string }[] = [];
+  await Promise.all(
+    todo.map(async (c) => {
+      try {
+        const home = await fetchPage(`https://${c.domain}`);
+        const link = home.ok ? findChannelLink(home.text) : null;
+        const channel = link ? await resolveChannel(link) : null;
+        if (!channel) return;
+        const { error } = await supabase.from("sources").insert({ competitor_id: c.id, type: "youtube", url: channel.url, discovered: true });
+        if (!error) found.push({ name: c.name, id: c.id });
+      } catch {
+        // one unreachable website shouldn't stop the others
+      }
+    }),
+  );
+
+  if (found.length) {
+    const ids = found.map((f) => f.id);
+    after(async () => {
+      const admin = createAdminClient();
+      if (!admin) return;
+      const { data } = await admin.from("sources").select("id, user_id, competitor_id, type, url").eq("type", "youtube").in("competitor_id", ids);
+      if (data?.length) await checkSources(admin, data as SourceRow[], { concurrency: 4, budgetMs: 50000 });
+      await processChanges(admin, { userId }).catch(() => null);
+    });
+  }
+  revalidatePath("/app/social");
+  const missed = todo.length - found.length;
+  return {
+    status: "saved",
+    message: found.length
+      ? `Found ${found.length} ${found.length === 1 ? "channel" : "channels"} (${found.map((f) => f.name).join(", ")}). Their latest videos will appear here in a minute or two.${missed ? ` ${missed} had no YouTube link on their website: add those by hand.` : ""}`
+      : "No YouTube links found on their websites. Add a channel by hand from the competitor's page.",
+  };
 }
 
 export async function rediscover(formData: FormData) {

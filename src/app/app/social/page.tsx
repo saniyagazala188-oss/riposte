@@ -4,6 +4,7 @@ import { SignalBrowser, SIGNAL_SELECT, type SignalRow } from "@/components/Signa
 import { Empty, PageHeader, Pager, pageNum, withParams } from "@/components/ui";
 import { ParamSelect } from "@/components/ui-client";
 import { NewsSwitch } from "@/components/NewsSwitch";
+import { FindChannels } from "./FindChannels";
 
 export const metadata = { title: "Social media · Riposte" };
 
@@ -141,9 +142,10 @@ export default async function SocialPage({ searchParams }: { searchParams: Promi
             ))}
             {missing.length > 6 && <li className="self-center text-xs text-muted">and {missing.length - 6} more without a channel</li>}
           </ul>
+          {missing.length > 0 && <FindChannels />}
           {missing.length > 0 && (
             <p className="mt-2 text-xs text-muted">
-              No channel found on their website. Open the competitor and add their YouTube link under &quot;Add a page or channel&quot;, or press &quot;Find pages again&quot;.
+              If a competitor has no YouTube link on their website, open the competitor and paste their channel under &quot;Add a page or channel&quot;.
             </p>
           )}
         </div>
