@@ -8,7 +8,7 @@ import { authorSchema, getAuthor, DEFAULT_AUTHOR, type Author } from "@/lib/auth
 import { AuthorAvatar } from "@/components/AuthorAvatar";
 import { JsonLd, SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { BlogToc } from "@/components/BlogToc";
-import { ReadingProgress, ShareLinks } from "@/components/BlogExtras";
+import { CopyCode, ReadingProgress, ShareLinks } from "@/components/BlogExtras";
 
 // Two designs for a post: "classic" and "magazine". Pick one in content/blog-settings.json,
 // or per post with `layout:` in its settings.
@@ -92,6 +92,7 @@ function Classic({ post, toc, more }: { post: Post; toc: Toc; more: Post[] }) {
                 <BlogToc headings={toc} variant="mobile" />
               </div>
             )}
+            <CopyCode />
             <div id="post-body" className="prose-riposte mt-10" dangerouslySetInnerHTML={{ __html: post.html }} />
             <BottomLine post={post} />
             <Faqs post={post} />
@@ -162,6 +163,7 @@ function Magazine({ post, toc, more, url }: { post: Post; toc: Toc; more: Post[]
                 <BlogToc headings={toc} variant="mobile" />
               </div>
             )}
+            <CopyCode />
             <div id="post-body" className="prose-riposte blog-b mt-10" dangerouslySetInnerHTML={{ __html: post.html }} />
             <BottomLine post={post} />
             <Faqs post={post} />

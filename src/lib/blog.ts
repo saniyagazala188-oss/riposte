@@ -160,6 +160,9 @@ function read(file: string): Post {
       return `<figure class="blog-shot"><div class="blog-shot-frame"><div class="blog-shot-bar"><i></i><i></i><i></i><span><b>useriposte.com</b>${screenPath(href)}</span></div>${img}</div>${cap}</figure>`;
     return `<figure class="blog-fig">${img}${cap}</figure>`;
   };
+  // Code blocks (like a template to copy) get a box and a Copy button (see CopyCode in BlogExtras).
+  renderer.code = ({ text }) =>
+    `<div class="blog-code"><button type="button" class="blog-copy" data-copy>Copy</button><pre><code>${esc(text)}</code></pre></div>`;
   // A paragraph holding only an image shouldn't wrap the figure in <p>.
   renderer.paragraph = ({ tokens }) => {
     const inner = renderer.parser.parseInline(tokens);

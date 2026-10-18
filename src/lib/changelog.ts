@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-19T01:20:00+05:30",
+    title: "New post: a free sales battlecard template",
+    body: "A new blog post on how to build a sales battlecard and keep it up to date, with a one-page template you can copy with one click. Every blog post now also answers 10 common buyer questions at the end.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-17T23:30:00+05:30",
     title: "Social media: YouTube",
     body: "A new Social media page under News & more. Riposte finds each competitor's YouTube channel from their website (or you paste it), checks it every morning, and turns new videos into signals: what they published, why it matters for you and what to do, with views and a Short label. X and LinkedIn are next, once their access allows it.",

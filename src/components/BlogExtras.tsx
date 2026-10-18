@@ -82,3 +82,21 @@ export function ShareLinks({ url, title }: { url: string; title: string }) {
     </div>
   );
 }
+
+// Copy buttons on code blocks in a post (the button HTML comes from the blog renderer).
+export function CopyCode() {
+  useEffect(() => {
+    const on = (e: MouseEvent) => {
+      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-copy]");
+      const code = btn?.parentElement?.querySelector("code");
+      if (!btn || !code) return;
+      navigator.clipboard.writeText(code.textContent ?? "").then(() => {
+        btn.textContent = "Copied";
+        setTimeout(() => (btn.textContent = "Copy"), 1600);
+      });
+    };
+    document.addEventListener("click", on);
+    return () => document.removeEventListener("click", on);
+  }, []);
+  return null;
+}

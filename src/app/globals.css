@@ -117,6 +117,42 @@ h3 {
   padding: 0.1em 0.35em;
   border-radius: 4px;
 }
+.prose-riposte .blog-code {
+  position: relative;
+  margin: 1.5em 0;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--bg);
+}
+.prose-riposte .blog-code pre {
+  margin: 0;
+  padding: 2.9em 1.2em 1.1em;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  font-size: 0.82rem;
+  line-height: 1.65;
+}
+.prose-riposte .blog-code code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+.blog-copy {
+  position: absolute;
+  top: 0.6em;
+  right: 0.6em;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 0.25em 0.9em;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+}
+.blog-copy:hover {
+  border-color: var(--accent);
+}
 .prose-riposte blockquote {
   border-left: 3px solid var(--line);
   padding-left: 1em;
