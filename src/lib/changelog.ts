@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-19T01:40:00+05:30",
+    title: "New post: how to choose a competitive intelligence tool",
+    body: "An honest buying guide to competitive intelligence tools: the five types (enterprise platforms, lighter tools, page monitors, SEO tools and social listening), who each is for, how they're priced, questions to ask in a demo, a free starter setup, and where Riposte fits and where it doesn't.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-19T01:20:00+05:30",
     title: "New post: a free sales battlecard template",
     body: "A new blog post on how to build a sales battlecard and keep it up to date, with a one-page template you can copy with one click. Every blog post now also answers 10 common buyer questions at the end.",
