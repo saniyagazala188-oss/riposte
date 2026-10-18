@@ -75,3 +75,13 @@ All CTAs live in one file, `content/ctas.json`. Change a CTA there and it change
 - `eyebrow`, `subtitle` and `image` are optional.
 
 The page adds the SEO and AEO pieces for you: meta title and description, canonical link, social share image, article and FAQ schema, author schema, and the table of contents.
+
+## Naming competitors
+
+It's fine to name competitors in posts and FAQs (buyers search for them), as long as:
+
+- **Everything is true and checkable.** Use their own pages or a named source. If unsure, leave it out.
+- **It's fair.** Say what they're good at, not only where Riposte wins.
+- **No exact prices** unless you just checked them; write the pricing model ("custom annual contract", "monthly plans") and date it ("as of October 2026").
+- **Name only.** No logos, no screenshots of their product, nothing that suggests a partnership.
+- **Re-check** competitor facts whenever you change `updated`.
