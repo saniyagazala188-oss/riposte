@@ -318,7 +318,8 @@ export async function checkSource(db: SupabaseClient, input: SourceRow): Promise
   }
   const modsChanged = modLines !== null && hashOf(modLines) !== hashOf(((previous?.lines as string[] | null) ?? []));
 
-  if (status !== "unchanged" || previous?.content_hash !== hash || modsChanged) {
+  // YouTube: save every check, so view counts and Short labels on "Latest on their channels" stay fresh.
+  if (status !== "unchanged" || previous?.content_hash !== hash || modsChanged || source.type === "youtube") {
     await db.from("snapshots").insert({
       user_id: source.user_id,
       source_id: source.id,

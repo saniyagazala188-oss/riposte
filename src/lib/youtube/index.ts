@@ -63,6 +63,19 @@ export async function resolveChannel(input: string): Promise<{ id: string; url: 
   }
 }
 
+async function isShort(videoId: string): Promise<boolean> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 5000);
+  try {
+    const res = await fetch(`https://www.youtube.com/shorts/${videoId}`, { method: "HEAD", redirect: "manual", signal: controller.signal, cache: "no-store" });
+    return res.status === 200;
+  } catch {
+    return false; // when unsure, don't label it
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 // The latest videos on a channel, newest first.
 export async function latestVideos(channelId: string): Promise<{ ok: true; items: VideoItem[] } | { ok: false; message: string }> {
   if (youtubeApiConfigured()) {
@@ -71,7 +84,11 @@ export async function latestVideos(channelId: string): Promise<{ ok: true; items
     if (!list.ok) return list;
     const ids = (list.data.items ?? []).map((i) => i.contentDetails?.videoId).filter(Boolean) as string[];
     const details = ids.length ? await api<Parameters<typeof videosFromApi>[1]>("videos", { part: "statistics,contentDetails", id: ids.join(",") }) : null;
-    return { ok: true, items: videosFromApi(list.data, details?.ok ? details.data : undefined) };
+    const items = videosFromApi(list.data, details?.ok ? details.data : undefined);
+    // A video under 3 minutes is only a Short if its /shorts/ address opens as a Short
+    // (normal videos are redirected to /watch).
+    await Promise.all(items.filter((v) => v.short).map(async (v) => (v.short = await isShort(v.videoId))));
+    return { ok: true, items };
   }
   try {
     const res = await fetchPage(feedUrl(channelId), { large: true });

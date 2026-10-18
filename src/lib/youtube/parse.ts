@@ -14,7 +14,7 @@ export type VideoItem = {
   date: string | null;
   summary?: string; // start of the description
   views?: number | null;
-  short?: boolean; // a YouTube Short (up to 3 minutes, vertical)
+  short?: boolean; // a real YouTube Short (vertical), confirmed by its /shorts/ address
 };
 
 const CHANNEL_ID = /^UC[\w-]{22}$/;
@@ -115,6 +115,7 @@ export function videosFromApi(list: PlaylistResponse, details?: VideosResponse):
         date: it.contentDetails?.videoPublishedAt ?? it.snippet?.publishedAt ?? null,
         summary: clip((it.snippet?.description ?? "").replace(/\s+/g, " ").trim(), 400) || undefined,
         views: d?.statistics?.viewCount != null ? Number(d.statistics.viewCount) : null,
+        // Up to 3 minutes MAY be a Short; latestVideos() confirms it before labelling.
         short: seconds != null ? seconds <= 180 : undefined,
       };
       return item;
