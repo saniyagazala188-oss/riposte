@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-19T23:20:00+05:30",
+    title: "Faster indexing with IndexNow",
+    body: "When a blog post is published or updated, Riposte now tells Bing and other IndexNow search engines straight away, so new posts can show up in search and AI answers within hours instead of days.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-19T01:40:00+05:30",
     title: "New post: how to choose a competitive intelligence tool",
     body: "An honest buying guide to competitive intelligence tools: the five types (enterprise platforms, lighter tools, page monitors, SEO tools and social listening), who each is for, how they're priced, questions to ask in a demo, a free starter setup, and where Riposte fits and where it doesn't.",
