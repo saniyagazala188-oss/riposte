@@ -26,6 +26,8 @@ faqs:
 2. Click **Build action kit**.
 3. Wait a few seconds while Riposte writes the drafts.
 
+![An action kit with owners, urgency and where to share](/docs/kits/kit.jpg)
+
 ## What each action has
 
 | Part | Example |
@@ -39,6 +41,8 @@ faqs:
 ## Work through your actions
 
 Open **Actions** to see every action from every kit, sorted into **Today**, **This week**, **Later** and **Done**. Copy the draft, share it, and mark it done.
+
+![The Actions board: Today, This week, Later and Done](/docs/kits/board.jpg)
 
 :::tip Rebuild after an edit
 Changed your product details? Use **Rebuild open actions** on the signal to get new drafts.

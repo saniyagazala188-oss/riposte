@@ -28,6 +28,8 @@ faqs:
 2. Type their website, for example `acme.com`. A name is optional.
 3. Click **Add competitor**.
 
+![Add a competitor by website and see the pages Riposte finds](/docs/start/add-competitor.jpg)
+
 Riposte reads their site and finds these pages on its own:
 
 | Page | Why it matters |
@@ -43,11 +45,15 @@ Riposte reads their site and finds these pages on its own:
 
 Open the competitor, scroll to **Add a page or channel**, pick the type (for example **Pricing page** or **Other page**), paste the address and save.
 
+![Add a page or channel: pick the type and paste the address](/docs/competitors/add-page.jpg)
+
 ## Useful buttons on a competitor
 
 - **Check now**: checks every page straight away.
 - **Find pages again**: looks for their pages again, for example after they redesign their site.
 - **Remove competitor**: stops tracking them.
+
+![Check now, Find pages again and Remove competitor](/docs/competitors/buttons.jpg)
 
 :::note The first check is a baseline
 The first time a page is checked, Riposte saves a copy. Changes show up from the next check on.

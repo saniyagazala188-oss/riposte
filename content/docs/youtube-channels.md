@@ -24,6 +24,8 @@ faqs:
 
 Open **Social media** and click **Find YouTube channels**. Riposte checks each competitor's website for a YouTube link, saves the channel and checks it straight away.
 
+![Find YouTube channels for every competitor](/docs/youtube/find.jpg)
+
 ## Add a channel yourself
 
 If a competitor has no YouTube link on their site:
@@ -36,3 +38,5 @@ If a competitor has no YouTube link on their site:
 
 - **Latest on their channels**: the newest videos from each channel, with views and a Short label.
 - **Signals**: each new video explained for your product, with what to do.
+
+![The latest videos on each competitor's channel](/docs/youtube/latest.jpg)

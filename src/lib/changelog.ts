@@ -14,7 +14,7 @@ export const CHANGELOG: ChangeEntry[] = [
   {
     at: "2026-10-20T00:45:00+05:30",
     title: "Riposte Docs",
-    body: "A new help center at /docs, separate from the blog: short step-by-step guides to set up and use each feature, with search, topics, simple pictures for each step, and a link from the app. Also a full guide to getting competitor alerts in Slack, with richer Slack alerts.",
+    body: "A new help center at /docs, separate from the blog: 14 short step-by-step guides covering every feature, from setup and competitors to alerts, comparisons, content intel and AI search. Each has simple pictures for each step, a search box, and a link from the app.",
     kind: "launch",
   },
   {

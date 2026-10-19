@@ -28,15 +28,21 @@ Riposte watches your competitors and tells you what changed, why it matters for 
 
 Open the invite email and sign in with **Google** or your **email**. You'll land on your feed, which is empty until you add competitors.
 
+![Sign in with Google or a login link](/docs/start/sign-in.jpg)
+
 ## Step 2: Describe your product
 
 Open **Your product** and fill in four fields: **product name**, **what it does**, **who you sell to** and **what makes you different**. Every explanation and draft is written against these, so specific beats short.
+
+![The four product fields](/docs/start/product.jpg)
 
 :::read your-product
 
 ## Step 3: Add your competitors
 
 Open **Competitors**, type a competitor's website and click **Add competitor**. Riposte finds their release notes, blog, blog feed, pricing page, sitemap and YouTube channel on its own.
+
+![Add a competitor by website and see the pages Riposte finds](/docs/start/add-competitor.jpg)
 
 :::tip Start with the ones you lose to
 Pick the two or three competitors that show up most in your deals. You can add more later, up to five during the beta.
@@ -46,9 +52,13 @@ Pick the two or three competitors that show up most in your deals. You can add m
 
 Open a competitor and click **Check now**. The first check saves a copy of each page. From then on, Riposte checks every morning and explains every real change.
 
+![Click Check now for the first check](/docs/start/check-now.jpg)
+
 ## Step 5: Read your feed
 
 Changes show up in your **Feed** as signals: what changed, why it matters to you and what to do. Click **Build action kit** on any signal to get a ready response.
+
+![A signal in the feed with Build action kit](/docs/start/feed.jpg)
 
 ## What's next
 

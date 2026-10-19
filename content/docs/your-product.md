@@ -35,6 +35,8 @@ Every signal, draft and comparison in Riposte is written for **your** product. T
 
 Click **Save** when you're done.
 
+![The four product fields filled in](/docs/start/product.jpg)
+
 :::tip Be specific
 "For marketers" is too wide. "For product marketers at B2B SaaS companies with 50 to 500 people" gives much sharper advice.
 :::
@@ -42,6 +44,8 @@ Click **Save** when you're done.
 ## Add files to the knowledge base (optional)
 
 Upload a **PDF** or **Word** file, such as a pitch deck, positioning doc, battlecard or pricing sheet. Riposte reads it and uses it when it explains changes and writes drafts.
+
+![Add PDF or Word files to the knowledge base](/docs/product/knowledge.jpg)
 
 - Up to **10 files** during the beta
 - Up to **10 MB** each

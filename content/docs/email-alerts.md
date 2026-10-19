@@ -27,6 +27,8 @@ faqs:
 3. Tick **Weekly digest every Monday**.
 4. Click **Save**.
 
+![Email alert settings and the test button](/docs/email/settings.jpg)
+
 ## Test it
 
 Under **Try it**, click **Send a test email**, or **Send this week's digest now** to see a full summary.

@@ -36,6 +36,8 @@ It also shows the **impact** (high, medium or low) and the **type**: pricing, pr
 - **All**: everything except noise
 - **Noise**: small changes Riposte filtered out
 
+![The To review, All and Noise views with a signal](/docs/feed/views.jpg)
+
 ## Handle a signal
 
 - **Mark reviewed** when you've seen it.
