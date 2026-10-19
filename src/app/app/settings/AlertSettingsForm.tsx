@@ -43,8 +43,30 @@ export function AlertSettingsForm(initial: Props) {
           autoComplete="off"
         />
         <p className="text-xs text-muted">
-          Paste an incoming webhook address to post the same alerts and digest into a channel. Leave empty for email only.
+          Paste your Slack incoming webhook link to get the same alerts and the Monday summary in a channel. Leave empty for email only.
         </p>
+        <details className="mt-1 rounded-xl border border-line bg-bg px-3 py-2 text-sm">
+          <summary className="cursor-pointer font-semibold">How to connect Slack (5 minutes)</summary>
+          <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-muted">
+            <li>
+              Open <a className="text-accent underline" href="https://api.slack.com/apps" target="_blank" rel="noopener noreferrer">api.slack.com/apps</a>,
+              click <b>Create an App</b> → <b>From scratch</b>, name it Riposte and pick your workspace.
+            </li>
+            <li>
+              Add the permission <b>incoming-webhook</b>, skip events, then <b>Create and Install</b> and pick the channel for alerts.
+            </li>
+            <li>
+              In the app&apos;s menu, open <b>Incoming Webhooks</b>, copy the link that starts with https://hooks.slack.com/services/ and paste it
+              above. Keep it private: anyone with it can post in your channel.
+            </li>
+            <li>
+              Open <b>Interactivity &amp; Shortcuts</b>, switch it on, and paste this as the Request URL, then save:
+              <code className="mt-1 block break-all rounded bg-surface px-2 py-1 text-xs text-ink">https://useriposte.com/api/slack/interactions</code>
+              This stops Slack showing a warning icon when you click a button in a Riposte message.
+            </li>
+            <li>Click Save here, then <b>Send a test to Slack</b>.</li>
+          </ol>
+        </details>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">

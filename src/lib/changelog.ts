@@ -14,7 +14,7 @@ export const CHANGELOG: ChangeEntry[] = [
   {
     at: "2026-10-19T23:45:00+05:30",
     title: "Slack alerts with the full story",
-    body: "Slack alerts now show each change as a card: which competitor, what changed, why it matters to you, what to do, and who does what from the action kit, with buttons to open it in Riposte. The test button sends a real example from your feed.",
+    body: "Slack alerts now show each change as a card: which competitor, what changed, why it matters to you, what to do, and who does what from the action kit, with buttons to open it in Riposte. The test button sends a real example from your feed, and Settings has a short guide to connect Slack.",
     kind: "feature",
   },
   {
