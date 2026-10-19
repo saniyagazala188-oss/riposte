@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-20T00:15:00+05:30",
+    title: "Riposte's own icon",
+    body: "Browser tabs and phone home screens now show Riposte's arrow logo instead of the default icon the site started with.",
+    kind: "fix",
+  },
+  {
     at: "2026-10-19T23:45:00+05:30",
     title: "Slack alerts with the full story",
     body: "Slack alerts now show each change as a card: which competitor, what changed, why it matters to you, what to do, and who does what from the action kit, with buttons to open it in Riposte. The test button sends a real example from your feed, and Settings has a short guide to connect Slack.",
