@@ -32,7 +32,7 @@ export function AlertSettingsForm(initial: Props) {
 
       <div className="flex flex-col gap-1.5">
         <label htmlFor="slack_webhook_url" className="font-semibold">
-          Slack (optional)
+          Slack
         </label>
         <input
           id="slack_webhook_url"
