@@ -14,9 +14,9 @@ import { processChanges } from "@/lib/signals/process";
 import { generateJson, geminiConfigured, Overloaded, RateLimited } from "@/lib/ai/gemini";
 import { buildKitPrompt, cleanKit, KIT_SCHEMA } from "@/lib/actions/prompt";
 import { SOURCE_LABELS as PAGE_LABELS, type SourceType as PageType } from "@/lib/discovery/parse";
-import { sendAlerts, sendDigests } from "@/lib/notify/alerts";
+import { sendAlerts, sendDigests, withActions } from "@/lib/notify/alerts";
 import { emailConfigured, sendEmail, sendSlack } from "@/lib/notify/send";
-import { SITE_URL, testEmail } from "@/lib/notify/templates";
+import { SITE_URL, slackMessage, testEmail, type SignalForMessage } from "@/lib/notify/templates";
 import { loadContent } from "@/lib/content/load";
 import { findStories, findTrends } from "@/lib/insights/run";
 import { titlesForTopics } from "@/lib/content/stats";
@@ -386,9 +386,33 @@ export async function sendTest(_prev: CheckState, formData: FormData): Promise<C
   try {
     if (what === "slack") {
       if (!profile?.slack_webhook_url) return { status: "error", message: "Save a Slack webhook first." };
-      await sendSlack(profile.slack_webhook_url, {
-        text: `*Riposte is connected.* High-impact competitor changes and the weekly digest will be posted here. <${SITE_URL}/app|Open your feed>`,
-      });
+      // An example built from one of this user's real changes (high impact first), so they see
+      // exactly what alerts will look like. Falls back to a short "connected" note.
+      const { data: rows } = await supabase
+        .from("signals")
+        .select("id, title, what_changed, so_what, action, impact, category, competitor_id, competitors(name)")
+        .eq("noise", false)
+        .order("created_at", { ascending: false })
+        .limit(30);
+      const order = { high: 0, medium: 1, low: 2 } as const;
+      const pick = ((rows ?? []) as unknown as (Omit<SignalForMessage, "competitor"> & { competitors: { name: string } | null })[]).sort(
+        (a, b) => order[a.impact] - order[b.impact],
+      )[0];
+      if (pick) {
+        const [example] = await withActions(supabase, [{ ...pick, competitor: pick.competitors?.name ?? "A competitor" }]);
+        await sendSlack(
+          profile.slack_webhook_url,
+          slackMessage("Riposte is connected ✅", [example], "This is an example from your feed. High-impact changes will be posted here the morning they're found, and a summary every Monday."),
+        );
+      } else {
+        await sendSlack(profile.slack_webhook_url, {
+          text: "Riposte is connected.",
+          blocks: [
+            { type: "section", text: { type: "mrkdwn", text: "*Riposte is connected ✅*\nHigh-impact competitor changes will be posted here the morning they're found, and a summary every Monday." } },
+            { type: "actions", elements: [{ type: "button", style: "primary", text: { type: "plain_text", text: "Open your feed" }, url: `${SITE_URL}/app` }] },
+          ],
+        });
+      }
       return { status: "done", message: "Sent. Check your Slack channel." };
     }
     if (!emailConfigured()) return { status: "error", message: "Email isn't set up yet: the RESEND_API_KEY setting is missing." };

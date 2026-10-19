@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-19T23:45:00+05:30",
+    title: "Slack alerts with the full story",
+    body: "Slack alerts now show each change as a card: which competitor, what changed, why it matters to you, what to do, and who does what from the action kit, with buttons to open it in Riposte. The test button sends a real example from your feed.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-19T23:20:00+05:30",
     title: "Faster indexing with IndexNow",
     body: "When a blog post is published or updated, Riposte now tells Bing and other IndexNow search engines straight away, so new posts can show up in search and AI answers within hours instead of days.",

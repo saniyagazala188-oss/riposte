@@ -14,7 +14,21 @@ type ProfileRow = {
 
 type SignalRow = Omit<SignalForMessage, "competitor"> & { user_id: string; competitors: { name: string } | null };
 
-const SIGNAL_FIELDS = "id, user_id, title, what_changed, so_what, action, impact, competitor_id, competitors(name)";
+const SIGNAL_FIELDS = "id, user_id, title, what_changed, so_what, action, impact, category, competitor_id, competitors(name)";
+
+// Adds each signal's action kit (if one was built) so Slack can show who does what.
+export async function withActions(db: SupabaseClient, signals: SignalForMessage[]): Promise<SignalForMessage[]> {
+  if (!signals.length) return signals;
+  const { data } = await db
+    .from("action_items")
+    .select("signal_id, title, owner, priority, channel, position")
+    .in("signal_id", signals.map((s) => s.id))
+    .order("position", { ascending: true });
+  const by = new Map<string, NonNullable<SignalForMessage["actions"]>>();
+  for (const a of (data ?? []) as { signal_id: string; title: string; owner: string; priority: string; channel: string }[])
+    by.set(a.signal_id, [...(by.get(a.signal_id) ?? []), a]);
+  return signals.map((s) => ({ ...s, actions: by.get(s.id) }));
+}
 const DAY = 24 * 60 * 60 * 1000;
 
 function toMessage(s: SignalRow): SignalForMessage {
@@ -65,7 +79,7 @@ export async function sendAlerts(db: SupabaseClient, { userId }: { userId?: stri
     if (p.slack_webhook_url) {
       try {
         const heading = signals.length === 1 ? "High-impact competitor change" : `${signals.length} high-impact competitor changes`;
-        await sendSlack(p.slack_webhook_url, slackMessage(heading, signals));
+        await sendSlack(p.slack_webhook_url, slackMessage(heading, await withActions(db, signals)));
         delivered = true;
       } catch (e) {
         errors.push(`slack: ${(e as Error).message}`);
@@ -149,7 +163,7 @@ export async function sendDigests(db: SupabaseClient, { userId, force = false }:
     }
     if (p.slack_webhook_url && signals.length) {
       try {
-        await sendSlack(p.slack_webhook_url, slackMessage(`Your week in competitors: ${signals.length} changes`, signals));
+        await sendSlack(p.slack_webhook_url, slackMessage(`Your week in competitors: ${signals.length} changes`, await withActions(db, signals), "Most important first."));
         delivered = true;
       } catch (e) {
         errors.push(`slack: ${(e as Error).message}`);

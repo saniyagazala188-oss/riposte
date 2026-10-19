@@ -11,6 +11,9 @@ export type SignalForMessage = {
   impact: "high" | "medium" | "low";
   competitor: string;
   competitor_id: string;
+  category?: string;
+  // The action kit, when one was built: who does what, how soon, and where to share it.
+  actions?: { title: string; owner: string; priority: string; channel: string }[];
 };
 
 const esc = (s: string) =>
@@ -138,10 +141,71 @@ function plainText(signals: SignalForMessage[]) {
 // Slack "mrkdwn" escapes only &, < and >.
 const slackEsc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-export function slackMessage(heading: string, signals: SignalForMessage[]) {
-  const lines = signals.slice(0, 10).map(
-    (s) =>
-      `*<${SITE_URL}/app/competitors/${s.competitor_id}|${slackEsc(s.title)}>*\n${slackEsc(s.what_changed)}\n_Why it matters:_ ${slackEsc(s.so_what)}\n_Do this:_ ${slackEsc(s.action)}`,
+const CATEGORY: Record<string, string> = {
+  pricing: "Pricing",
+  product: "Product",
+  content: "Content",
+  positioning: "Positioning",
+};
+const PRIORITY: Record<string, string> = { now: "Today", this_week: "This week", later: "Later" };
+const IMPACT: Record<string, string> = { high: "🔴 High impact", medium: "🟠 Medium impact", low: "⚪ Low impact" };
+
+// A Slack message as cards (Block Kit): for each change, the competitor, what changed, why it
+// matters, what to do, who does what (from the action kit) and buttons back into Riposte.
+// `text` is the plain version Slack shows in notifications.
+export function slackMessage(heading: string, signals: SignalForMessage[], note?: string) {
+  const list = signals.slice(0, 8);
+  const blocks: unknown[] = [{ type: "header", text: { type: "plain_text", text: heading.slice(0, 150), emoji: true } }];
+  if (note) blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: slackEsc(note) }] });
+
+  for (const s of list) {
+    const open = `${SITE_URL}/app?show=all&s=${s.id}`;
+    const tags = [IMPACT[s.impact], s.category && CATEGORY[s.category]].filter(Boolean).join("  ·  ");
+    blocks.push(
+      { type: "divider" },
+      {
+        type: "section",
+        text: { type: "mrkdwn", text: `*${slackEsc(s.competitor)}*  ·  ${tags}\n*<${open}|${slackEsc(s.title)}>*` },
+      },
+      {
+        type: "section",
+        fields: [
+          { type: "mrkdwn", text: `*What changed*\n${slackEsc(clip(s.what_changed, 900))}` },
+          { type: "mrkdwn", text: `*Why it matters to you*\n${slackEsc(clip(s.so_what, 900))}` },
+        ],
+      },
+      { type: "section", text: { type: "mrkdwn", text: `*What to do*\n${slackEsc(clip(s.action, 1500))}` } },
+    );
+    if (s.actions?.length) {
+      const rows = s.actions
+        .slice(0, 4)
+        .map(
+          (a) =>
+            `• *${PRIORITY[a.priority] ?? "This week"} · ${slackEsc(a.owner)}:* ${slackEsc(a.title)}${a.channel ? `\n   _Share in:_ ${slackEsc(a.channel)}` : ""}`,
+        );
+      blocks.push({ type: "section", text: { type: "mrkdwn", text: `*Who does what*\n${rows.join("\n")}` } });
+    }
+    blocks.push({
+      type: "actions",
+      elements: [
+        { type: "button", style: "primary", text: { type: "plain_text", text: s.actions?.length ? "Open the action kit" : "Open in Riposte" }, url: open },
+        { type: "button", text: { type: "plain_text", text: "Their page" }, url: `${SITE_URL}/app/competitors/${s.competitor_id}` },
+      ],
+    });
+  }
+
+  blocks.push(
+    { type: "divider" },
+    {
+      type: "actions",
+      elements: [{ type: "button", text: { type: "plain_text", text: "Open your feed" }, url: `${SITE_URL}/app` }],
+    },
   );
-  return { text: [`*${slackEsc(heading)}*`, ...lines].join("\n\n") };
+  if (signals.length > list.length)
+    blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: `And ${signals.length - list.length} more in your feed.` }] });
+
+  const text = [heading, ...list.map((s) => `${s.competitor}: ${s.title}`)].join("\n");
+  return { text, blocks };
 }
+
+const clip = (t: string, n: number) => (t.length > n ? `${t.slice(0, n - 1).trimEnd()}…` : t);
