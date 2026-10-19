@@ -60,7 +60,8 @@ export function AlertSettingsForm(initial: Props) {
               above. Keep it private: anyone with it can post in your channel.
             </li>
             <li>
-              Open <b>Interactivity &amp; Shortcuts</b>, switch it on, and paste this as the Request URL, then save:
+              Open <b>Socket Mode</b> and make sure it&apos;s <b>off</b> (Slack sometimes turns it on). Then open <b>Interactivity &amp; Shortcuts</b>,
+              switch it on, and paste this as the Request URL, then save:
               <code className="mt-1 block break-all rounded bg-surface px-2 py-1 text-xs text-ink">https://useriposte.com/api/slack/interactions</code>
               This stops Slack showing a warning icon when you click a button in a Riposte message.
             </li>
