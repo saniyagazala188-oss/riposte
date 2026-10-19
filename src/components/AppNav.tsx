@@ -63,6 +63,13 @@ const ICONS: Record<string, React.ReactNode> = {
       <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
     </>
   ),
+  docs: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3" />
+      <path d="M12 17h.01" />
+    </>
+  ),
   blog: (
     <>
       <path d="M12 20h9" />
@@ -133,6 +140,7 @@ export function navGroups(counts: { toReview: number; openActions: number }, adm
     {
       label: "Riposte",
       items: [
+        { href: "/docs", label: "Help & docs", icon: "docs" },
         { href: "/app/feedback", label: "Give feedback", icon: "feedback" },
         { href: "/blog", label: "Blog", icon: "blog" },
         { href: "/changelog", label: "Changelog", icon: "changelog" },

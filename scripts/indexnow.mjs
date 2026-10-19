@@ -29,6 +29,17 @@ async function main() {
   }
   if (urls.size) ["/blog", "/blog/rss.xml", "/llms.txt"].forEach((p) => urls.add(SITE + p));
 
+  const docsDir = path.join(process.cwd(), "content/docs");
+  let docsChanged = false;
+  for (const f of fs.existsSync(docsDir) ? fs.readdirSync(docsDir).filter((f) => f.endsWith(".md") && f !== "README.md") : []) {
+    const { data } = matter(fs.readFileSync(path.join(docsDir, f), "utf8"));
+    if (all || recent(data.updated)) {
+      urls.add(`${SITE}/docs/${data.slug || f.replace(/\.md$/, "")}`);
+      docsChanged = true;
+    }
+  }
+  if (docsChanged) ["/docs", "/llms.txt"].forEach((p) => urls.add(SITE + p));
+
   const log = fs.readFileSync(path.join(process.cwd(), "src/lib/changelog.ts"), "utf8");
   const latest = log.match(/at:\s*"([^"]+)"/)?.[1];
   if (all || recent(latest)) urls.add(`${SITE}/changelog`);

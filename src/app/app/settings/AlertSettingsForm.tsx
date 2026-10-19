@@ -67,8 +67,8 @@ export function AlertSettingsForm(initial: Props) {
             </li>
             <li>Click Save here, then <b>Send a test to Slack</b>.</li>
           </ol>
-          <a className="mt-2 inline-block font-semibold text-accent underline" href="/blog/competitor-alerts-in-slack" target="_blank">
-            Full guide with screenshots ↗
+          <a className="mt-2 inline-block font-semibold text-accent underline" href="/docs/slack-alerts" target="_blank">
+            Full guide with pictures ↗
           </a>
         </details>
       </div>

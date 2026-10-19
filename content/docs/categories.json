@@ -1,0 +1,9 @@
+[
+  { "id": "getting-started", "title": "Getting started", "description": "Set up Riposte and see your first signals.", "icon": "🚀" },
+  { "id": "competitors", "title": "Tracking competitors", "description": "Add competitors, their pages and their YouTube channels.", "icon": "🔭" },
+  { "id": "signals", "title": "Signals and actions", "description": "Read what changed and turn it into a response.", "icon": "⚡" },
+  { "id": "alerts", "title": "Alerts and integrations", "description": "Get changes by email and in Slack.", "icon": "🔔" },
+  { "id": "content", "title": "Content and comparisons", "description": "Comparison pages, content intel and briefs.", "icon": "📝" },
+  { "id": "ai-search", "title": "AI search", "description": "Prompt Studio and AI visibility.", "icon": "✨" },
+  { "id": "account", "title": "Account", "description": "Your login, beta limits and data.", "icon": "👤" }
+]

@@ -56,7 +56,7 @@ const slugify = (s: string) =>
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
-const decode = (s: string) =>
+export const decode = (s: string) =>
   s.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
 
 const files = () =>
@@ -89,7 +89,13 @@ const CALLOUT: Record<string, { label: string; icon: string }> = {
 //   :::cta beta            an image CTA from content/ctas.json
 //   :::read some-post      a "read next" card linking to another post
 //   :::tip Optional title  a highlighted box, closed by a line with just :::
-function blocks(md: string, inline: (s: string) => string): string {
+export type ReadCard = { href: string; title: string; description: string; cover: string | null };
+const blogCard = (slug: string): ReadCard | null => {
+  const p = frontOf(slug);
+  return p ? { href: `/blog/${slug}`, ...p } : null;
+};
+
+function blocks(md: string, inline: (s: string) => string, card: (slug: string) => ReadCard | null = blogCard): string {
   const lines = md.split("\n");
   const out: string[] = [];
   for (let i = 0; i < lines.length; i++) {
@@ -101,11 +107,11 @@ function blocks(md: string, inline: (s: string) => string): string {
     }
     m = line.match(/^:::read\s+([\w-]+)\s*$/);
     if (m) {
-      const p = frontOf(m[1]);
+      const p = card(m[1]);
       if (p)
         out.push(
           "",
-          `<div class="blog-read-wrap"><a class="blog-read" href="/blog/${m[1]}">${p.cover ? `<img src="${esc(p.cover)}" alt="" loading="lazy" />` : ""}<span><small>Read next</small><strong>${esc(p.title)}</strong><em>${esc(p.description)}</em></span><b aria-hidden="true">→</b></a></div>`,
+          `<div class="blog-read-wrap"><a class="blog-read" href="${p.href}">${p.cover ? `<img src="${esc(p.cover)}" alt="" loading="lazy" />` : ""}<span><small>Read next</small><strong>${esc(p.title)}</strong><em>${esc(p.description)}</em></span><b aria-hidden="true">→</b></a></div>`,
           "",
         );
       else console.warn(`Blog: ":::read ${m[1]}" points to a post that doesn't exist`);
@@ -129,10 +135,10 @@ function blocks(md: string, inline: (s: string) => string): string {
   return out.join("\n");
 }
 
-function read(file: string): Post {
-  const raw = fs.readFileSync(path.join(DIR, file), "utf8");
-  const { data, content } = matter(raw);
-  const slug = String(data.slug || file.replace(/\.md$/, ""));
+// Markdown → HTML with Riposte's blocks (CTAs, read-next cards, callout boxes), figures, copyable
+// code and h2 ids for the table of contents. Used by the blog and the docs. Docs use plain
+// (un-numbered) section headings.
+export function renderMarkdown(content: string, { numbered = true, card }: { numbered?: boolean; card?: (slug: string) => ReadCard | null } = {}) {
   const headings: Post["headings"] = [];
   const renderer = new marked.Renderer();
   renderer.heading = ({ tokens, depth }) => {
@@ -140,6 +146,11 @@ function read(file: string): Post {
     if (depth !== 2) return `<h${depth} id="${slugify(text)}">${text}</h${depth}>`;
     // Section headings get a number, drawn by CSS from data-n so the heading text stays clean for
     // search engines and AI. "## 3. Something" keeps its own number.
+    if (!numbered) {
+      const id = slugify(decode(text));
+      headings.push({ id, text: decode(text.replace(/<[^>]+>/g, "")), n: "" });
+      return `<h2 id="${id}" class="doc-h2">${text}</h2>`;
+    }
     const own = text.match(/^(\d+)[.)]\s+/);
     const n = String(own ? Number(own[1]) : headings.length + 1).padStart(2, "0");
     if (own) text = text.slice(own[0].length);
@@ -169,7 +180,15 @@ function read(file: string): Post {
     return inner.trim().startsWith("<figure") ? inner : `<p>${inner}</p>`;
   };
   const md = (s: string) => marked.parse(s, { renderer, async: false }) as string;
-  const html = md(blocks(content, md));
+  const html = md(blocks(content, md, card));
+  return { html, headings };
+}
+
+function read(file: string): Post {
+  const raw = fs.readFileSync(path.join(DIR, file), "utf8");
+  const { data, content } = matter(raw);
+  const slug = String(data.slug || file.replace(/\.md$/, ""));
+  const { html, headings } = renderMarkdown(content);
   const date = String(data.date ?? "").slice(0, 10);
   const words = content.split(/\s+/).filter(Boolean).length;
   return {

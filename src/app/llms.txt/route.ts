@@ -1,5 +1,6 @@
 import { allPosts } from "@/lib/blog";
 import { allAuthors } from "@/lib/authors";
+import { docsByCategory } from "@/lib/docs";
 import { AUTHOR, SITE_URL } from "@/lib/site";
 
 // llms.txt: a plain-text guide to the site for AI tools.
@@ -16,6 +17,7 @@ Made by ${AUTHOR.name}, a product marketer based in Bengaluru, India. Built in p
 ## Pages
 
 - [Home](${SITE_URL}/): what Riposte does and who it is for
+- [Docs](${SITE_URL}/docs): how to set up and use every Riposte feature
 - [Blog](${SITE_URL}/blog): guides on competitive intelligence, content and AI search
 - [Changelog](${SITE_URL}/changelog): every step of the build, with dates
 - [Authors](${SITE_URL}/authors): who writes the blog
@@ -26,6 +28,12 @@ Made by ${AUTHOR.name}, a product marketer based in Bengaluru, India. Built in p
 ${allAuthors()
   .map((a) => `- [${a.name}](${a.url}): ${a.role}${a.location ? `, ${a.location}` : ""}. ${a.headline}`)
   .join("\n")}
+
+## Docs
+
+${docsByCategory()
+  .map((c) => `### ${c.title}\n\n${c.docs.map((d) => `- [${d.title}](${SITE_URL}/docs/${d.slug}): ${d.summary}`).join("\n")}`)
+  .join("\n\n")}
 
 ## Blog posts
 

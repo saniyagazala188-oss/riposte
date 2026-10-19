@@ -4,7 +4,7 @@ metaTitle: "Riposte Features: Competitive Intelligence for Marketers"
 description: "A short tour of Riposte: daily competitor checks, signals explained for your product, action kits with drafts, content intel, comparisons and AI visibility."
 summary: "Riposte watches your competitors every morning and turns each real change into a signal: what changed, why it matters for your product and what to do. Each signal can become an action kit with owners and first drafts. Riposte also shows what competitors publish, keeps your comparison pages current, writes content briefs, and tracks who AI tools recommend for your buyers' questions."
 date: "2026-10-05"
-updated: "2026-10-19"
+updated: "2026-10-20"
 keywords: ["Riposte features", "competitive intelligence tool", "competitor monitoring for marketers", "AI competitor tracking"]
 tags: ["Product", "Riposte"]
 faqs:
@@ -19,7 +19,7 @@ faqs:
   - q: "How much does Riposte cost?"
     a: "Riposte is free during its invite-only beta. Join the waitlist on useriposte.com to get access."
   - q: "What does Riposte track?"
-    a: "Competitors' pricing pages, release notes, blogs and blog feeds, sitemaps, homepages, news and YouTube channels. It checks them every morning."
+    a: "Competitors' pricing pages, release notes, blogs and blog feeds, sitemaps, news coverage and YouTube channels, plus any other page you add. It checks them every morning."
   - q: "Is Riposte an alternative to Crayon or Klue?"
     a: "For small teams, yes. Crayon and Klue are built for large sales teams, while Riposte is lighter, made for marketers, and turns each change into a ready response."
   - q: "Which AI does Riposte use?"
