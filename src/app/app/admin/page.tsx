@@ -106,7 +106,7 @@ export default async function AdminPage({
           ["Waiting", waiting.length],
           ["Approved", approved.length],
           ["Signed up", approved.filter((r) => signedUp.has(r.email)).length],
-          ["Feedback", answers.length],
+          ["Problems", answers.length],
         ].map(([k, v]) => (
           <div key={k} className={`${card} p-4`}>
             <p className="text-xs font-semibold uppercase tracking-wider text-muted">{k}</p>
@@ -135,7 +135,7 @@ export default async function AdminPage({
             tabs={[
               { key: "waiting", label: "Waiting", count: waiting.length, href: "/app/admin" },
               { key: "approved", label: "Approved", count: approved.length, href: "/app/admin?view=approved" },
-              { key: "feedback", label: "Feedback", count: answers.length, href: "/app/admin?view=feedback" },
+              { key: "feedback", label: "Problems", count: answers.length, href: "/app/admin?view=feedback" },
               { key: "survey", label: "Survey", count: survey.filter((r) => r.answered_at).length, href: "/app/admin?view=survey" },
             ]}
           />
@@ -145,7 +145,10 @@ export default async function AdminPage({
           <SurveyResults rows={survey} />
         ) : view === "feedback" ? (
           <>
-            <PanelHead title="What beta users say" description={`Would pay: ${pay.yes} yes · ${pay.maybe} maybe · ${pay.no} no`} />
+            <PanelHead
+              title="Problem reports"
+              description={pay.yes + pay.maybe + pay.no ? `Older feedback, would pay: ${pay.yes} yes · ${pay.maybe} maybe · ${pay.no} no` : "What beta users reported as broken or wrong"}
+            />
             <ul className="divide-y divide-line">
               {answers.map((f) => (
                 <li key={f.id} className="px-4 py-4 text-sm">
@@ -159,11 +162,17 @@ export default async function AdminPage({
                       </>
                     )}
                   </p>
-                  {[
-                    ["Uses it for", f.uses_for],
-                    ["Would miss most", f.miss_most],
-                    ["Missing or confusing", f.missing],
-                  ].map(([k, v]) =>
+                  {(f.miss_most || f.would_pay
+                    ? [
+                        ["Uses it for", f.uses_for],
+                        ["Would miss most", f.miss_most],
+                        ["Missing or confusing", f.missing],
+                      ]
+                    : [
+                        ["Problem", f.missing],
+                        ["Where", f.uses_for],
+                      ]
+                  ).map(([k, v]) =>
                     v ? (
                       <p key={k} className="mt-1.5">
                         <span className="font-semibold">{k}: </span>
@@ -173,7 +182,7 @@ export default async function AdminPage({
                   )}
                 </li>
               ))}
-              {!answers.length && <li className="px-4 py-6 text-center text-sm text-muted">No feedback yet.</li>}
+              {!answers.length && <li className="px-4 py-6 text-center text-sm text-muted">No problems reported yet.</li>}
             </ul>
           </>
         ) : (

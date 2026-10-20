@@ -14,7 +14,7 @@ export const CHANGELOG: ChangeEntry[] = [
   {
     at: "2026-10-21T00:15:00+05:30",
     title: "A 2-minute beta survey",
-    body: "Seven days after someone joins the beta, the feed shows a small card asking 6 quick questions: how they kept up with competitors before, which part helps most, how they'd feel without Riposte, what's confusing, what price feels fair, and whether they'd like a call. If they haven't answered after 10 days, one reminder email goes out, and never more. Answers are summed up for the team, including the share who'd be very disappointed without Riposte.",
+    body: "Seven days after someone joins the beta, the feed shows a small card asking 6 quick questions: how they kept up with competitors before, which part helps most, how they'd feel without Riposte, what's confusing, what price feels fair, and whether they'd like a call. If they haven't answered after 10 days, one reminder email goes out, and never more. Answers are summed up for the team, including the share who'd be very disappointed without Riposte. Give feedback in the menu now opens the survey, and a new Report a problem page is for anything broken.",
     kind: "feature",
   },
   {

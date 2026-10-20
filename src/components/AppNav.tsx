@@ -83,6 +83,13 @@ const ICONS: Record<string, React.ReactNode> = {
     </>
   ),
   feedback: <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />,
+  report: (
+    <>
+      <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
+      <path d="M12 9v4" />
+      <path d="M12 17h.01" />
+    </>
+  ),
   admin: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />,
   about: (
     <>
@@ -141,7 +148,8 @@ export function navGroups(counts: { toReview: number; openActions: number }, adm
       label: "Riposte",
       items: [
         { href: "/docs", label: "Help & docs", icon: "docs" },
-        { href: "/app/feedback", label: "Give feedback", icon: "feedback" },
+        { href: "/app/survey", label: "Give feedback", icon: "feedback" },
+        { href: "/app/feedback", label: "Report a problem", icon: "report" },
         { href: "/blog", label: "Blog", icon: "blog" },
         { href: "/changelog", label: "Changelog", icon: "changelog" },
         { href: "/authors/saniya-gazala", label: "About Saniya", icon: "about" },

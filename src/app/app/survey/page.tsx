@@ -47,11 +47,11 @@ export default async function SurveyPage({ searchParams }: { searchParams: Promi
         <div className={`${card} mt-6 max-w-2xl p-6`}>
           <p className="font-display text-xl font-bold">Thank you 🙏</p>
           <p className="mt-2 text-muted">
-            Your answers are saved. Anything else on your mind? The{" "}
+            Your answers are saved. Found something broken?{" "}
             <Link href="/app/feedback" className="font-semibold text-accent hover:underline">
-              feedback form
-            </Link>{" "}
-            is always open.
+              Report a problem
+            </Link>
+            .
           </p>
         </div>
       ) : (

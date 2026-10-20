@@ -17,7 +17,7 @@ export async function sendFeedback(formData: FormData) {
     would_pay: ["yes", "maybe", "no"].includes(pay) ? pay : null,
     pay_amount: clip(formData.get("pay_amount"), 200),
   };
-  if (!row.uses_for && !row.miss_most && !row.missing && !row.would_pay) redirect("/app/feedback?empty=1");
+  if (!row.missing) redirect("/app/feedback?empty=1");
   const { error } = await supabase.from("feedback").insert(row);
   redirect(error ? "/app/feedback?error=1" : "/app/feedback?thanks=1");
 }
