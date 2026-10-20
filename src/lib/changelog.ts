@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-20T21:30:00+05:30",
+    title: "Pricing page",
+    body: "A new pricing page at /pricing shows the plans planned after the beta: Starter ($19 or ₹1,499 a month), Pro ($49 or ₹3,999) and Team ($99 or ₹7,999), with 2 months free on yearly plans and a 7-day free trial. Riposte stays free during the beta, beta users get a lower founding-member price, and every button joins the free beta, so nothing can be bought yet.",
+    kind: "decision",
+  },
+  {
     at: "2026-10-20T00:45:00+05:30",
     title: "Riposte Docs",
     body: "A new help center at /docs, separate from the blog: 14 short step-by-step guides covering every feature, from setup and competitors to alerts, comparisons, content intel and AI search. Each has simple pictures for each step, a search box, and a link from the app.",

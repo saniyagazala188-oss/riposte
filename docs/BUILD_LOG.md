@@ -736,3 +736,10 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - **SEO/AEO:** each page has TechArticle + BreadcrumbList + FAQPage schema; /docs has CollectionPage. Docs are in the sitemap, in `llms.txt` (grouped by topic, with each page's short answer) and sent to IndexNow when their `updated` date changes.
 - **Links:** "Docs" in the site header and footer, "Help & docs" in the app sidebar, and Settings' Slack guide links to `/docs/slack-alerts`.
 - **Fixes found while writing:** the CI tools post said Riposte fits "3 to 10 competitors", but the beta allows 5; the What Riposte does FAQ listed "homepages", which isn't a page type (any page can be added as "Other page"). Both corrected.
+
+## Pricing page (20 Oct, 21:30)
+
+- **Why:** Saniya wanted a pricing page so people can see what Riposte will cost. Weekly plans were dropped (unusual for business tools, more payment fees, people leave faster); a 7-day free trial covers "try it cheaply" instead.
+- **Plans (after the beta):** Starter $19 / ₹1,499 a month (2 competitors, morning checks, explained changes, noise filter, email alerts and Monday summary), Pro $49 / ₹3,999 (5 competitors, everything in Starter plus action kits, Slack, News and YouTube, knowledge base, comparison pages, content intel, Prompt Studio and AI visibility with 10 prompts), Team $99 / ₹7,999 (15 competitors, 30 tracked prompts, priority help). Yearly = pay for 10 months, get 12. Prices live in `src/lib/pricing.ts`.
+- **Beta stays free:** a banner says Riposte is free during the beta, beta users get a lower founding-member price, and 30 days' notice before any pricing (same promise as the home page). Every button says "Join the free beta" and scrolls to a waitlist form on the page. No payment provider is connected yet; that needs Saniya's own account (Razorpay, Paddle or Lemon Squeezy) and a GST check with a CA.
+- **Page:** `/pricing` with Monthly/Yearly and USD/INR switches (`src/components/PricingTable.tsx`), 8 FAQs (FAQPage schema), SoftwareApplication schema with the 3 offers. Added to the header and footer ("Pricing"), sitemap and llms.txt.

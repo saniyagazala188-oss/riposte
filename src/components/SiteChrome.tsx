@@ -4,6 +4,7 @@ import { Logo } from "@/components/Logo";
 // Header and footer for the public pages (landing, blog, changelog, about).
 
 const NAV = [
+  { href: "/pricing", label: "Pricing" },
   { href: "/docs", label: "Docs" },
   { href: "/blog", label: "Blog" },
   { href: "/changelog", label: "Changelog" },

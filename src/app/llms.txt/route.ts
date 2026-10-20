@@ -17,6 +17,7 @@ Made by ${AUTHOR.name}, a product marketer based in Bengaluru, India. Built in p
 ## Pages
 
 - [Home](${SITE_URL}/): what Riposte does and who it is for
+- [Pricing](${SITE_URL}/pricing): free during the beta; after launch Starter $19, Pro $49, Team $99 a month (or INR), yearly gets 2 months free, 7-day free trial
 - [Docs](${SITE_URL}/docs): how to set up and use every Riposte feature
 - [Blog](${SITE_URL}/blog): guides on competitive intelligence, content and AI search
 - [Changelog](${SITE_URL}/changelog): every step of the build, with dates
