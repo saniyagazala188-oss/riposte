@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-21T00:15:00+05:30",
+    title: "A 2-minute beta survey",
+    body: "Seven days after someone joins the beta, the feed shows a small card asking 6 quick questions: how they kept up with competitors before, which part helps most, how they'd feel without Riposte, what's confusing, what price feels fair, and whether they'd like a call. If they haven't answered after 10 days, one reminder email goes out, and never more. Answers are summed up for the team, including the share who'd be very disappointed without Riposte.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-20T00:45:00+05:30",
     title: "Riposte Docs",
     body: "A new help center at /docs, separate from the blog: 14 short step-by-step guides covering every feature, from setup and competitors to alerts, comparisons, content intel and AI search. Each has simple pictures for each step, a search box, and a link from the app.",

@@ -8,6 +8,9 @@ import { StoryList, STORY_SELECT, type StoryRow } from "@/components/InsightList
 import { loadComparisons } from "@/lib/compare/stale";
 import { Empty, LinkTabs, PageHeader, Pager, pageNum, withParams } from "@/components/ui";
 import { ParamSelect } from "@/components/ui-client";
+import { SurveyCard } from "@/components/SurveyCard";
+import { surveyDue } from "@/lib/survey";
+import { isAdmin } from "@/lib/access";
 
 export const metadata = { title: "Feed · Riposte" };
 export const maxDuration = 90;
@@ -73,6 +76,7 @@ export default async function AppHome({ searchParams }: { searchParams: Promise<
       : { data: [] as { id: string; title: string }[] };
   const signalTitles = new Map((linkedRows ?? []).map((r) => [r.id as string, r.title as string]));
   const { stale } = await loadComparisons(supabase);
+  const askSurvey = !isAdmin(user.email) && (await surveyDue(supabase, user));
 
   const steps = [
     { done: Boolean(profile?.product_name), title: "Tell Riposte about your product", href: "/app/product", cta: "Add your product" },
@@ -91,6 +95,7 @@ export default async function AppHome({ searchParams }: { searchParams: Promise<
 
   return (
     <div>
+      {askSurvey && <SurveyCard />}
       <PageHeader
         kicker="Your workspace"
         title={profile?.product_name ? `${profile.product_name}'s feed` : "Welcome to Riposte"}

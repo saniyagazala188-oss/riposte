@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { card, inputClass, primaryButton } from "@/components/styles";
 import { PageHeader } from "@/components/ui";
@@ -19,6 +20,13 @@ export default async function FeedbackPage({ searchParams }: { searchParams: Pro
         title="Give feedback"
         description="Riposte is free while it's in beta. Your answers decide what gets built next and what it should cost. Two minutes, and every answer is read."
       />
+      <p className="mt-4 text-sm text-muted">
+        Prefer quick clicks?{" "}
+        <Link href="/app/survey" className="font-semibold text-accent hover:underline">
+          Take the 6-question survey
+        </Link>
+        .
+      </p>
       {params.thanks ? (
         <div className={`${card} mt-6 p-6`}>
           <p className="font-display text-xl font-bold">Thank you.</p>

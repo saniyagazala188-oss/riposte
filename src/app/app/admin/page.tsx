@@ -9,6 +9,7 @@ import { SubmitButton } from "@/components/FormButtons";
 import { timeAgo } from "@/lib/time";
 import { approveEmail, unapproveEmail } from "./actions";
 import { CopyInvite } from "./CopyInvite";
+import { SurveyResults, type SurveyRow } from "./SurveyResults";
 
 export const metadata = { title: "Admin · Riposte" };
 export const dynamic = "force-dynamic";
@@ -41,13 +42,19 @@ export default async function AdminPage({
   if (!isAdmin(user.email)) redirect("/app");
   const db = createAdminClient();
 
-  const [{ data: list, error: listError }, { data: profiles }, { data: feedback }] = db
+  const [{ data: list, error: listError }, { data: profiles }, { data: feedback }, { data: surveyRows }] = db
     ? await Promise.all([
         db.from("waitlist").select("email, source, created_at, approved_at, invited_at").order("created_at", { ascending: false }).limit(500),
         db.from("profiles").select("email").limit(2000),
         db.from("feedback").select("id, email, created_at, uses_for, miss_most, missing, would_pay, pay_amount").order("created_at", { ascending: false }).limit(200),
+        db
+          .from("beta_survey")
+          .select("user_id, email, answered_at, dismissed_at, emailed_at, before_tool, most_useful, disappointment, fair_price, missing, call_ok")
+          .order("answered_at", { ascending: false, nullsFirst: false })
+          .limit(500),
       ])
-    : [{ data: null, error: null }, { data: null }, { data: null }];
+    : [{ data: null, error: null }, { data: null }, { data: null }, { data: null }];
+  const survey = (surveyRows ?? []) as SurveyRow[];
 
   const rows = (list ?? []) as Row[];
   const signedUp = new Set((profiles ?? []).map((p) => String(p.email ?? "").toLowerCase()));
@@ -57,7 +64,8 @@ export default async function AdminPage({
   const pay = { yes: 0, maybe: 0, no: 0 };
   for (const f of answers) if (f.would_pay && f.would_pay in pay) pay[f.would_pay as keyof typeof pay]++;
 
-  const view = params.view === "approved" ? "approved" : params.view === "feedback" ? "feedback" : "waiting";
+  const view =
+    params.view === "approved" ? "approved" : params.view === "feedback" ? "feedback" : params.view === "survey" ? "survey" : "waiting";
   const shown = view === "approved" ? approved : waiting;
   const justApproved = params.approved ? decodeURIComponent(params.approved) : "";
 
@@ -128,11 +136,14 @@ export default async function AdminPage({
               { key: "waiting", label: "Waiting", count: waiting.length, href: "/app/admin" },
               { key: "approved", label: "Approved", count: approved.length, href: "/app/admin?view=approved" },
               { key: "feedback", label: "Feedback", count: answers.length, href: "/app/admin?view=feedback" },
+              { key: "survey", label: "Survey", count: survey.filter((r) => r.answered_at).length, href: "/app/admin?view=survey" },
             ]}
           />
         </div>
 
-        {view === "feedback" ? (
+        {view === "survey" ? (
+          <SurveyResults rows={survey} />
+        ) : view === "feedback" ? (
           <>
             <PanelHead title="What beta users say" description={`Would pay: ${pay.yes} yes · ${pay.maybe} maybe · ${pay.no} no`} />
             <ul className="divide-y divide-line">

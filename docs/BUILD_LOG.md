@@ -736,3 +736,12 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - **SEO/AEO:** each page has TechArticle + BreadcrumbList + FAQPage schema; /docs has CollectionPage. Docs are in the sitemap, in `llms.txt` (grouped by topic, with each page's short answer) and sent to IndexNow when their `updated` date changes.
 - **Links:** "Docs" in the site header and footer, "Help & docs" in the app sidebar, and Settings' Slack guide links to `/docs/slack-alerts`.
 - **Fixes found while writing:** the CI tools post said Riposte fits "3 to 10 competitors", but the beta allows 5; the What Riposte does FAQ listed "homepages", which isn't a page type (any page can be added as "Other page"). Both corrected.
+
+## Beta survey (21 Oct, 00:15)
+
+- **Why:** Saniya can't call every beta user (they may be anywhere in the world), so the key questions are asked inside the app instead. An AI interviewer was considered and dropped.
+- **When:** 7 days after approval (waitlist `approved_at`, or the account date if later), the feed shows a "Got 2 minutes? Help shape Riposte" card with "Answer 6 questions" and "Not now". Admins never see it. If still unanswered 10 days after approval, the morning job sends one reminder email (max 20 a day), and never again.
+- **Questions (`src/lib/survey.ts`):** how they kept up with competitors before; which part helps most; how they'd feel if they could no longer use Riposte (very / somewhat / not disappointed: the Sean Ellis test, goal 40% "very"); what's confusing or missing (short text); fair monthly price (under $19 / $19–49 / $49–99 / $99+); happy to do a 15-minute call.
+- **Where:** `/app/survey` (can be answered again; also linked from Give feedback), card `src/components/SurveyCard.tsx`, email `src/lib/notify/survey.ts` (called from `/api/cron/check`), results in Admin → Survey (`SurveyResults.tsx`: the "very disappointed" score, a bar per answer, who's happy to talk, every written answer).
+- **Database:** migration `0018_beta_survey.sql` (table `beta_survey`, one row per person, with `answered_at`, `dismissed_at`, `emailed_at`; function `my_approved_at()`). Must be run in Supabase before going live.
+- **Email note:** reminder emails need Resend to send from a verified domain, same as invites. Until then the in-app card still works.

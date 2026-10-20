@@ -5,13 +5,15 @@ import { processChanges } from "@/lib/signals/process";
 import { sendAlerts, sendDigests } from "@/lib/notify/alerts";
 import { findStories, findTrends } from "@/lib/insights/run";
 import { runVisibility } from "@/lib/visibility/run";
+import { sendSurveyReminders } from "@/lib/notify/survey";
 
 // Runs every morning (see vercel.json):
 // 1. checks every page that is due (daily competitors after 12 hours, weekly after ~6.5 days),
 // 2. turns new changes into AI signals,
 // 3. sends alerts for high-impact signals,
 // 4. joins related moves, refreshes trends on Mondays, asks tracked prompts in AI search weekly,
-// 5. on Mondays, sends the weekly digest.
+// 5. on Mondays, sends the weekly digest,
+// 6. emails the beta survey once to people approved 10+ days ago who haven't answered.
 export const maxDuration = 300;
 export const dynamic = "force-dynamic";
 
@@ -93,5 +95,13 @@ export async function GET(request: Request) {
       ? await sendDigests(db, { force: url.searchParams.get("digest") === "1" })
       : null;
 
-  return NextResponse.json({ due: due.length, checked: results.length, summary, signals, alerts, linked, trends: trendRuns, visibility, digest });
+  // Beta survey: one reminder email, 10 days after approval, if still unanswered.
+  let survey: unknown = null;
+  try {
+    survey = await sendSurveyReminders(db);
+  } catch (e) {
+    survey = { error: e instanceof Error ? e.message.slice(0, 120) : "failed" };
+  }
+
+  return NextResponse.json({ due: due.length, checked: results.length, summary, signals, alerts, linked, trends: trendRuns, visibility, digest, survey });
 }
