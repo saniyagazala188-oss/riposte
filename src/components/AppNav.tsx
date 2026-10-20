@@ -148,7 +148,7 @@ export function navGroups(counts: { toReview: number; openActions: number }, adm
       label: "Riposte",
       items: [
         { href: "/docs", label: "Help & docs", icon: "docs" },
-        { href: "/app/survey", label: "Give feedback", icon: "feedback" },
+        { href: "/app/survey", label: "Help shape Riposte", icon: "feedback" },
         { href: "/app/feedback", label: "Report a problem", icon: "report" },
         { href: "/blog", label: "Blog", icon: "blog" },
         { href: "/changelog", label: "Changelog", icon: "changelog" },

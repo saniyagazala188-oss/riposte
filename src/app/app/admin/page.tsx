@@ -24,6 +24,10 @@ type Feedback = {
   missing: string | null;
   would_pay: string | null;
   pay_amount: string | null;
+  expected?: string | null;
+  page_url?: string | null;
+  browser?: string | null;
+  screenshot_paths?: string[] | null;
 };
 
 const ERRORS: Record<string, string> = {
@@ -46,7 +50,7 @@ export default async function AdminPage({
     ? await Promise.all([
         db.from("waitlist").select("email, source, created_at, approved_at, invited_at").order("created_at", { ascending: false }).limit(500),
         db.from("profiles").select("email").limit(2000),
-        db.from("feedback").select("id, email, created_at, uses_for, miss_most, missing, would_pay, pay_amount").order("created_at", { ascending: false }).limit(200),
+        db.from("feedback").select("*").order("created_at", { ascending: false }).limit(200),
         db
           .from("beta_survey")
           .select("user_id, email, answered_at, dismissed_at, emailed_at, before_tool, most_useful, disappointment, fair_price, missing, call_ok")
@@ -61,6 +65,13 @@ export default async function AdminPage({
   const waiting = rows.filter((r) => !r.approved_at);
   const approved = rows.filter((r) => r.approved_at && !adminEmails().includes(r.email));
   const answers = (feedback ?? []) as Feedback[];
+  // Screenshots are private: make short-lived links for the ones on this page.
+  const shotPaths = answers.flatMap((f) => f.screenshot_paths ?? []);
+  const shotUrls = new Map<string, string>();
+  if (db && shotPaths.length) {
+    const { data: signed } = await db.storage.from("reports").createSignedUrls(shotPaths, 3600);
+    for (const s of signed ?? []) if (s.path && s.signedUrl) shotUrls.set(s.path, s.signedUrl);
+  }
   const pay = { yes: 0, maybe: 0, no: 0 };
   for (const f of answers) if (f.would_pay && f.would_pay in pay) pay[f.would_pay as keyof typeof pay]++;
 
@@ -170,15 +181,32 @@ export default async function AdminPage({
                       ]
                     : [
                         ["Problem", f.missing],
+                        ["Expected", f.expected ?? null],
                         ["Where", f.uses_for],
+                        ["Came from", f.page_url ?? null],
+                        ["Browser", f.browser ?? null],
                       ]
                   ).map(([k, v]) =>
                     v ? (
-                      <p key={k} className="mt-1.5">
+                      <p key={k} className={`mt-1.5 ${k === "Browser" ? "text-xs text-muted" : ""}`}>
                         <span className="font-semibold">{k}: </span>
                         {v}
                       </p>
                     ) : null,
+                  )}
+                  {(f.screenshot_paths ?? []).length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {(f.screenshot_paths ?? []).map((p) =>
+                        shotUrls.get(p) ? (
+                          <a key={p} href={shotUrls.get(p)} target="_blank" rel="noreferrer" className="block h-24 w-36 overflow-hidden rounded-lg border border-line">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={shotUrls.get(p)} alt="Screenshot" className="h-full w-full object-cover" />
+                          </a>
+                        ) : (
+                          <span key={p} className="rounded-lg border border-line px-3 py-2 text-xs text-muted">Screenshot unavailable</span>
+                        ),
+                      )}
+                    </div>
                   )}
                 </li>
               ))}

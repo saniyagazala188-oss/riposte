@@ -746,3 +746,11 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - **Database:** migration `0018_beta_survey.sql` (table `beta_survey`, one row per person, with `answered_at`, `dismissed_at`, `emailed_at`; function `my_approved_at()`). Must be run in Supabase before going live.
 - **Email note:** reminder emails need Resend to send from a verified domain, same as invites. Until then the in-app card still works.
 - **Give feedback → survey (21 Oct, 00:10):** Saniya worried nobody would click "Take the 6-question survey" from the old form. The menu's "Give feedback" (and the beta bar link) now opens the survey directly. The old free-text form became **Report a problem** (`/app/feedback`, new menu item with a warning icon): "What went wrong?" (required) and "Where did it happen?" (optional), saved to the same `feedback` table (`missing`, `uses_for`), shown in Admin under **Problems**. No database change.
+
+## Better problem reports + waitlist emails (21 Oct, 00:30)
+
+- **Report a problem** now asks what went wrong (required), what they expected, and where, and takes up to 3 screenshots (PNG/JPG/WebP/GIF, 5 MB each). Screenshots go straight from the browser into the person's own folder in a new private bucket `reports`; the page they came from and their browser are added automatically. Admin → Problems shows all of it, with screenshot thumbnails (short-lived private links).
+- **Menu:** "Give feedback" is now **Help shape Riposte** (opens the survey); the beta bar link and the invite email say the same, and the invite mentions Report a problem.
+- **Emails to the admin:** when someone joins the waitlist (website form, or signing in before approval) and when someone reports a problem, every address in ADMIN_EMAILS gets a short email with a link to Admin. Uses the same Resend setup; failures never block the signup or report.
+- **Admin is admin-only:** the Admin page sends anyone not in ADMIN_EMAILS back to the feed, and the menu item only shows for admins (unchanged).
+- **Database:** migration `0019_problem_reports.sql` (columns `expected`, `page_url`, `browser`, `screenshot_paths` on `feedback`; bucket `reports` with own-folder policies). If it isn't run yet, reports still save the basics.

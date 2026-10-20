@@ -456,6 +456,17 @@ export function mockTables(): Record<string, Row[]> {
     ],
     feedback: [
       {
+        id: "f0",
+        email: "arjun@devtools.io",
+        created_at: ago(0.5),
+        missing: "I clicked Build action kit on the Beacon signal and the page showed 'Something went wrong'.",
+        expected: "The action kit with three drafts",
+        uses_for: "Feed",
+        page_url: "/app?s=sig3",
+        browser: "Chrome 141 on macOS · 1512×860",
+        screenshot_paths: null,
+      },
+      {
         id: "f1",
         email: "meera@contentco.io",
         created_at: ago(1),
