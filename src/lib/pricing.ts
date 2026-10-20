@@ -60,7 +60,7 @@ export const PLANS: Plan[] = [
       usd: { monthly: "$99", yearly: "$990", yearlyPerMonth: "$83" },
       inr: { monthly: "₹7,999", yearly: "₹79,990", yearlyPerMonth: "₹6,666" },
     },
-    features: ["15 competitors", "Everything in Pro", "30 tracked AI prompts", "Priority help from me"],
+    features: ["15 competitors", "Everything in Pro", "30 tracked AI prompts"],
   },
 ];
 
