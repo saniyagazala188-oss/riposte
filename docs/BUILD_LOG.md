@@ -759,3 +759,9 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 
 - **Why:** two waitlist signups (wirethings.net, tf-info.com) came from domains with no website and almost no search presence, a typical bot pattern. Left unapproved.
 - **How:** `WaitlistForm` has a hidden "website" field (off-screen, hidden from screen readers, not tabbable) that only bots fill in, and a hidden timestamp set after the page loads. `joinWaitlist` ignores a signup if the hidden field is filled or the form came back less than 2 seconds after it appeared. Bots still see "You're on the list", but nothing is saved and no admin email goes out. People without JavaScript aren't blocked (no timestamp = no time check).
+
+## Survey checkboxes + compact admin lists (21 Oct, 00:40)
+
+- **Checkboxes:** "How did you keep up with competitors before Riposte?" and "Which part helps you most?" now allow several answers, plus a "Something else" option with a one-line box. Saved in the same text columns as `a|b|other:their words` (no database change). Price and "how disappointed" stay single-choice.
+- **Admin → Survey:** a short note under the "very disappointed" score explains it (40% or more = solves a real problem). Bars count the share of people who picked each option; "Something else" answers fold out under each question. Every person is one compact row (email, when, disappointed, fair price, what's confusing) that opens to show all their answers, so the page stays readable with 30–40 people.
+- **Admin → Problems:** one line per report (email, when, first line, screenshot count) that opens to show everything and the screenshots.

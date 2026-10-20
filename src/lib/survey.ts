@@ -14,6 +14,7 @@ export const SURVEY = {
       ["monitor", "A page-change monitor"],
       ["other_tool", "Another competitive intelligence tool"],
       ["none", "I didn't really keep up"],
+      ["other", "Something else"],
     ],
   },
   most_useful: {
@@ -25,6 +26,7 @@ export const SURVEY = {
       ["comparisons", "Comparison pages and content intel"],
       ["ai_visibility", "Prompt Studio and AI visibility"],
       ["alerts", "Email and Slack alerts"],
+      ["other", "Something else"],
     ],
   },
   disappointment: {
@@ -50,8 +52,19 @@ export const MISSING_Q = "What confused you, or what's missing?";
 export const CALL_Q = "Happy to do a 15-minute call about it?";
 
 export type SurveyKey = keyof typeof SURVEY;
+
+// These two allow several answers (checkboxes), saved as "a|b|other:their words".
+export const MULTI: SurveyKey[] = ["before_tool", "most_useful"];
+export const isMulti = (key: SurveyKey) => MULTI.includes(key);
+export const splitAnswers = (v: string | null | undefined) => (v ? v.split("|").filter(Boolean) : []);
+
+const optionLabel = (key: SurveyKey, value: string) =>
+  (SURVEY[key].options as readonly (readonly [string, string])[]).find(([v]) => v === value)?.[1] ?? value;
+
 export const labelFor = (key: SurveyKey, value: string | null) =>
-  (SURVEY[key].options as readonly (readonly [string, string])[]).find(([v]) => v === value)?.[1] ?? value ?? "";
+  splitAnswers(value)
+    .map((v) => (v.startsWith("other:") ? `Something else: ${v.slice(6)}` : optionLabel(key, v)))
+    .join(", ");
 
 const DAY = 24 * 60 * 60 * 1000;
 

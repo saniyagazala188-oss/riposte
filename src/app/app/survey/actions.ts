@@ -5,9 +5,18 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { SURVEY, type SurveyKey } from "@/lib/survey";
 
+const valid = (key: SurveyKey, s: string) => (SURVEY[key].options as readonly (readonly [string, string])[]).some(([o]) => o === s);
 const pick = (key: SurveyKey, v: FormDataEntryValue | null) => {
   const s = String(v ?? "");
-  return (SURVEY[key].options as readonly (readonly [string, string])[]).some(([o]) => o === s) ? s : null;
+  return valid(key, s) ? s : null;
+};
+// Checkbox questions: every ticked option, plus their own words for "Something else".
+const pickMany = (key: SurveyKey, formData: FormData) => {
+  const picked = formData.getAll(key).map(String).filter((s) => valid(key, s) && s !== "other");
+  const own = String(formData.get(`${key}_other`) ?? "").replace(/\|/g, "/").trim().slice(0, 200);
+  if (own) picked.push(`other:${own}`);
+  else if (formData.getAll(key).map(String).includes("other")) picked.push("other");
+  return picked.length ? picked.join("|") : null;
 };
 
 export async function sendSurvey(formData: FormData) {
@@ -16,8 +25,8 @@ export async function sendSurvey(formData: FormData) {
   const row = {
     user_id: user.id,
     email: user.email ?? null,
-    before_tool: pick("before_tool", formData.get("before_tool")),
-    most_useful: pick("most_useful", formData.get("most_useful")),
+    before_tool: pickMany("before_tool", formData),
+    most_useful: pickMany("most_useful", formData),
     disappointment: pick("disappointment", formData.get("disappointment")),
     fair_price: pick("fair_price", formData.get("fair_price")),
     missing: String(formData.get("missing") ?? "").trim().slice(0, 1500) || null,

@@ -3,7 +3,7 @@ import { requireUser } from "@/lib/auth";
 import { card, inputClass, primaryButton } from "@/components/styles";
 import { PageHeader } from "@/components/ui";
 import { SubmitButton } from "@/components/FormButtons";
-import { SURVEY, MISSING_Q, CALL_Q, type SurveyKey } from "@/lib/survey";
+import { SURVEY, MISSING_Q, CALL_Q, isMulti, splitAnswers, type SurveyKey } from "@/lib/survey";
 import { sendSurvey } from "./actions";
 
 export const metadata = { title: "Quick survey · Riposte" };
@@ -12,16 +12,36 @@ const label = "text-sm font-semibold";
 
 function Choice({ name, value }: { name: SurveyKey; value?: string | null }) {
   const { q, options } = SURVEY[name];
+  const multi = isMulti(name);
+  const picked = splitAnswers(value);
+  const own = picked.find((v) => v.startsWith("other:"))?.slice(6) ?? "";
   return (
     <fieldset className="flex flex-col gap-2">
-      <legend className={label}>{q}</legend>
+      <legend className={label}>
+        {q} {multi && <span className="font-normal text-muted">(tick all that apply)</span>}
+      </legend>
       <div className="mt-1 flex flex-col gap-2 text-sm">
         {(options as readonly (readonly [string, string])[]).map(([v, t]) => (
           <label key={v} className="flex items-center gap-2.5">
-            <input type="radio" name={name} value={v} defaultChecked={value === v} className="accent-[var(--color-accent)]" />
+            <input
+              type={multi ? "checkbox" : "radio"}
+              name={name}
+              value={v}
+              defaultChecked={multi ? picked.includes(v) || (v === "other" && Boolean(own)) : value === v}
+              className="accent-[var(--color-accent)]"
+            />
             {t}
           </label>
         ))}
+        {multi && (
+          <input
+            name={`${name}_other`}
+            defaultValue={own}
+            className={`${inputClass} ml-6 max-w-sm py-1.5 text-sm`}
+            placeholder="Something else? Tell me in a few words"
+            aria-label={`${q} Something else`}
+          />
+        )}
       </div>
     </fieldset>
   );

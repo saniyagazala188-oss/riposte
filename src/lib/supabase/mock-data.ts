@@ -449,9 +449,9 @@ export function mockTables(): Record<string, Row[]> {
       { email: "meera@contentco.io", source: "landing", created_at: ago(3), approved_at: ago(2), invited_at: ago(2) },
     ],
     beta_survey: [
-      { user_id: "s1", email: "meera@contentco.io", answered_at: ago(5), dismissed_at: null, emailed_at: null, before_tool: "by_hand", most_useful: "action_kits", disappointment: "very", fair_price: "19_49", missing: "Share a signal with my sales lead in one click.", call_ok: true },
+      { user_id: "s1", email: "meera@contentco.io", answered_at: ago(5), dismissed_at: null, emailed_at: null, before_tool: "by_hand|alerts", most_useful: "action_kits|signals", disappointment: "very", fair_price: "19_49", missing: "Share a signal with my sales lead in one click.", call_ok: true },
       { user_id: "s2", email: "arjun@devtools.io", answered_at: ago(20), dismissed_at: null, emailed_at: ago(30), before_tool: "alerts", most_useful: "signals", disappointment: "somewhat", fair_price: "under_19", missing: "Took me a while to find where news stories live.", call_ok: false },
-      { user_id: "s3", email: "lena@hrstack.de", answered_at: ago(40), dismissed_at: null, emailed_at: null, before_tool: "monitor", most_useful: "signals", disappointment: "very", fair_price: "49_99", missing: null, call_ok: true },
+      { user_id: "s3", email: "lena@hrstack.de", answered_at: ago(40), dismissed_at: null, emailed_at: null, before_tool: "monitor|other:A Notion page my team updates", most_useful: "signals", disappointment: "very", fair_price: "49_99", missing: null, call_ok: true },
       { user_id: "s4", email: "sam@growthlab.co", answered_at: null, dismissed_at: ago(10), emailed_at: null, before_tool: null, most_useful: null, disappointment: null, fair_price: null, missing: null, call_ok: null },
     ],
     feedback: [

@@ -1,6 +1,6 @@
 import { PanelHead } from "@/components/ui";
 import { timeAgo } from "@/lib/time";
-import { SURVEY, labelFor, type SurveyKey } from "@/lib/survey";
+import { SURVEY, labelFor, splitAnswers, isMulti, type SurveyKey } from "@/lib/survey";
 
 export type SurveyRow = {
   user_id: string;
@@ -16,8 +16,11 @@ export type SurveyRow = {
   call_ok: boolean | null;
 };
 
-// The beta survey, summed up: the "very disappointed" score first (40% or more is the goal),
-// then a bar per answer for each question, then every written answer.
+const DIS = { very: "Very", somewhat: "Somewhat", not: "Not" } as Record<string, string>;
+
+// The beta survey, summed up so it reads the same with 3 answers or 300:
+// the "very disappointed" score, a bar per answer, who's happy to talk,
+// then one compact row per person that opens to show everything they said.
 export function SurveyResults({ rows }: { rows: SurveyRow[] }) {
   const answered = rows.filter((r) => r.answered_at);
   const scored = answered.filter((r) => r.disappointment);
@@ -25,13 +28,16 @@ export function SurveyResults({ rows }: { rows: SurveyRow[] }) {
   const pct = scored.length ? Math.round((very / scored.length) * 100) : 0;
   const calls = answered.filter((r) => r.call_ok);
 
+  // Share of people who picked each option (checkbox questions can add up to more than 100%).
   const tally = (key: SurveyKey) => {
     const n = answered.filter((r) => r[key]).length;
     return (SURVEY[key].options as readonly (readonly [string, string])[]).map(([v, t]) => {
-      const c = answered.filter((r) => r[key] === v).length;
+      const c = answered.filter((r) => splitAnswers(r[key]).some((a) => a === v || (v === "other" && a.startsWith("other")))).length;
       return { t, c, w: n ? Math.round((c / n) * 100) : 0 };
     });
   };
+  const ownWords = (key: SurveyKey) =>
+    answered.flatMap((r) => splitAnswers(r[key]).filter((a) => a.startsWith("other:")).map((a) => ({ who: r.email, text: a.slice(6) })));
 
   return (
     <>
@@ -48,10 +54,16 @@ export function SurveyResults({ rows }: { rows: SurveyRow[] }) {
               {very} of {scored.length} · the goal is 40% or more
             </span>
           </p>
+          <p className="mt-2 text-xs text-muted">
+            The most important number here. If 40% or more would be very disappointed to lose Riposte, it solves a real problem and is ready to launch.
+            Below that, look at what those who said &quot;very&quot; have in common.
+          </p>
         </div>
         {(["before_tool", "most_useful", "fair_price"] as SurveyKey[]).map((key) => (
           <div key={key} className="rounded-xl border border-line p-4">
-            <p className="text-sm font-semibold">{SURVEY[key].q}</p>
+            <p className="text-sm font-semibold">
+              {SURVEY[key].q} {isMulti(key) && <span className="font-normal text-muted">(several allowed)</span>}
+            </p>
             <ul className="mt-3 flex flex-col gap-2 text-sm">
               {tally(key).map((o) => (
                 <li key={o.t}>
@@ -65,11 +77,23 @@ export function SurveyResults({ rows }: { rows: SurveyRow[] }) {
                 </li>
               ))}
             </ul>
+            {isMulti(key) && ownWords(key).length > 0 && (
+              <details className="mt-3 text-sm">
+                <summary className="cursor-pointer text-muted">&quot;Something else&quot; answers ({ownWords(key).length})</summary>
+                <ul className="mt-2 flex flex-col gap-1">
+                  {ownWords(key).map((o, i) => (
+                    <li key={i}>
+                      &quot;{o.text}&quot; <span className="text-xs text-muted">· {o.who}</span>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
           </div>
         ))}
         <div className="rounded-xl border border-line p-4">
           <p className="text-sm font-semibold">Happy to do a call ({calls.length})</p>
-          <ul className="mt-3 flex flex-col gap-1.5 text-sm">
+          <ul className="mt-3 flex max-h-56 flex-col gap-1.5 overflow-auto text-sm">
             {calls.map((r) => (
               <li key={r.user_id} className="truncate">
                 {r.email}
@@ -79,24 +103,46 @@ export function SurveyResults({ rows }: { rows: SurveyRow[] }) {
           </ul>
         </div>
       </div>
-      <ul className="divide-y divide-line border-t border-line">
-        {answered.map((r) => (
-          <li key={r.user_id} className="px-4 py-4 text-sm">
-            <p className="text-xs text-muted">
-              <span className="font-semibold text-ink">{r.email}</span> · {timeAgo(r.answered_at!)}
-              {r.disappointment && ` · ${labelFor("disappointment", r.disappointment).toLowerCase()}`}
-              {r.fair_price && ` · fair price: ${labelFor("fair_price", r.fair_price)}`}
-            </p>
-            {r.missing && (
-              <p className="mt-1.5">
-                <span className="font-semibold">Confusing or missing: </span>
-                {r.missing}
-              </p>
-            )}
-          </li>
-        ))}
-        {!answered.length && <li className="px-4 py-6 text-center text-sm text-muted">No answers yet. The survey shows to people 7 days after you approve them.</li>}
-      </ul>
+
+      <div className="border-t border-line">
+        <p className="px-4 pt-4 text-sm font-semibold">Answers by person ({answered.length})</p>
+        <div className="hidden grid-cols-[1.6fr_0.7fr_0.8fr_0.8fr_1.6fr] gap-3 px-4 pt-3 pb-2 text-xs font-semibold uppercase tracking-wider text-muted md:grid">
+          <span>Who</span>
+          <span>When</span>
+          <span>Disappointed</span>
+          <span>Fair price</span>
+          <span>Confusing or missing</span>
+        </div>
+        <ul className="divide-y divide-line">
+          {answered.map((r) => (
+            <li key={r.user_id}>
+              <details className="group px-4 py-2.5 text-sm">
+                <summary className="grid cursor-pointer list-none grid-cols-2 gap-x-3 gap-y-1 marker:hidden md:grid-cols-[1.6fr_0.7fr_0.8fr_0.8fr_1.6fr] md:items-center">
+                  <span className="truncate font-semibold">
+                    <span className="mr-1 inline-block text-muted transition group-open:rotate-90">›</span>
+                    {r.email}
+                  </span>
+                  <span className="text-muted">{timeAgo(r.answered_at!)}</span>
+                  <span>{r.disappointment ? DIS[r.disappointment] : "–"}</span>
+                  <span>{r.fair_price ? labelFor("fair_price", r.fair_price) : "–"}</span>
+                  <span className="col-span-2 truncate text-muted md:col-span-1">{r.missing ?? "–"}</span>
+                </summary>
+                <dl className="mt-2 grid gap-1.5 rounded-lg bg-bg p-3 md:grid-cols-[12rem_1fr]">
+                  <dt className="font-semibold">Before Riposte</dt>
+                  <dd>{labelFor("before_tool", r.before_tool) || "–"}</dd>
+                  <dt className="font-semibold">Helps most</dt>
+                  <dd>{labelFor("most_useful", r.most_useful) || "–"}</dd>
+                  <dt className="font-semibold">Confusing or missing</dt>
+                  <dd>{r.missing ?? "–"}</dd>
+                  <dt className="font-semibold">Happy to talk</dt>
+                  <dd>{r.call_ok == null ? "–" : r.call_ok ? "Yes" : "No"}</dd>
+                </dl>
+              </details>
+            </li>
+          ))}
+          {!answered.length && <li className="px-4 py-6 text-center text-sm text-muted">No answers yet. The survey shows to people 7 days after you approve them.</li>}
+        </ul>
+      </div>
     </>
   );
 }

@@ -162,52 +162,64 @@ export default async function AdminPage({
             />
             <ul className="divide-y divide-line">
               {answers.map((f) => (
-                <li key={f.id} className="px-4 py-4 text-sm">
-                  <p className="text-xs text-muted">
-                    <span className="font-semibold text-ink">{f.email}</span> · {timeAgo(f.created_at)}
-                    {f.would_pay && (
-                      <>
-                        {" "}
-                        · would pay: <span className="font-semibold text-ink">{f.would_pay}</span>
-                        {f.pay_amount && ` (${f.pay_amount})`}
-                      </>
-                    )}
-                  </p>
-                  {(f.miss_most || f.would_pay
-                    ? [
-                        ["Uses it for", f.uses_for],
-                        ["Would miss most", f.miss_most],
-                        ["Missing or confusing", f.missing],
-                      ]
-                    : [
-                        ["Problem", f.missing],
-                        ["Expected", f.expected ?? null],
-                        ["Where", f.uses_for],
-                        ["Came from", f.page_url ?? null],
-                        ["Browser", f.browser ?? null],
-                      ]
-                  ).map(([k, v]) =>
-                    v ? (
-                      <p key={k} className={`mt-1.5 ${k === "Browser" ? "text-xs text-muted" : ""}`}>
-                        <span className="font-semibold">{k}: </span>
-                        {v}
-                      </p>
-                    ) : null,
-                  )}
-                  {(f.screenshot_paths ?? []).length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {(f.screenshot_paths ?? []).map((p) =>
-                        shotUrls.get(p) ? (
-                          <a key={p} href={shotUrls.get(p)} target="_blank" rel="noreferrer" className="block h-24 w-36 overflow-hidden rounded-lg border border-line">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={shotUrls.get(p)} alt="Screenshot" className="h-full w-full object-cover" />
-                          </a>
-                        ) : (
-                          <span key={p} className="rounded-lg border border-line px-3 py-2 text-xs text-muted">Screenshot unavailable</span>
-                        ),
+                <li key={f.id}>
+                  {/* One line per report; click to see everything, including screenshots. */}
+                  <details className="group px-4 py-2.5 text-sm">
+                    <summary className="flex cursor-pointer list-none items-center gap-3 marker:hidden">
+                      <span className="inline-block text-muted transition group-open:rotate-90">›</span>
+                      <span className="w-48 shrink-0 truncate font-semibold">{f.email}</span>
+                      <span className="w-32 shrink-0 whitespace-nowrap text-muted">{timeAgo(f.created_at)}</span>
+                      <span className="min-w-0 flex-1 truncate">{f.missing ?? f.miss_most ?? f.uses_for ?? "–"}</span>
+                      {(f.screenshot_paths ?? []).length > 0 && (
+                        <span className="shrink-0 rounded-full bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent">
+                          {(f.screenshot_paths ?? []).length} screenshot{(f.screenshot_paths ?? []).length > 1 ? "s" : ""}
+                        </span>
+                      )}
+                    </summary>
+                    <div className="mt-2 rounded-lg bg-bg p-3">
+                      {f.would_pay && (
+                        <p className="text-xs text-muted">
+                          Older feedback · would pay: <span className="font-semibold text-ink">{f.would_pay}</span>
+                          {f.pay_amount && ` (${f.pay_amount})`}
+                        </p>
+                      )}
+                      {(f.miss_most || f.would_pay
+                        ? [
+                            ["Uses it for", f.uses_for],
+                            ["Would miss most", f.miss_most],
+                            ["Missing or confusing", f.missing],
+                          ]
+                        : [
+                            ["Problem", f.missing],
+                            ["Expected", f.expected ?? null],
+                            ["Where", f.uses_for],
+                            ["Came from", f.page_url ?? null],
+                            ["Browser", f.browser ?? null],
+                          ]
+                      ).map(([k, v]) =>
+                        v ? (
+                          <p key={k} className={`mt-1.5 first:mt-0 ${k === "Browser" ? "text-xs text-muted" : ""}`}>
+                            <span className="font-semibold">{k}: </span>
+                            {v}
+                          </p>
+                        ) : null,
+                      )}
+                      {(f.screenshot_paths ?? []).length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {(f.screenshot_paths ?? []).map((p) =>
+                            shotUrls.get(p) ? (
+                              <a key={p} href={shotUrls.get(p)} target="_blank" rel="noreferrer" className="block h-24 w-36 overflow-hidden rounded-lg border border-line">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={shotUrls.get(p)} alt="Screenshot" className="h-full w-full object-cover" />
+                              </a>
+                            ) : (
+                              <span key={p} className="rounded-lg border border-line px-3 py-2 text-xs text-muted">Screenshot unavailable</span>
+                            ),
+                          )}
+                        </div>
                       )}
                     </div>
-                  )}
+                  </details>
                 </li>
               ))}
               {!answers.length && <li className="px-4 py-6 text-center text-sm text-muted">No problems reported yet.</li>}
