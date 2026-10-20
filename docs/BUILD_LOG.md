@@ -754,3 +754,8 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - **Emails to the admin:** when someone joins the waitlist (website form, or signing in before approval) and when someone reports a problem, every address in ADMIN_EMAILS gets a short email with a link to Admin. Uses the same Resend setup; failures never block the signup or report.
 - **Admin is admin-only:** the Admin page sends anyone not in ADMIN_EMAILS back to the feed, and the menu item only shows for admins (unchanged).
 - **Database:** migration `0019_problem_reports.sql` (columns `expected`, `page_url`, `browser`, `screenshot_paths` on `feedback`; bucket `reports` with own-folder policies). If it isn't run yet, reports still save the basics.
+
+## Waitlist bot trap (21 Oct, 00:20)
+
+- **Why:** two waitlist signups (wirethings.net, tf-info.com) came from domains with no website and almost no search presence, a typical bot pattern. Left unapproved.
+- **How:** `WaitlistForm` has a hidden "website" field (off-screen, hidden from screen readers, not tabbable) that only bots fill in, and a hidden timestamp set after the page loads. `joinWaitlist` ignores a signup if the hidden field is filled or the form came back less than 2 seconds after it appeared. Bots still see "You're on the list", but nothing is saved and no admin email goes out. People without JavaScript aren't blocked (no timestamp = no time check).

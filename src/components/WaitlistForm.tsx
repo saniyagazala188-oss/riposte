@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { track } from "@/lib/analytics";
 import { joinWaitlist, type WaitlistState } from "@/app/actions";
 
@@ -8,6 +8,9 @@ const initial: WaitlistState = { status: "idle" };
 
 export function WaitlistForm({ id = "waitlist-email" }: { id?: string }) {
   const [state, action, pending] = useActionState(joinWaitlist, initial);
+  // Bot trap: when the form appeared. Filled in after the page loads, so bots that post instantly are caught.
+  const [shownAt, setShownAt] = useState("");
+  useEffect(() => setShownAt(String(Date.now())), []);
   useEffect(() => {
     if (state.status === "joined") track("join_waitlist");
   }, [state.status]);
@@ -25,6 +28,12 @@ export function WaitlistForm({ id = "waitlist-email" }: { id?: string }) {
       <label htmlFor={id} className="sr-only">
         Work email
       </label>
+      <input type="hidden" name="t" value={shownAt} />
+      {/* Bot trap: hidden from people and screen readers; only bots fill it in. */}
+      <div aria-hidden="true" style={{ position: "absolute", left: "-10000px", width: 1, height: 1, overflow: "hidden" }}>
+        <label htmlFor={`${id}-website`}>Website</label>
+        <input id={`${id}-website`} name="website" type="text" tabIndex={-1} autoComplete="off" defaultValue="" />
+      </div>
       <input
         id={id}
         name="email"
