@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { notifyNewWaitlist } from "@/lib/notify/admin";
 
 export type WaitlistState = { status: "idle" | "joined" | "error"; message?: string };
 
@@ -21,5 +22,6 @@ export async function joinWaitlist(_prev: WaitlistState, formData: FormData): Pr
   if (error && error.code !== "23505") {
     return { status: "error", message: "Something went wrong saving your email. Please try again." };
   }
+  if (!error) await notifyNewWaitlist(email, "from the website");
   return { status: "joined" };
 }

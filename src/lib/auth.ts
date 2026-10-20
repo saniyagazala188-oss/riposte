@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isAdmin } from "@/lib/access";
 import { mockEnabled } from "@/lib/supabase/mock";
+import { notifyNewWaitlist } from "@/lib/notify/admin";
 
 // For pages and actions inside /app: returns the Supabase client and the signed-in user,
 // or sends the visitor to the login page. During the invite-only beta, people who aren't
@@ -20,7 +21,10 @@ export async function requireUser() {
     // If the approval check isn't set up yet (migration 0014 not run), let people in
     // rather than locking everyone out.
     if (!error && approved === false) {
-      if (user.email) await supabase.from("waitlist").insert({ email: user.email.toLowerCase(), source: "signed up" });
+      if (user.email) {
+        const { error: added } = await supabase.from("waitlist").insert({ email: user.email.toLowerCase(), source: "signed up" });
+        if (!added) await notifyNewWaitlist(user.email.toLowerCase(), "signed up before being approved");
+      }
       redirect("/waitlist");
     }
   }

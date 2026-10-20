@@ -45,7 +45,7 @@ export function BetaBar({
       {meter("Tracked prompts", prompts, limits.trackedPrompts)}
       <span>Checked every morning</span>
       <Link href="/app/survey" className="ml-auto font-semibold text-accent hover:underline">
-        Give feedback →
+        Help shape Riposte →
       </Link>
     </div>
   );

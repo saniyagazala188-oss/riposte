@@ -10,7 +10,7 @@ Sign up at ${url} with this email (${email}). It's free for as long as the beta 
 
 Start with "Your product", then add up to 5 competitors. Riposte checks them every morning and tells you what changed, why it matters and what to do.
 
-I'd love to hear what you think. There's a "Give feedback" link in the menu, and I read every answer.
+I'd love to hear what you think. There's a "Help shape Riposte" link in the menu, and I read every answer. If anything breaks, use "Report a problem".
 
 ${AUTHOR.name.split(" ")[0]}, from Riposte`;
   const html = text
