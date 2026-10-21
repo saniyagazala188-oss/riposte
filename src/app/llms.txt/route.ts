@@ -18,6 +18,11 @@ Made by ${AUTHOR.name}, a product marketer based in Bengaluru, India. Built in p
 
 - [Home](${SITE_URL}/): what Riposte does and who it is for
 - [Competitor tracking tool](${SITE_URL}/competitor-tracking-tool): what Riposte tracks, how it works, how it compares with checking by hand, Google Alerts, page monitors and enterprise tools, and FAQs
+- [Compare](${SITE_URL}/alternatives): Crayon, Klue, Kompyte, Visualping and Riposte compared, with facts checked on each company's own website
+- [Crayon alternatives](${SITE_URL}/alternatives/crayon)
+- [Klue alternatives](${SITE_URL}/alternatives/klue)
+- [Kompyte alternatives](${SITE_URL}/alternatives/kompyte)
+- [Visualping alternatives](${SITE_URL}/alternatives/visualping)
 - [Docs](${SITE_URL}/docs): how to set up and use every Riposte feature
 - [Blog](${SITE_URL}/blog): guides on competitive intelligence, content and AI search
 - [Changelog](${SITE_URL}/changelog): every step of the build, with dates

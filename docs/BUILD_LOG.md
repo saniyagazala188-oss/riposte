@@ -779,3 +779,10 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 ## Blog to landing page links (21 Oct, 22:35)
 - Search Console showed /blog/how-to-track-competitors gets 27 of 33 impressions, for "competitor tracking" queries, but it never linked to /competitor-tracking-tool.
 - Added 2 links: anchor "competitor tracking tool" in section 6, and a closing line "how the Riposte competitor tracking tool works".
+
+## Alternatives pages (21 Oct, 23:30)
+- New: /alternatives (hub) and /alternatives/crayon, /klue, /kompyte, /visualping, one template driven by src/lib/alternatives.ts.
+- Each page: breadcrumb, hero with Short answer box + product image, byline with "facts last checked", What is X (from its own site), why small teams look elsewhere, hover table X vs Riposte (Riposte tinted) + "Why choose Riposte?" link, CTA band, Choose Riposte if / Stay with X if, every option in short (Riposte first, links between pages), how to choose, FAQs, sources (nofollow) + "tell me if out of date", final CTA.
+- Schema: WebPage + BreadcrumbList, ItemList, FAQPage; hub is a CollectionPage.
+- Facts checked 21 Oct 2026: crayon.co + crayon.co/integrations, klue.com + klue.com/salesforce, Semrush KB + news for Kompyte (kompyte.com wasn't reachable), visualping.io/business/pricing. Only Visualping prices shown (public). No logos.
+- Header: "Compare ▾" dropdown (hover/focus). Footer: Compare line. Sitemap + llms.txt updated.
