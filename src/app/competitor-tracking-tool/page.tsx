@@ -124,7 +124,7 @@ function Band({ text }: { text: string }) {
 
 export default function CompetitorTrackingTool() {
   return (
-    <div className="min-h-dvh">
+    <div className="blog-canvas min-h-dvh">
       <SiteHeader />
       <main>
         {/* 1. Hero: the answer on the left, the product on the right */}

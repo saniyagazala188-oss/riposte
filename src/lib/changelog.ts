@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-21T22:25:00+05:30",
+    title: "Softer background on the competitor tracking page",
+    body: "The competitor tracking page now has the same dotted background as the blog, so it feels part of the same site.",
+    kind: "fix",
+  },
+  {
     at: "2026-10-21T21:45:00+05:30",
     title: "A page about competitor tracking",
     body: "A new page explains what Riposte tracks, how it works, and how it compares with checking competitors by hand, Google Alerts, page monitors and enterprise tools, with a 2-minute product tour and answers to common questions.",
