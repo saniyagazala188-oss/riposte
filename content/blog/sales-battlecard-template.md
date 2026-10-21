@@ -68,7 +68,7 @@ Add two things at the top of every card: the **owner** and a **last checked** da
 
 ## Free sales battlecard template
 
-Copy this into Notion, Google Docs or Confluence. One card per competitor.
+Copy this into Notion, Google Docs or Confluence. One card per competitor. Want a first draft filled in for you? Try the [free battlecard generator](/tools/battlecard-generator): enter a competitor's website and get these sections drafted from their own pages.
 
 ```
 BATTLECARD: [Competitor name]

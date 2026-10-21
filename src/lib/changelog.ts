@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-22T00:15:00+05:30",
+    title: "A free battlecard generator",
+    body: "Anyone can now make a one-page sales battlecard for free, with no sign-up. Enter your product and a competitor's website, and it reads their homepage and pricing page to draft 8 parts: who they are, who they sell to, why you win, why you lose, pricing, objections, questions to ask and proof to add. It never guesses prices, and it lists what to check before sharing. Up to 3 cards a day.",
+    kind: "launch",
+  },
+  {
     at: "2026-10-21T23:30:00+05:30",
     title: "Honest comparisons with other tools",
     body: "New Compare pages explain how Riposte compares with Crayon, Klue, Kompyte and Visualping: who each tool is built for, what it tracks, how pricing works, and when the other tool is the better choice. Facts are checked on each company's own website, with the date shown. Compare is now in the menu.",
