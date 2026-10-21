@@ -80,7 +80,8 @@ This is the step most teams skip. A change only matters if someone does somethin
 
 ## 6. Automate the checking, keep the thinking
 
-Steps 2 and 3 are repetitive, so a system should do them for you. Your time should go into steps 4 and 5. That is why I built [Riposte](/): it checks competitor pages every morning, explains each change against your product, and drafts the response with an owner, so the Monday routine becomes a short review.
+Steps 2 and 3 are repetitive, so a system should do them for you. Your time should go into steps 4 and 5. That is why I built [Riposte](/), a [competitor tracking tool](/competitor-tracking-tool) for small marketing teams. It checks competitor pages every morning, explains each change against your product, and drafts the response with an owner, so the Monday routine becomes a short review.
 
 ![Competitors in Riposte](/blog/screens/competitors.jpg "Riposte finds each competitor's pricing, changelog, blog feed and sitemap on its own")
 
+Want to see what it watches, and how it compares with Google Alerts, page monitors and enterprise tools? Here is [how the Riposte competitor tracking tool works](/competitor-tracking-tool).

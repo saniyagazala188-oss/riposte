@@ -775,3 +775,7 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 
 ## Landing page dotted background (21 Oct, 22:25)
 - /competitor-tracking-tool looked pale next to the blog. Added the same `blog-canvas` class (soft dots + colour glows) to the page wrapper. Cards stay white on top.
+
+## Blog to landing page links (21 Oct, 22:35)
+- Search Console showed /blog/how-to-track-competitors gets 27 of 33 impressions, for "competitor tracking" queries, but it never linked to /competitor-tracking-tool.
+- Added 2 links: anchor "competitor tracking tool" in section 6, and a closing line "how the Riposte competitor tracking tool works".
