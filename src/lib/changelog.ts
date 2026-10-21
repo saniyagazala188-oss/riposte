@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-21T21:45:00+05:30",
+    title: "A page about competitor tracking",
+    body: "A new page explains what Riposte tracks, how it works, and how it compares with checking competitors by hand, Google Alerts, page monitors and enterprise tools, with a 2-minute product tour and answers to common questions.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-21T00:30:00+05:30",
     title: "Report a problem, with screenshots",
     body: "Report a problem now asks what went wrong, what you expected and where, and you can add up to 3 screenshots. The page you came from and your browser are added automatically, so problems get fixed faster. Give feedback in the menu is now called Help shape Riposte.",
