@@ -20,3 +20,6 @@ create index if not exists tool_runs_time on public.tool_runs (tool, created_at 
 
 -- Row level security on, with no policies: the browser can't touch it at all.
 alter table public.tool_runs enable row level security;
+
+-- The server (secret key) needs explicit access, like the other tables in this project.
+grant select, insert on public.tool_runs to service_role;

@@ -794,3 +794,7 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - Result: card with Copy as text, a "this goes out of date" band with the waitlist form, and runs left today. Fields stay filled after sending.
 - Page: Short answer, the 8 parts, CTA band, 7 FAQs, WebApplication + FAQPage + Breadcrumb schema. Linked from the footer ("Free tools"), the battlecard template blog, sitemap and llms.txt.
 - Local preview (mock, no AI key) shows a sample card with made-up names.
+
+## Fix: battlecard generator said "resting" (22 Oct, 00:05)
+- 0020 created tool_runs without a grant, and this project needs explicit grants (like 0018), so the server's count query was denied.
+- Added `grant select, insert on public.tool_runs to service_role;` to 0020; Saniya runs it once in the SQL Editor.
