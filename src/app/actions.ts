@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { notifyNewWaitlist } from "@/lib/notify/admin";
+import { cleanPath, pageLabel } from "@/lib/joinSource";
 
 export type WaitlistState = { status: "idle" | "joined" | "error"; message?: string };
 
@@ -24,11 +25,13 @@ export async function joinWaitlist(_prev: WaitlistState, formData: FormData): Pr
     return { status: "error", message: "The waitlist isn't connected yet. Please try again soon." };
   }
 
-  const { error } = await supabase.from("waitlist").insert({ email, source: "landing" });
+  // Save the page they joined from (e.g. "/tools/battlecard-generator"), so Admin can show where sign-ups come from.
+  const source = cleanPath(formData.get("from")) ?? "landing";
+  const { error } = await supabase.from("waitlist").insert({ email, source });
   // 23505 = this email is already on the list, which is fine.
   if (error && error.code !== "23505") {
     return { status: "error", message: "Something went wrong saving your email. Please try again." };
   }
-  if (!error) await notifyNewWaitlist(email, "from the website");
+  if (!error) await notifyNewWaitlist(email, `from ${pageLabel(source)}`);
   return { status: "joined" };
 }

@@ -444,7 +444,9 @@ export function mockTables(): Record<string, Row[]> {
     comparisons,
     page_outlines: [],
     waitlist: [
-      { email: "priya@acmesaas.com", source: "landing", created_at: ago(0.2), approved_at: null, invited_at: null },
+      { email: "priya@acmesaas.com", source: "/tools/battlecard-generator", created_at: ago(0.2), approved_at: null, invited_at: null },
+      { email: "dev@beacon.io", source: "/alternatives/crayon", created_at: ago(0.5), approved_at: null, invited_at: null },
+      { email: "li@northwind.co", source: "/tools/battlecard-generator", created_at: ago(0.8), approved_at: null, invited_at: null },
       { email: "rahul.pmm@example.com", source: "signed up", created_at: ago(1), approved_at: null, invited_at: null },
       { email: "meera@contentco.io", source: "landing", created_at: ago(3), approved_at: ago(2), invited_at: ago(2) },
     ],

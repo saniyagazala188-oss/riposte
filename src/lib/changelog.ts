@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-22T00:30:00+05:30",
+    title: "Know which page brought each sign-up",
+    body: "When someone joins the waitlist, Riposte now notes the page they joined from, like the battlecard tool, a Compare page or the product page. The beta admin view shows it next to each person, with a count per page, and the sign-up email says it too.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-22T00:15:00+05:30",
     title: "A free battlecard generator",
     body: "Anyone can now make a one-page sales battlecard for free, with no sign-up. Enter your product and a competitor's website, and it reads their homepage and pricing page to draft 8 parts: who they are, who they sell to, why you win, why you lose, pricing, objections, questions to ask and proof to add. It never guesses prices, and it lists what to check before sharing. Up to 3 cards a day.",

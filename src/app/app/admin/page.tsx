@@ -6,6 +6,7 @@ import { inviteMessage } from "@/lib/invite";
 import { card, inputClass, primaryButton } from "@/components/styles";
 import { LinkTabs, PageHeader, PanelHead } from "@/components/ui";
 import { SubmitButton } from "@/components/FormButtons";
+import { pageLabel } from "@/lib/joinSource";
 import { timeAgo } from "@/lib/time";
 import { approveEmail, unapproveEmail } from "./actions";
 import { CopyInvite } from "./CopyInvite";
@@ -64,6 +65,16 @@ export default async function AdminPage({
   const signedUp = new Set((profiles ?? []).map((p) => String(p.email ?? "").toLowerCase()));
   const waiting = rows.filter((r) => !r.approved_at);
   const approved = rows.filter((r) => r.approved_at && !adminEmails().includes(r.email));
+  // Count of sign-ups per page, busiest first (admins left out).
+  const joinedFrom = Object.entries(
+    rows
+      .filter((r) => !adminEmails().includes(r.email))
+      .reduce<Record<string, number>>((acc, r) => {
+        const k = pageLabel(r.source);
+        acc[k] = (acc[k] ?? 0) + 1;
+        return acc;
+      }, {}),
+  ).sort((a, b) => b[1] - a[1]);
   const answers = (feedback ?? []) as Feedback[];
   // Screenshots are private: make short-lived links for the ones on this page.
   const shotPaths = answers.flatMap((f) => f.screenshot_paths ?? []);
@@ -227,12 +238,22 @@ export default async function AdminPage({
           </>
         ) : (
           <ul className="divide-y divide-line">
+            {joinedFrom.length > 0 && (
+              <li className="flex flex-wrap items-center gap-2 px-4 py-3 text-xs">
+                <span className="font-semibold text-muted">Where people joined:</span>
+                {joinedFrom.map(([label, n]) => (
+                  <span key={label} className="rounded-full bg-accent-soft px-2.5 py-1 font-semibold text-accent">
+                    {label} · {n}
+                  </span>
+                ))}
+              </li>
+            )}
             {shown.map((r) => (
               <li key={r.email} className="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-semibold">{r.email}</p>
                   <p className="text-xs text-muted">
-                    {r.source ?? "landing"} · joined {timeAgo(r.created_at)}
+                    {pageLabel(r.source)} · joined {timeAgo(r.created_at)}
                     {r.approved_at && ` · approved ${timeAgo(r.approved_at)}`}
                     {r.approved_at && (signedUp.has(r.email) ? " · signed up" : " · not signed up yet")}
                     {r.invited_at && " · invite emailed"}

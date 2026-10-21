@@ -10,9 +10,14 @@ export function WaitlistForm({ id = "waitlist-email" }: { id?: string }) {
   const [state, action, pending] = useActionState(joinWaitlist, initial);
   // Bot trap: when the form appeared. Filled in after the page loads, so bots that post instantly are caught.
   const [shownAt, setShownAt] = useState("");
-  useEffect(() => setShownAt(String(Date.now())), []);
+  // The page they're on, so Admin can show where each person joined from.
+  const [from, setFrom] = useState("");
   useEffect(() => {
-    if (state.status === "joined") track("join_waitlist");
+    setShownAt(String(Date.now()));
+    setFrom(window.location.pathname);
+  }, []);
+  useEffect(() => {
+    if (state.status === "joined") track("join_waitlist", { join_page: window.location.pathname });
   }, [state.status]);
 
   if (state.status === "joined") {
@@ -29,6 +34,7 @@ export function WaitlistForm({ id = "waitlist-email" }: { id?: string }) {
         Work email
       </label>
       <input type="hidden" name="t" value={shownAt} />
+      <input type="hidden" name="from" value={from} />
       {/* Bot trap: hidden from people and screen readers; only bots fill it in. */}
       <div aria-hidden="true" style={{ position: "absolute", left: "-10000px", width: 1, height: 1, overflow: "hidden" }}>
         <label htmlFor={`${id}-website`}>Website</label>

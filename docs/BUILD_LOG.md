@@ -798,3 +798,9 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 ## Fix: battlecard generator said "resting" (22 Oct, 00:05)
 - 0020 created tool_runs without a grant, and this project needs explicit grants (like 0018), so the server's count query was denied.
 - Added `grant select, insert on public.tool_runs to service_role;` to 0020; Saniya runs it once in the SQL Editor.
+
+## Waitlist: save the page people joined from (22 Oct, 00:30)
+- WaitlistForm sends the current path in a hidden `from` field; joinWaitlist saves it (cleaned by cleanPath) in waitlist.source instead of always "landing". No database change needed.
+- src/lib/joinSource.ts: pageLabel() turns paths into names (Product page, Battlecard tool, Compare: Crayon, Blog: …). Old rows ("landing", "signed up") still show.
+- Admin: each person shows where they joined, plus a "Where people joined" row with counts. The new-sign-up email names the page.
+- GA4: join_waitlist event now carries join_page. No UTMs on internal links (they'd overwrite the real source).
