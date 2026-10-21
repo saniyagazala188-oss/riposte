@@ -786,3 +786,11 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - Schema: WebPage + BreadcrumbList, ItemList, FAQPage; hub is a CollectionPage.
 - Facts checked 21 Oct 2026: crayon.co + crayon.co/integrations, klue.com + klue.com/salesforce, Semrush KB + news for Kompyte (kompyte.com wasn't reachable), visualping.io/business/pricing. Only Visualping prices shown (public). No logos.
 - Header: "Compare ▾" dropdown (hover/focus). Footer: Compare line. Sitemap + llms.txt updated.
+
+## Free tool: battlecard generator (22 Oct, 00:15)
+- New public page /tools/battlecard-generator (no login). Form: your product, what it does, your site (optional), competitor site.
+- src/lib/tools/battlecard.ts reads the competitor homepage + pricing page (link found on the homepage, else /pricing) and your homepage, then Gemini drafts the 8 battlecard parts from the blog template, plus "check these". Prompt: only facts from their pages, never guess prices, honest "why we lose".
+- Server action: honeypot + 2-second trap, input checks, limits of 3 runs per visitor per day and 150 a day overall (to cap AI cost). Only a hashed IP is stored, in new table tool_runs (migration 0020, RLS on with no policies, server-only). maxDuration 60s.
+- Result: card with Copy as text, a "this goes out of date" band with the waitlist form, and runs left today. Fields stay filled after sending.
+- Page: Short answer, the 8 parts, CTA band, 7 FAQs, WebApplication + FAQPage + Breadcrumb schema. Linked from the footer ("Free tools"), the battlecard template blog, sitemap and llms.txt.
+- Local preview (mock, no AI key) shows a sample card with made-up names.

@@ -110,6 +110,12 @@ export function SiteFooter() {
             </Link>
           ))}
         </nav>
+        <nav className="flex w-full flex-wrap gap-x-4 gap-y-1 text-xs" aria-label="Free tools">
+          <span className="font-semibold">Free tools:</span>
+          <Link href="/tools/battlecard-generator" className="hover:text-ink">
+            Battlecard generator
+          </Link>
+        </nav>
       </div>
     </footer>
   );
