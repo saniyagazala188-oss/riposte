@@ -823,4 +823,5 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - Email forwarding with ImprovMX (free plan): a catch-all on useriposte.com forwards to the founder's Gmail. Added in Vercel DNS: MX mx1.improvmx.com (10), MX mx2.improvmx.com (20), TXT v=spf1 include:spf.improvmx.com ~all. Resend records (send/rsend/resend._domainkey) untouched. Tested: a mail to hello@ arrived.
 - CONTACT_EMAIL is now hello@useriposte.com (tools hub, Compare pages, Privacy, Terms, next-batch email).
 - Waitlist label: "/tools" now shows as "Free tools page".
-- Next: EMAIL_REPLY_TO=hello@useriposte.com in Vercel; Gmail "Send mail as" hello@ through Resend SMTP so replies come from the Riposte address.
+- Done (23 Oct, 01:10): EMAIL_REPLY_TO=hello@useriposte.com set in Vercel and redeployed. Gmail "Send mail as" hello@useriposte.com through Resend SMTP (smtp.resend.com:587, TLS, user resend, a sending-only key named "Gmail send-as"). Tested: mail from hello@ arrived in the inbox as "Saniya from Riposte".
+- To do: replace that Resend key with a fresh one (part of it showed in a screenshot) and update it in Gmail.
