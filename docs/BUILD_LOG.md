@@ -811,3 +811,10 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - Live: Battlecard generator. Coming soon: Does AI recommend you? (card links to the beta form, not to a page).
 - Page: Short answer, category sections, CTA band, 5 FAQs (incl. what's stored: hashed IP, competitor site, time), "suggest a tool" email box, waitlist. Schema: CollectionPage + ItemList + Breadcrumb + FAQPage.
 - Battlecard page: visible breadcrumb "Free tools / Battlecard generator", schema breadcrumb now has 3 levels, link to all free tools.
+
+## Admin: Next batch and Delete on the waitlist (23 Oct, 00:15)
+- Each waiting person now has three buttons: Delete, Next batch, Approve.
+- Approve: unchanged, sends the "You're in" welcome email (from alerts@useriposte.com), and clears any next-batch mark.
+- Next batch: sets waitlist.next_batch_at and emails a polite "this round is full, your spot is saved" note (src/lib/nextBatch.ts). They move to a new "Next batch" tab, where they can be approved or deleted later. If the email can't go out, the banner shows the message to copy.
+- Delete: asks "Yes, delete" first, then removes the row for good (only unapproved people). No email. For bots and junk sign-ups.
+- Migration 0021: adds next_batch_at and grants delete on waitlist to service_role. The page still loads if 0021 hasn't run yet (reads without the new column).
