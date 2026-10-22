@@ -7,6 +7,7 @@ import { isAdmin } from "@/lib/access";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { emailConfigured, sendEmail } from "@/lib/notify/send";
 import { inviteMessage } from "@/lib/invite";
+import { nextBatchMessage } from "@/lib/nextBatch";
 
 async function requireAdmin() {
   const { user } = await requireUser();
@@ -26,6 +27,8 @@ export async function approveEmail(formData: FormData) {
   const { error } = await db
     .from("waitlist")
     .upsert({ email, source: String(formData.get("source") ?? "") || "added by admin", approved_at: now }, { onConflict: "email" });
+  // If they were in the next batch, that's done now (fine if the 0021 column isn't there yet).
+  await db.from("waitlist").update({ next_batch_at: null }).eq("email", email);
   if (error) redirect(`/app/admin?error=save`);
 
   let mail = "off";
@@ -49,4 +52,35 @@ export async function unapproveEmail(formData: FormData) {
   await db.from("waitlist").update({ approved_at: null }).eq("email", email);
   revalidatePath("/app/admin");
   redirect("/app/admin");
+}
+
+// Moves someone to the next batch: they stay on the list and get a polite "your spot is saved" email.
+export async function moveToNextBatch(formData: FormData) {
+  const db = await requireAdmin();
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const { error } = await db.from("waitlist").update({ next_batch_at: new Date().toISOString() }).eq("email", email);
+  if (error) redirect("/app/admin?error=batch");
+
+  let mail = "off";
+  if (emailConfigured()) {
+    try {
+      await sendEmail(email, nextBatchMessage());
+      mail = "sent";
+    } catch {
+      mail = "failed";
+    }
+  }
+  revalidatePath("/app/admin");
+  redirect(`/app/admin?batched=${encodeURIComponent(email)}&mail=${mail}`);
+}
+
+// Deletes a waitlist row for good (for bots and junk sign-ups). No email is sent.
+export async function deleteFromWaitlist(formData: FormData) {
+  const db = await requireAdmin();
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const view = String(formData.get("view") ?? "");
+  const { error } = await db.from("waitlist").delete().eq("email", email).is("approved_at", null);
+  if (error) redirect("/app/admin?error=delete");
+  revalidatePath("/app/admin");
+  redirect(`/app/admin?${view === "next" ? "view=next&" : ""}deleted=${encodeURIComponent(email)}`);
 }

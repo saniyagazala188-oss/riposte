@@ -5,17 +5,18 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { inviteMessage } from "@/lib/invite";
 import { card, inputClass, primaryButton } from "@/components/styles";
 import { LinkTabs, PageHeader, PanelHead } from "@/components/ui";
-import { SubmitButton } from "@/components/FormButtons";
+import { ConfirmSubmit, SubmitButton } from "@/components/FormButtons";
+import { nextBatchMessage } from "@/lib/nextBatch";
 import { pageLabel } from "@/lib/joinSource";
 import { timeAgo } from "@/lib/time";
-import { approveEmail, unapproveEmail } from "./actions";
+import { approveEmail, deleteFromWaitlist, moveToNextBatch, unapproveEmail } from "./actions";
 import { CopyInvite } from "./CopyInvite";
 import { SurveyResults, type SurveyRow } from "./SurveyResults";
 
 export const metadata = { title: "Admin · Riposte" };
 export const dynamic = "force-dynamic";
 
-type Row = { email: string; source: string | null; created_at: string; approved_at: string | null; invited_at: string | null };
+type Row = { email: string; source: string | null; created_at: string; approved_at: string | null; invited_at: string | null; next_batch_at?: string | null };
 type Feedback = {
   id: string;
   email: string | null;
@@ -35,21 +36,31 @@ const ERRORS: Record<string, string> = {
   key: "The SUPABASE_SERVICE_ROLE_KEY setting is missing, so the list can't be read.",
   email: "That doesn't look like an email address.",
   save: "Couldn't save the approval. Has migration 0014 been run?",
+  batch: "Couldn't move them to the next batch. Has migration 0021 been run?",
+  delete: "Couldn't delete them. Has migration 0021 been run?",
 };
 
 export default async function AdminPage({
   searchParams,
 }: {
-  searchParams: Promise<{ view?: string; approved?: string; mail?: string; error?: string }>;
+  searchParams: Promise<{ view?: string; approved?: string; batched?: string; deleted?: string; mail?: string; error?: string }>;
 }) {
   const params = await searchParams;
   const { user } = await requireUser();
   if (!isAdmin(user.email)) redirect("/app");
   const db = createAdminClient();
 
+  // Reads the waitlist with the "next batch" date, or without it if migration 0021 hasn't run yet.
+  const readList = async () => {
+    if (!db) return { data: null, error: null };
+    const cols = "email, source, created_at, approved_at, invited_at";
+    const q = (c: string) => db.from("waitlist").select(c).order("created_at", { ascending: false }).limit(500);
+    const withBatch = await q(`${cols}, next_batch_at`);
+    return withBatch.error ? await q(cols) : withBatch;
+  };
   const [{ data: list, error: listError }, { data: profiles }, { data: feedback }, { data: surveyRows }] = db
     ? await Promise.all([
-        db.from("waitlist").select("email, source, created_at, approved_at, invited_at").order("created_at", { ascending: false }).limit(500),
+        readList(),
         db.from("profiles").select("email").limit(2000),
         db.from("feedback").select("*").order("created_at", { ascending: false }).limit(200),
         db
@@ -61,9 +72,10 @@ export default async function AdminPage({
     : [{ data: null, error: null }, { data: null }, { data: null }, { data: null }];
   const survey = (surveyRows ?? []) as SurveyRow[];
 
-  const rows = (list ?? []) as Row[];
+  const rows = (list ?? []) as unknown as Row[];
   const signedUp = new Set((profiles ?? []).map((p) => String(p.email ?? "").toLowerCase()));
-  const waiting = rows.filter((r) => !r.approved_at);
+  const waiting = rows.filter((r) => !r.approved_at && !r.next_batch_at);
+  const nextBatch = rows.filter((r) => !r.approved_at && r.next_batch_at);
   const approved = rows.filter((r) => r.approved_at && !adminEmails().includes(r.email));
   // Count of sign-ups per page, busiest first (admins left out).
   const joinedFrom = Object.entries(
@@ -87,9 +99,11 @@ export default async function AdminPage({
   for (const f of answers) if (f.would_pay && f.would_pay in pay) pay[f.would_pay as keyof typeof pay]++;
 
   const view =
-    params.view === "approved" ? "approved" : params.view === "feedback" ? "feedback" : params.view === "survey" ? "survey" : "waiting";
-  const shown = view === "approved" ? approved : waiting;
+    params.view === "approved" ? "approved" : params.view === "next" ? "next" : params.view === "feedback" ? "feedback" : params.view === "survey" ? "survey" : "waiting";
+  const shown = view === "approved" ? approved : view === "next" ? nextBatch : waiting;
   const justApproved = params.approved ? decodeURIComponent(params.approved) : "";
+  const justBatched = params.batched ? decodeURIComponent(params.batched) : "";
+  const justDeleted = params.deleted ? decodeURIComponent(params.deleted) : "";
 
   return (
     <div>
@@ -122,6 +136,21 @@ export default async function AdminPage({
           )}
         </div>
       )}
+
+      {justBatched && (
+        <div className="mt-4 rounded-xl border border-line bg-surface p-4 text-sm">
+          <p className="font-semibold">✓ {justBatched} is in the next batch.</p>
+          {params.mail === "sent" ? (
+            <p className="mt-1 text-muted">They&apos;ve been emailed that their spot is saved. Find them under the Next batch tab when you&apos;re ready to approve.</p>
+          ) : (
+            <>
+              <p className="mt-1 text-muted">The email didn&apos;t go out, so you can send this message yourself.</p>
+              <CopyInvite text={nextBatchMessage().text} />
+            </>
+          )}
+        </div>
+      )}
+      {justDeleted && <p className="mt-4 rounded-lg bg-bg px-4 py-3 text-sm text-muted">Deleted {justDeleted} from the waitlist. No email was sent.</p>}
 
       <div className="mt-6 grid gap-4 sm:grid-cols-4">
         {[
@@ -156,6 +185,7 @@ export default async function AdminPage({
             active={view}
             tabs={[
               { key: "waiting", label: "Waiting", count: waiting.length, href: "/app/admin" },
+              { key: "next", label: "Next batch", count: nextBatch.length, href: "/app/admin?view=next" },
               { key: "approved", label: "Approved", count: approved.length, href: "/app/admin?view=approved" },
               { key: "feedback", label: "Problems", count: answers.length, href: "/app/admin?view=feedback" },
               { key: "survey", label: "Survey", count: survey.filter((r) => r.answered_at).length, href: "/app/admin?view=survey" },
@@ -254,6 +284,7 @@ export default async function AdminPage({
                   <p className="truncate font-semibold">{r.email}</p>
                   <p className="text-xs text-muted">
                     {pageLabel(r.source)} · joined {timeAgo(r.created_at)}
+                    {r.next_batch_at && !r.approved_at && ` · moved to next batch ${timeAgo(r.next_batch_at)}`}
                     {r.approved_at && ` · approved ${timeAgo(r.approved_at)}`}
                     {r.approved_at && (signedUp.has(r.email) ? " · signed up" : " · not signed up yet")}
                     {r.invited_at && " · invite emailed"}
@@ -267,19 +298,32 @@ export default async function AdminPage({
                     </SubmitButton>
                   </form>
                 ) : (
-                  <form action={approveEmail}>
-                    <input type="hidden" name="email" value={r.email} />
-                    <input type="hidden" name="source" value={r.source ?? "landing"} />
-                    <SubmitButton pendingLabel="Approving…" className={primaryButton}>
-                      Approve
-                    </SubmitButton>
-                  </form>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <form action={deleteFromWaitlist}>
+                      <input type="hidden" name="email" value={r.email} />
+                      <input type="hidden" name="view" value={view} />
+                      <ConfirmSubmit label="Delete" confirmLabel="Yes, delete" pendingLabel="Deleting…" />
+                    </form>
+                    {!r.next_batch_at && (
+                      <form action={moveToNextBatch}>
+                        <input type="hidden" name="email" value={r.email} />
+                        <SubmitButton pendingLabel="Moving…">Next batch</SubmitButton>
+                      </form>
+                    )}
+                    <form action={approveEmail}>
+                      <input type="hidden" name="email" value={r.email} />
+                      <input type="hidden" name="source" value={r.source ?? "landing"} />
+                      <SubmitButton pendingLabel="Approving…" className={primaryButton}>
+                        Approve
+                      </SubmitButton>
+                    </form>
+                  </div>
                 )}
               </li>
             ))}
             {!shown.length && (
               <li className="px-4 py-6 text-center text-sm text-muted">
-                {view === "waiting" ? "Nobody is waiting right now." : "Nobody approved yet."}
+                {view === "waiting" ? "Nobody is waiting right now." : view === "next" ? "Nobody in the next batch yet." : "Nobody approved yet."}
               </li>
             )}
           </ul>

@@ -448,6 +448,8 @@ export function mockTables(): Record<string, Row[]> {
       { email: "dev@beacon.io", source: "/alternatives/crayon", created_at: ago(0.5), approved_at: null, invited_at: null },
       { email: "li@northwind.co", source: "/tools/battlecard-generator", created_at: ago(0.8), approved_at: null, invited_at: null },
       { email: "rahul.pmm@example.com", source: "signed up", created_at: ago(1), approved_at: null, invited_at: null },
+      { email: "x7kq2bot@yzmail.example", source: "signed up", created_at: ago(4), approved_at: null, invited_at: null },
+      { email: "anita@clarion.app", source: "/blog/how-to-track-competitors", created_at: ago(2), approved_at: null, invited_at: null, next_batch_at: ago(1.5) },
       { email: "meera@contentco.io", source: "landing", created_at: ago(3), approved_at: ago(2), invited_at: ago(2) },
     ],
     beta_survey: [
