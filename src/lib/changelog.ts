@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-23T01:30:00+05:30",
+    title: "A kind note when someone leaves the waitlist",
+    body: "When a real person is removed from the waitlist, for example a duplicate sign-up or someone who asked to leave, they now get a short, polite note saying so, with a way back in. Fake sign-ups are still removed quietly.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-23T00:50:00+05:30",
     title: "A Riposte email address",
     body: "Riposte now has its own contact address, hello@useriposte.com. It's on the free tools page, the Compare pages, the Privacy and Terms pages, and in waitlist emails.",

@@ -25,3 +25,22 @@ ${AUTHOR.name.split(" ")[0]}, from Riposte`;
     .join("");
   return { subject: "Your spot in the next Riposte batch", text, html };
 }
+
+// Sent when the admin removes a real person from the waitlist (not a bot). No reason given,
+// so it fits any case: a duplicate, someone who asked to leave, or not the right fit yet.
+export function removedMessage() {
+  const site = SITE_URL.replace(/^https?:\/\//, "");
+  const text = `Hi,
+
+Thank you for your interest in Riposte. I've removed your email from the waitlist, so you won't get any more emails from us.
+
+If this was a mistake, or you'd like to join again later, you're always welcome back at ${site}.
+
+Take care,
+${AUTHOR.name.split(" ")[0]}, from Riposte`;
+  const html = text
+    .split("\n\n")
+    .map((p) => `<p>${p.replace(`${site}.`, `<a href="${SITE_URL}">${site}</a>.`).replace(/\n/g, "<br>")}</p>`)
+    .join("");
+  return { subject: "You've been removed from the Riposte waitlist", text, html };
+}

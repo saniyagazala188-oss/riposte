@@ -4,7 +4,7 @@ import { useState } from "react";
 import { secondaryButton } from "@/components/styles";
 
 // The invite message, folded away behind a preview, with a one-click copy.
-export function CopyInvite({ text }: { text: string }) {
+export function CopyInvite({ text, label = "Copy the invite message" }: { text: string; label?: string }) {
   const [copied, setCopied] = useState(false);
   const [open, setOpen] = useState(false);
   return (
@@ -23,7 +23,7 @@ export function CopyInvite({ text }: { text: string }) {
             }
           }}
         >
-          {copied ? "Copied ✓" : "Copy the invite message"}
+          {copied ? "Copied ✓" : label}
         </button>
         <button type="button" onClick={() => setOpen((v) => !v)} className="text-sm font-medium text-accent hover:underline">
           {open ? "Hide message" : "Preview message"}

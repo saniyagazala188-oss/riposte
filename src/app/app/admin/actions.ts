@@ -7,7 +7,7 @@ import { isAdmin } from "@/lib/access";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { emailConfigured, sendEmail } from "@/lib/notify/send";
 import { inviteMessage } from "@/lib/invite";
-import { nextBatchMessage } from "@/lib/nextBatch";
+import { nextBatchMessage, removedMessage } from "@/lib/nextBatch";
 
 async function requireAdmin() {
   const { user } = await requireUser();
@@ -74,13 +74,26 @@ export async function moveToNextBatch(formData: FormData) {
   redirect(`/app/admin?batched=${encodeURIComponent(email)}&mail=${mail}`);
 }
 
-// Deletes a waitlist row for good (for bots and junk sign-ups). No email is sent.
+// Deletes a waitlist row for good. A bot gets no email; a real person can get a short, kind note.
 export async function deleteFromWaitlist(formData: FormData) {
   const db = await requireAdmin();
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const view = String(formData.get("view") ?? "");
   const { error } = await db.from("waitlist").delete().eq("email", email).is("approved_at", null);
   if (error) redirect("/app/admin?error=delete");
+
+  let mail = "none";
+  if (formData.get("note") === "1") {
+    mail = "off";
+    if (emailConfigured()) {
+      try {
+        await sendEmail(email, removedMessage());
+        mail = "sent";
+      } catch {
+        mail = "failed";
+      }
+    }
+  }
   revalidatePath("/app/admin");
-  redirect(`/app/admin?${view === "next" ? "view=next&" : ""}deleted=${encodeURIComponent(email)}`);
+  redirect(`/app/admin?${view === "next" ? "view=next&" : ""}deleted=${encodeURIComponent(email)}&mail=${mail}`);
 }

@@ -825,3 +825,9 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - Waitlist label: "/tools" now shows as "Free tools page".
 - Done (23 Oct, 01:10): EMAIL_REPLY_TO=hello@useriposte.com set in Vercel and redeployed. Gmail "Send mail as" hello@useriposte.com through Resend SMTP (smtp.resend.com:587, TLS, user resend, a sending-only key named "Gmail send-as"). Tested: mail from hello@ arrived in the inbox as "Saniya from Riposte".
 - To do: replace that Resend key with a fresh one (part of it showed in a screenshot) and update it in Gmail.
+
+## Admin: Delete asks "bot or real person?" (23 Oct, 01:30)
+- Delete now opens two choices: "Delete (bot, no email)" and "Remove with a note", plus Cancel (src/app/app/admin/DeleteChoice.tsx; the clicked button sends note=0/1).
+- Remove with a note: deletes the row, then emails removedMessage() (src/lib/nextBatch.ts): thanks, you've been removed, no more emails, welcome back at useriposte.com. No reason given, so it fits any case. If the email fails, the banner shows the note to copy.
+- Bots stay silent on purpose: emails to fake or trap addresses hurt how much Gmail trusts alerts@useriposte.com.
+- CopyInvite takes a label, so each banner's copy button names the right message.

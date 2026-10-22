@@ -5,8 +5,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { inviteMessage } from "@/lib/invite";
 import { card, inputClass, primaryButton } from "@/components/styles";
 import { LinkTabs, PageHeader, PanelHead } from "@/components/ui";
-import { ConfirmSubmit, SubmitButton } from "@/components/FormButtons";
-import { nextBatchMessage } from "@/lib/nextBatch";
+import { SubmitButton } from "@/components/FormButtons";
+import { nextBatchMessage, removedMessage } from "@/lib/nextBatch";
+import { DeleteChoice } from "./DeleteChoice";
 import { pageLabel } from "@/lib/joinSource";
 import { timeAgo } from "@/lib/time";
 import { approveEmail, deleteFromWaitlist, moveToNextBatch, unapproveEmail } from "./actions";
@@ -145,12 +146,23 @@ export default async function AdminPage({
           ) : (
             <>
               <p className="mt-1 text-muted">The email didn&apos;t go out, so you can send this message yourself.</p>
-              <CopyInvite text={nextBatchMessage().text} />
+              <CopyInvite text={nextBatchMessage().text} label="Copy the message" />
             </>
           )}
         </div>
       )}
-      {justDeleted && <p className="mt-4 rounded-lg bg-bg px-4 py-3 text-sm text-muted">Deleted {justDeleted} from the waitlist. No email was sent.</p>}
+      {justDeleted &&
+        (params.mail === "sent" ? (
+          <p className="mt-4 rounded-lg bg-bg px-4 py-3 text-sm text-muted">Removed {justDeleted} from the waitlist and sent them a short note.</p>
+        ) : params.mail === "failed" || params.mail === "off" ? (
+          <div className="mt-4 rounded-xl border border-line bg-surface p-4 text-sm">
+            <p className="font-semibold">Removed {justDeleted}, but the note didn&apos;t go out.</p>
+            <p className="mt-1 text-muted">You can send it yourself:</p>
+            <CopyInvite text={removedMessage().text} label="Copy the note" />
+          </div>
+        ) : (
+          <p className="mt-4 rounded-lg bg-bg px-4 py-3 text-sm text-muted">Deleted {justDeleted} from the waitlist. No email was sent.</p>
+        ))}
 
       <div className="mt-6 grid gap-4 sm:grid-cols-4">
         {[
@@ -302,7 +314,7 @@ export default async function AdminPage({
                     <form action={deleteFromWaitlist}>
                       <input type="hidden" name="email" value={r.email} />
                       <input type="hidden" name="view" value={view} />
-                      <ConfirmSubmit label="Delete" confirmLabel="Yes, delete" pendingLabel="Deleting…" />
+                      <DeleteChoice />
                     </form>
                     {!r.next_batch_at && (
                       <form action={moveToNextBatch}>
