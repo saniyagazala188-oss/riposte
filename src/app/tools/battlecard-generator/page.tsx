@@ -49,7 +49,12 @@ export default function BattlecardGenerator() {
       <SiteHeader />
       <main>
         <section className="mx-auto max-w-3xl px-4 pt-10 pb-10 lg:pt-14">
-          <p className="text-xs font-semibold uppercase tracking-widest text-accent">Free tool</p>
+          <nav aria-label="Breadcrumb" className="text-xs font-semibold uppercase tracking-widest text-accent">
+            <Link href="/tools" className="hover:underline">
+              Free tools
+            </Link>{" "}
+            <span aria-hidden className="text-muted">/</span> Battlecard generator
+          </nav>
           <h1 className="mt-3 font-display text-4xl leading-[1.05] font-extrabold tracking-tight sm:text-5xl">Free battlecard generator</h1>
           <p className="mt-4 text-lg text-muted">A one-page sales battlecard from any competitor&apos;s website, in about 30 seconds.</p>
           <div className="mt-6">
@@ -124,6 +129,10 @@ export default function BattlecardGenerator() {
             <Link href="/alternatives" className="font-semibold text-accent hover:underline">
               See how competitor tracking tools compare
             </Link>
+            . Or browse{" "}
+            <Link href="/tools" className="font-semibold text-accent hover:underline">
+              all free tools
+            </Link>
             .
           </p>
         </section>
@@ -146,7 +155,8 @@ export default function BattlecardGenerator() {
                 "@type": "BreadcrumbList",
                 itemListElement: [
                   { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-                  { "@type": "ListItem", position: 2, name: "Battlecard generator", item: URL },
+                  { "@type": "ListItem", position: 2, name: "Free tools", item: `${SITE_URL}/tools` },
+                  { "@type": "ListItem", position: 3, name: "Battlecard generator", item: URL },
                 ],
               },
             },

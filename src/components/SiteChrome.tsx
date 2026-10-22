@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { ALTERNATIVES } from "@/lib/alternatives";
+import { LIVE_TOOLS, toolHref } from "@/lib/freeTools";
 
 // Header and footer for the public pages (landing, blog, changelog, about).
 
 const NAV = [
   { href: "/competitor-tracking-tool", label: "Product" },
   { href: "/alternatives", label: "Compare" },
+  { href: "/tools", label: "Free tools" },
   { href: "/docs", label: "Docs" },
   { href: "/blog", label: "Blog" },
   { href: "/changelog", label: "Changelog" },
@@ -112,8 +114,13 @@ export function SiteFooter() {
         </nav>
         <nav className="flex w-full flex-wrap gap-x-4 gap-y-1 text-xs" aria-label="Free tools">
           <span className="font-semibold">Free tools:</span>
-          <Link href="/tools/battlecard-generator" className="hover:text-ink">
-            Battlecard generator
+          {LIVE_TOOLS.map((t) => (
+            <Link key={t.slug} href={toolHref(t)} className="hover:text-ink">
+              {t.name}
+            </Link>
+          ))}
+          <Link href="/tools" className="hover:text-ink">
+            All free tools
           </Link>
         </nav>
       </div>

@@ -15,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...posts.map((p) => ({ url: `${SITE_URL}/blog/${p.slug}`, lastModified: p.updated, changeFrequency: "monthly" as const, priority: 0.7 })),
     { url: `${SITE_URL}/competitor-tracking-tool`, lastModified: "2026-10-21", changeFrequency: "monthly", priority: 0.9 },
     { url: `${SITE_URL}/alternatives`, lastModified: CHECKED, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${SITE_URL}/tools`, lastModified: "2026-10-22", changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}/tools/battlecard-generator`, lastModified: "2026-10-21", changeFrequency: "monthly", priority: 0.8 },
     ...ALTERNATIVES.map((a) => ({ url: `${SITE_URL}/alternatives/${a.slug}`, lastModified: CHECKED, changeFrequency: "monthly" as const, priority: 0.8 })),
     { url: `${SITE_URL}/docs`, lastModified: latest, changeFrequency: "weekly", priority: 0.7 },
