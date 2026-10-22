@@ -804,3 +804,10 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - src/lib/joinSource.ts: pageLabel() turns paths into names (Product page, Battlecard tool, Compare: Crayon, Blog: …). Old rows ("landing", "signed up") still show.
 - Admin: each person shows where they joined, plus a "Where people joined" row with counts. The new-sign-up email names the page.
 - GA4: join_waitlist event now carries join_page. No UTMs on internal links (they'd overwrite the real source).
+
+## Free tools hub (22 Oct, 23:45)
+- New page /tools (it used to 404), inspired by graphed.com/calculators: one list of every free tool, grouped by category, each card showing status (live / coming soon), time per run and what you get.
+- src/lib/freeTools.ts is the single list. The hub, header nav ("Free tools"), footer line, sitemap and llms.txt read from it, so each new tool needs one entry.
+- Live: Battlecard generator. Coming soon: Does AI recommend you? (card links to the beta form, not to a page).
+- Page: Short answer, category sections, CTA band, 5 FAQs (incl. what's stored: hashed IP, competitor site, time), "suggest a tool" email box, waitlist. Schema: CollectionPage + ItemList + Breadcrumb + FAQPage.
+- Battlecard page: visible breadcrumb "Free tools / Battlecard generator", schema breadcrumb now has 3 levels, link to all free tools.

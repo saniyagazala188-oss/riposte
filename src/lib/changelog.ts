@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-22T23:45:00+05:30",
+    title: "One home for every free tool",
+    body: "A new Free tools page lists every free Riposte tool in one place, grouped by the job it does, with what each one gives you and how long it takes. The battlecard generator is live there, and the next tool, Does AI recommend you?, is marked as coming soon. Free tools is now in the menu and the footer.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-22T00:30:00+05:30",
     title: "Know which page brought each sign-up",
     body: "When someone joins the waitlist, Riposte now notes the page they joined from, like the battlecard tool, a Compare page or the product page. The beta admin view shows it next to each person, with a count per page, and the sign-up email says it too.",

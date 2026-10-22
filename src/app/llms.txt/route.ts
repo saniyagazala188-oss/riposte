@@ -23,6 +23,7 @@ Made by ${AUTHOR.name}, a product marketer based in Bengaluru, India. Built in p
 - [Klue alternatives](${SITE_URL}/alternatives/klue)
 - [Kompyte alternatives](${SITE_URL}/alternatives/kompyte)
 - [Visualping alternatives](${SITE_URL}/alternatives/visualping)
+- [Free tools](${SITE_URL}/tools): every free Riposte tool for product marketers, no sign-up
 - [Free battlecard generator](${SITE_URL}/tools/battlecard-generator): enter a competitor's website and get a one-page sales battlecard drafted from their own pages
 - [Docs](${SITE_URL}/docs): how to set up and use every Riposte feature
 - [Blog](${SITE_URL}/blog): guides on competitive intelligence, content and AI search
