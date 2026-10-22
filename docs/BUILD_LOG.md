@@ -818,3 +818,9 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - Next batch: sets waitlist.next_batch_at and emails a polite "this round is full, your spot is saved" note (src/lib/nextBatch.ts). They move to a new "Next batch" tab, where they can be approved or deleted later. If the email can't go out, the banner shows the message to copy.
 - Delete: asks "Yes, delete" first, then removes the row for good (only unapproved people). No email. For bots and junk sign-ups.
 - Migration 0021: adds next_batch_at and grants delete on waitlist to service_role. The page still loads if 0021 hasn't run yet (reads without the new column).
+
+## hello@useriposte.com (23 Oct, 00:50)
+- Email forwarding with ImprovMX (free plan): a catch-all on useriposte.com forwards to the founder's Gmail. Added in Vercel DNS: MX mx1.improvmx.com (10), MX mx2.improvmx.com (20), TXT v=spf1 include:spf.improvmx.com ~all. Resend records (send/rsend/resend._domainkey) untouched. Tested: a mail to hello@ arrived.
+- CONTACT_EMAIL is now hello@useriposte.com (tools hub, Compare pages, Privacy, Terms, next-batch email).
+- Waitlist label: "/tools" now shows as "Free tools page".
+- Next: EMAIL_REPLY_TO=hello@useriposte.com in Vercel; Gmail "Send mail as" hello@ through Resend SMTP so replies come from the Riposte address.

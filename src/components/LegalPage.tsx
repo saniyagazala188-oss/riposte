@@ -1,6 +1,6 @@
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 
-export const CONTACT_EMAIL = "saniyagazala188@gmail.com";
+export const CONTACT_EMAIL = "hello@useriposte.com";
 export const LEGAL_UPDATED = "17 October 2026";
 
 export type LegalSection = { heading: string; body: React.ReactNode };
