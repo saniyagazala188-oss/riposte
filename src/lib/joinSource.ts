@@ -12,6 +12,7 @@ const PAGES: Record<string, string> = {
   "/": "Homepage",
   "/competitor-tracking-tool": "Product page",
   "/tools/battlecard-generator": "Battlecard tool",
+  "/tools": "Free tools page",
   "/alternatives": "Compare page",
   "/blog": "Blog home",
   "/docs": "Docs home",

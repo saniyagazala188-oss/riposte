@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-23T00:50:00+05:30",
+    title: "A Riposte email address",
+    body: "Riposte now has its own contact address, hello@useriposte.com. It's on the free tools page, the Compare pages, the Privacy and Terms pages, and in waitlist emails.",
+    kind: "decision",
+  },
+  {
     at: "2026-10-23T00:15:00+05:30",
     title: "Beta invites in batches",
     body: "The beta opens a few people at a time. When a round is full, people on the waitlist now get a short email saying their spot is saved for the next batch, and they hear back as soon as it opens. Approved people still get the welcome email with how to start.",
