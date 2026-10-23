@@ -37,7 +37,7 @@ export default function BlogIndex() {
   }));
 
   return (
-    <div className="min-h-dvh">
+    <div className="blog-canvas min-h-dvh">
       <SiteHeader />
 
       <section className="border-b border-line bg-[linear-gradient(180deg,var(--accent-soft),var(--bg))]">
@@ -65,7 +65,7 @@ export default function BlogIndex() {
         </div>
       </section>
 
-      <div className="blog-canvas">
+      <div>
         <main className="mx-auto max-w-6xl px-4 py-12 sm:py-16">
           {featured && (
             <section aria-labelledby="featured-title">

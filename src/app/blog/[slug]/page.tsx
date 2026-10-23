@@ -59,7 +59,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
   ];
 
   return (
-    <div className="min-h-dvh">
+    <div className="blog-canvas min-h-dvh">
       <SiteHeader />
       {post.layout === "magazine" ? <Magazine post={post} toc={toc} more={more} url={url} /> : <Classic post={post} toc={toc} more={more} />}
       <SiteFooter />
@@ -136,7 +136,7 @@ function Magazine({ post, toc, more, url }: { post: Post; toc: Toc; more: Post[]
         </div>
       </section>
 
-      <div className="blog-canvas">
+      <div>
       <main className="mx-auto max-w-6xl px-4 pb-20">
         {post.cover && <Cover post={post} className="relative z-10 -mt-28 sm:-mt-40" />}
 
