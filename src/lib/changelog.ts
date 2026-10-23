@@ -12,6 +12,18 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-24T00:40:00+05:30",
+    title: "New post: Crayon vs Klue",
+    body: "An honest comparison of Crayon and Klue: what each one leans toward, where they are the same, a side-by-side table checked on their own websites, and when a small marketing team needs neither. The guide to competitive intelligence tools now links to it.",
+    kind: "feature",
+  },
+  {
+    at: "2026-10-24T00:35:00+05:30",
+    title: "The dotted background on every blog page",
+    body: "Blog posts, the blog page and this changelog now sit fully on the dotted Riposte background, down to the footer, like the tools and Compare pages.",
+    kind: "fix",
+  },
+  {
     at: "2026-10-23T01:30:00+05:30",
     title: "A kind note when someone leaves the waitlist",
     body: "When a real person is removed from the waitlist, for example a duplicate sign-up or someone who asked to leave, they now get a short, polite note saying so, with a way back in. Fake sign-ups are still removed quietly.",

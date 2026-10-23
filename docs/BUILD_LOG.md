@@ -831,3 +831,12 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - Remove with a note: deletes the row, then emails removedMessage() (src/lib/nextBatch.ts): thanks, you've been removed, no more emails, welcome back at useriposte.com. No reason given, so it fits any case. If the email fails, the banner shows the note to copy.
 - Bots stay silent on purpose: emails to fake or trap addresses hurt how much Gmail trusts alerts@useriposte.com.
 - CopyInvite takes a label, so each banner's copy button names the right message.
+
+## Blog: Crayon vs Klue (24 Oct, 00:40)
+- New post `/blog/crayon-vs-klue`, "Crayon vs Klue: which competitive intelligence platform fits your team (2026)". Week 1 item of the backlink plan. Keywords: "crayon vs klue", "klue vs crayon", "crayon alternatives" (no search volumes this time: the DataForSEO account returned a payment error).
+- Facts from crayon.co, crayon.co/integrations, klue.com, klue.com/salesforce, the Semrush Kompyte page and Visualping pricing, all opened 23 Oct 2026 and listed under Sources. No prices (neither publishes them), no logos.
+- At-a-glance table, what each is best at, where they're the same, when neither fits (Riposte named once, with what it doesn't do). 10 buyer-intent FAQs, new cover in the blog cover style.
+- Internal links: /alternatives/crayon, /alternatives/klue, /blog/competitive-intelligence-tools, /tools/battlecard-generator. Link back: one sentence in the competitive intelligence tools guide (updated date 24 Oct).
+- Fix: blog posts follow the content brief's page design rule. The page's outer wrapper is now `blog-canvas min-h-dvh`, with SiteHeader and SiteFooter inside it (before, only the middle of the post had the dotted background, and the footer sat on a plain background). Works for both the magazine and classic layouts. The blog list (/blog) and the changelog (/changelog) had the same gap and got the same fix.
+- Table on the post kept short so it fits a phone; on a 390px screen it still scrolls about 20px sideways, like tables in other posts.
+

@@ -87,7 +87,7 @@ export default function ChangelogPage() {
   ];
 
   return (
-    <div className="min-h-dvh">
+    <div className="blog-canvas min-h-dvh">
       <SiteHeader />
 
       <section className="border-b border-line bg-[linear-gradient(180deg,var(--accent-soft),var(--bg))]">
@@ -111,7 +111,7 @@ export default function ChangelogPage() {
         </div>
       </section>
 
-      <div className="blog-canvas">
+      <div>
         <main className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:py-16 lg:grid-cols-[15rem_minmax(0,1fr)]">
           <aside className="hidden lg:block">
             <div className="sticky top-24 flex flex-col gap-5">
