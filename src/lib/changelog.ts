@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-27T01:40:00+05:30",
+    title: "AI visibility shows the brief you wrote for each prompt",
+    body: "Once you write a content brief for an AI answer, the prompt shows its status: Brief ready, Brief · writing or Brief · published. Click it to open the brief. The button changes to Open the brief, so you don't write a second one by mistake.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-27T01:20:00+05:30",
     title: "New post: CI software judged by the executive digest",
     body: "A guide for product marketing teams that report to leadership: what a good weekly competitor digest looks like, a one-page template to copy, and how Crayon, Klue, Contify, RivalSense, Competely and Riposte compare on the digest they send. Every claim is checked on each vendor's own site. The solo PMM guide links to it.",
