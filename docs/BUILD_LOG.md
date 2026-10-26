@@ -840,3 +840,8 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - Fix: blog posts follow the content brief's page design rule. The page's outer wrapper is now `blog-canvas min-h-dvh`, with SiteHeader and SiteFooter inside it (before, only the middle of the post had the dotted background, and the footer sat on a plain background). Works for both the magazine and classic layouts. The blog list (/blog) and the changelog (/changelog) had the same gap and got the same fix.
 - Table on the post kept short so it fits a phone; on a 390px screen it still scrolls about 20px sideways, like tables in other posts.
 
+
+## Fix: robots.txt blocked /authors (26 Oct, 18:25)
+- Search Console live test on /authors/saniya-gazala: "Blocked by robots.txt". Cause: `disallow: "/auth"` is a prefix rule, so it also matched /authors and /authors/saniya-gazala. "/app" also matched /apple-icon.png.
+- New rules: /app$, /app/, /api/, /auth/, /login, /reset-password, /waitlist. Public pages (/authors, /alternatives, /tools, /blog, /docs) are no longer caught.
+- After deploy: in Search Console, request indexing for /authors and /authors/saniya-gazala again.
