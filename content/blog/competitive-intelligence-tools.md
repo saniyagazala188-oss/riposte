@@ -66,6 +66,8 @@ Write down the one question you want answered every week, like "Did any competit
 
 *Pricing models as of October 2026. Check each vendor's site for current plans.*
 
+For actual prices and what each plan allows, I've checked them on each vendor's site in [competitive intelligence platforms under $15,000 a year](/blog/competitive-intelligence-platforms-under-15000).
+
 ### 1. Enterprise CI platforms
 
 Crayon and Klue are the best known. They track a wide range of competitor sources, score what's important, and push it to sales through battlecards, CRM integrations and alerts. Klue is especially strong on battlecards and win/loss analysis. If you're choosing between the two, I've put them side by side in [Crayon vs Klue](/blog/crayon-vs-klue).

@@ -864,3 +864,9 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - 10 buyer-intent FAQs, comparison table (Klue, Crayon, Visualping, Riposte), new cover. Internal links: /alternatives/klue, /alternatives/crayon, /blog/crayon-vs-klue, /tools/battlecard-generator.
 - Link back from /blog/crayon-vs-klue. Visualping lines in crayon-vs-klue and competitive-intelligence-tools corrected to mention its AI summaries; the guide got a Sources section for that.
 
+## Blog: CI platforms under $15,000 a year (27 Oct, 00:45)
+- New post `/blog/competitive-intelligence-platforms-under-15000`, "Competitive intelligence platforms under $15,000 a year (2026)". Written from Saniya's second brief with her rules: Riposte = up to 5 competitors in the beta, free during the beta with no final price yet, Slack and email alerts, no CRM; no "2 to 3 hours" stat; meta title says 2026.
+- Prices checked on each vendor's own site on 27 Oct: Visualping (business/pricing: free 5 pages; $120 to $3,000 a year paid), Prisync (compare-plans: $99 to $799 a month, built for ecommerce), Kompyte (plans: Essentials 10 companies, Professional 20, Unlimited; no prices), Contify (platform: no prices, unlimited users, 7-day trial). Klue (llm-info, 26 Oct) and Crayon (23 Oct): no published prices.
+- Left out: Compint (no official site found, only review-site prices, so no price could be confirmed on its own site). The brief's "Kompyte is under $15,000" and "unlimited tracking" framing dropped; unlimited is stated only where a vendor's page says it (Kompyte Unlimited plan, Prisync Professional).
+- 10 FAQs, tools-at-a-glance table, new cover. Internal links: /alternatives, /alternatives/kompyte, /blog/competitive-intelligence-tools-solo-product-marketers, /blog/crayon-vs-klue. Link back from /blog/competitive-intelligence-tools.
+
