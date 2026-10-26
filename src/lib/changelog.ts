@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-26T19:00:00+05:30",
+    title: "Cleaner visitor numbers and a clearer home page",
+    body: "Visit numbers no longer count the signed-in app or the team's own devices, so they show real visitors only. The home page has a clearer title for Google, and the home, waitlist, privacy and terms pages now share the dotted Riposte background.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-26T18:25:00+05:30",
     title: "Fix: author pages can be found in Google again",
     body: "A rule meant to keep Google out of the login pages also matched the author pages, so Google couldn't read them. The rule now only covers the login and app pages.",

@@ -7,7 +7,7 @@ export type LegalSection = { heading: string; body: React.ReactNode };
 
 export function LegalPage({ kicker, title, intro, sections }: { kicker: string; title: string; intro: React.ReactNode; sections: LegalSection[] }) {
   return (
-    <div className="min-h-dvh">
+    <div className="blog-canvas min-h-dvh">
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-4 pt-8 pb-16">
         <p className="text-xs font-semibold uppercase tracking-widest text-accent">{kicker}</p>
