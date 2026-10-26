@@ -112,7 +112,7 @@ Riposte asks your buyers' questions in Gemini with Google Search every week and 
 
 ## A lean weekly CI routine for a solo PMM
 
-This is the routine I'd run as a team of one, with or without a tool:
+This is the routine I'd run as a team of one, with or without a tool. If you also send leadership a weekly update, I've written about [what a good executive digest looks like](/blog/competitive-intelligence-software-executive-digest).
 
 1. **Pick 3 to 5 competitors.** The ones you lose deals to, not everyone in your category.
 2. **Watch the pages that change deals.** Pricing, release notes or changelog, blog, and sitemap for new pages.
