@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-27T01:55:00+05:30",
+    title: "\"Why are they winning?\" for every product AI names",
+    body: "AI visibility now explains why an answer picked a product even when it isn't one of your tracked competitors, so new rivals that AI recommends get the same breakdown and brief.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-27T01:40:00+05:30",
     title: "AI visibility shows the brief you wrote for each prompt",
     body: "Once you write a content brief for an AI answer, the prompt shows its status: Brief ready, Brief · writing or Brief · published. Click it to open the brief. The button changes to Open the brief, so you don't write a second one by mistake.",
