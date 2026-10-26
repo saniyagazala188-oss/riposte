@@ -851,3 +851,8 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - "Don't track me": open useriposte.com/?notrack once per device; a localStorage flag turns GA off there, with a 5-second note. useriposte.com/?track turns it back on.
 - Home page: title "Riposte: Competitive Intelligence for Small Marketing Teams" (not the product page's "competitor tracking tool", to avoid two pages chasing one keyword), a description and Open Graph tags.
 - blog-canvas (dots) on the home page, the waitlist page and LegalPage (Privacy, Terms).
+
+## Fix: AI visibility "Run again now" crashed the page (26 Oct, 23:45)
+- Clicking Run again showed "Application error: a client-side exception". The run itself had saved answers (after reload: "Asked 2 of 5 prompts. 1 failed. Google said: This operation was aborted").
+- Cause: a slow run could outlast the function's time limit, so the server action's promise rejected, and useActionState rethrows rejections, which crashed the page.
+- Fix: RunButton calls the action through a wrapper that catches a rejection and shows a short message; the run budget is cut from 70 s to 55 s (maxDuration 90 s) so it ends cleanly with room to spare.
