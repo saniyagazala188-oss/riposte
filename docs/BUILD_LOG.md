@@ -845,3 +845,9 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - Search Console live test on /authors/saniya-gazala: "Blocked by robots.txt". Cause: `disallow: "/auth"` is a prefix rule, so it also matched /authors and /authors/saniya-gazala. "/app" also matched /apple-icon.png.
 - New rules: /app$, /app/, /api/, /auth/, /login, /reset-password, /waitlist. Public pages (/authors, /alternatives, /tools, /blog, /docs) are no longer caught.
 - After deploy: in Search Console, request indexing for /authors and /authors/saniya-gazala again.
+
+## Analytics cleanup, home page title, dotted background (26 Oct, 19:00)
+- GA4 is off for /app and /app/... (the signed-in app), so app use by the team stops inflating Direct traffic. The ga-disable flag is set in the GA inline script on first load and kept in sync on client-side navigation (src/components/AnalyticsGate.tsx).
+- "Don't track me": open useriposte.com/?notrack once per device; a localStorage flag turns GA off there, with a 5-second note. useriposte.com/?track turns it back on.
+- Home page: title "Riposte: Competitive Intelligence for Small Marketing Teams" (not the product page's "competitor tracking tool", to avoid two pages chasing one keyword), a description and Open Graph tags.
+- blog-canvas (dots) on the home page, the waitlist page and LegalPage (Privacy, Terms).

@@ -16,7 +16,7 @@ export default async function WaitlistPage() {
   if (approved) redirect("/app");
 
   return (
-    <div className="min-h-dvh">
+    <div className="blog-canvas min-h-dvh">
       <SiteHeader hideAuth />
       <main className="mx-auto max-w-xl px-4 py-16">
         <p className="text-xs font-semibold uppercase tracking-widest text-accent">Free beta</p>

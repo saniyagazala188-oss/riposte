@@ -5,7 +5,15 @@ import { createClient } from "@/lib/supabase/server";
 import { SITE_URL } from "@/lib/site";
 
 // The home page's main address, so search engines treat useriposte.com/ as the one version.
-export const metadata = { alternates: { canonical: `${SITE_URL}/` } };
+const TITLE = "Riposte: Competitive Intelligence for Small Marketing Teams";
+const DESC =
+  "Riposte checks your competitors' pricing, launches, blogs and news every morning, explains what changed for your product, and drafts the response. Free beta.";
+export const metadata = {
+  title: TITLE,
+  description: DESC,
+  alternates: { canonical: `${SITE_URL}/` },
+  openGraph: { title: TITLE, description: DESC, url: `${SITE_URL}/`, siteName: "Riposte", type: "website", images: [{ url: "/video/riposte-hero-poster.jpg" }] },
+};
 
 const problems = [
   {
@@ -76,7 +84,7 @@ export default async function Home() {
   const supabase = await createClient();
   const signedIn = supabase ? Boolean((await supabase.auth.getUser()).data.user) : false;
   return (
-    <div className="min-h-dvh">
+    <div className="blog-canvas min-h-dvh">
       <SiteHeader signedIn={signedIn} />
 
       <main>
