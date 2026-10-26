@@ -64,6 +64,18 @@ export default async function VisibilityPage({
         .order("position"),
     ]);
   const prompts = promptRows ?? [];
+  // The latest content brief written for each prompt, so its status shows next to the prompt.
+  const { data: briefRows } = prompts.length
+    ? await supabase
+        .from("content_briefs")
+        .select("id, source_id, status, created_at")
+        .eq("source", "visibility")
+        .in("source_id", prompts.map((p) => p.id))
+        .order("created_at", { ascending: false })
+    : { data: [] };
+  const briefOf = new Map<string, Brief>();
+  for (const b of (briefRows ?? []) as (Brief & { source_id: string })[])
+    if (!briefOf.has(b.source_id)) briefOf.set(b.source_id, { id: b.id, status: b.status });
   const entities = entitiesFor(profile?.product_name ?? null, comps ?? []);
   const { data: answerRows } = prompts.length
     ? await supabase
@@ -418,6 +430,7 @@ export default async function VisibilityPage({
                         {timeAgo(a.run_at)}
                       </span>
                     )}
+                    {briefOf.get(p.id) && <BriefChip brief={briefOf.get(p.id)!} />}
                     {a?.engine === "gemini-no-search" && (
                       <span className="text-muted">· no web search</span>
                     )}
@@ -443,6 +456,7 @@ export default async function VisibilityPage({
                         movesOf={movesOf}
                         sources={a.citations.slice(0, 3).map((c) => c.domain)}
                         promptId={p.id}
+                        brief={briefOf.get(p.id)}
                       />
                     </Reveal>
                   )}
@@ -491,6 +505,7 @@ function WhyWinning({
   movesOf,
   sources,
   promptId,
+  brief,
 }: {
   answerId: string;
   named: Mention[];
@@ -500,6 +515,7 @@ function WhyWinning({
   >;
   sources: string[];
   promptId: string;
+  brief?: Brief;
 }) {
   const read = hasReasons(named);
   return (
@@ -584,11 +600,20 @@ function WhyWinning({
       )}
       {read && (
         <div className="mt-3">
-          <BriefButton
-            source="visibility"
-            sourceId={promptId}
-            label="Write a content brief to win this answer"
-          />
+          {brief ? (
+            <div className="flex flex-wrap items-center gap-3">
+              <Link href={`/app/content/briefs/${brief.id}`} className="rounded-lg border border-accent px-3 py-2 text-sm font-semibold text-accent hover:bg-accent-soft">
+                Open the brief →
+              </Link>
+              <BriefChip brief={brief} />
+            </div>
+          ) : (
+            <BriefButton
+              source="visibility"
+              sourceId={promptId}
+              label="Write a content brief to win this answer"
+            />
+          )}
         </div>
       )}
     </div>
@@ -645,5 +670,22 @@ function AnswerDetail({ a }: { a: Answer & { citations: Citation[] } }) {
         />
       )}
     </div>
+  );
+}
+
+type Brief = { id: string; status: "new" | "writing" | "published" };
+const BRIEF_LABEL = {
+  new: { text: "Brief ready", cls: "bg-accent-soft text-accent" },
+  writing: { text: "Brief · writing", cls: "bg-signal-soft text-signal" },
+  published: { text: "Brief · published ✓", cls: "bg-accent text-accent-ink" },
+} as const;
+
+// A small status chip that opens the brief written for this prompt.
+function BriefChip({ brief }: { brief: Brief }) {
+  const l = BRIEF_LABEL[brief.status] ?? BRIEF_LABEL.new;
+  return (
+    <Link href={`/app/content/briefs/${brief.id}`} className={`rounded-full px-2 py-0.5 text-xs font-semibold hover:underline ${l.cls}`}>
+      {l.text}
+    </Link>
   );
 }

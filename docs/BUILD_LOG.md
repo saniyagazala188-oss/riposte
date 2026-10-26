@@ -877,3 +877,9 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - Vendor claims from their own sites (27 Oct unless noted): Crayon daily morning email and /crayon in Slack (aggregate, Slack, Crayon Answers pages); Klue win-loss and leadership reporting (win-loss page; llm-info 26 Oct); Contify executive newsletters from templates, leadership changes, SEC and regulatory sources; RivalSense weekly briefings by email or Slack, 80+ sources (its own blog posts); Competely brief emails shareable with execs, $39 to $99 a month. Dropped as unverified: Crayon "hundreds of data types", RivalSense prices (only in a blog post, garbled).
 - One-page digest template (copyable code block), comparison table, 10 FAQs, new cover with made-up companies. Internal links: solo PMM post, /blog/crayon-vs-klue, /blog/riposte-action-kits. Link back from the solo PMM post.
 
+
+## AI visibility: brief status on each prompt (27 Oct, 01:40)
+- The visibility page reads content_briefs (source = visibility, source_id = prompt id) and keeps the latest brief per prompt.
+- Each prompt row shows a chip next to its time: "Brief ready" (new), "Brief · writing", "Brief · published ✓", linking to the brief.
+- Inside "Why are they winning?", the "Write a content brief" button becomes "Open the brief →" once a brief exists.
+- Writing, status changes and deletes now also refresh /app/visibility, so Mark writing / Mark published shows up there straight away.

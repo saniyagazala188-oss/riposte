@@ -81,6 +81,7 @@ export async function writeBrief(_prev: BriefState, formData: FormData): Promise
     .single();
   if (error || !row) return { status: "error", message: "Couldn't save the brief. Has migration 0013 been run?" };
   revalidatePath("/app/content");
+  revalidatePath("/app/visibility");
   return { status: "done", message: "Brief ready.", briefId: row.id };
 }
 
@@ -90,10 +91,12 @@ export async function setBriefStatus(formData: FormData) {
   if (!["new", "writing", "published"].includes(status)) return;
   await supabase.from("content_briefs").update({ status }).eq("id", String(formData.get("brief_id") ?? ""));
   revalidatePath("/app/content");
+  revalidatePath("/app/visibility");
 }
 
 export async function deleteBrief(formData: FormData) {
   const { supabase } = await requireUser();
   await supabase.from("content_briefs").delete().eq("id", String(formData.get("brief_id") ?? ""));
   revalidatePath("/app/content");
+  revalidatePath("/app/visibility");
 }
