@@ -856,3 +856,11 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - Clicking Run again showed "Application error: a client-side exception". The run itself had saved answers (after reload: "Asked 2 of 5 prompts. 1 failed. Google said: This operation was aborted").
 - Cause: a slow run could outlast the function's time limit, so the server action's promise rejected, and useActionState rethrows rejections, which crashed the page.
 - Fix: RunButton calls the action through a wrapper that catches a rejection and shows a short message; the run budget is cut from 70 s to 55 s (maxDuration 90 s) so it ends cleanly with room to spare.
+
+## Blog: CI tools for a solo product marketer (27 Oct, 00:20)
+- New post `/blog/competitive-intelligence-tools-solo-product-marketers`, "The best competitive intelligence tools for a solo product marketer (2026)". Written from Saniya's brief, with these fixes: meta title says 2026; "Series A to C, 3 to 30 competitors" replaced with the real beta limits (teams of 1 to 5 marketers, up to 5 competitors); the unsourced "2 to 3 hours a week" stat dropped.
+- Competitor facts from their own sites: klue.com/llm-info (26 Oct), klue.com and crayon.co (23 Oct), Visualping's AI page (26 Oct) and pricing (23 Oct). The brief said Visualping only flags basic text changes and Klue needs heavy manual setup; both are wrong per their own sites (Visualping writes AI summaries and can alert only on changes that match your criteria; Klue's Compete Agent builds insights and battlecards automatically), so the post doesn't say either.
+- Riposte facts checked in code: 5 competitors in the beta (src/lib/access.ts), high/medium/low impact, high-impact alerts by email or Slack with who-does-what (drafts open in the app), Monday digest, AI visibility asks Gemini with Google Search.
+- 10 buyer-intent FAQs, comparison table (Klue, Crayon, Visualping, Riposte), new cover. Internal links: /alternatives/klue, /alternatives/crayon, /blog/crayon-vs-klue, /tools/battlecard-generator.
+- Link back from /blog/crayon-vs-klue. Visualping lines in crayon-vs-klue and competitive-intelligence-tools corrected to mention its AI summaries; the guide got a Sources section for that.
+
