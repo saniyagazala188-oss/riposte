@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-27T00:20:00+05:30",
+    title: "New post: CI tools for a solo product marketer",
+    body: "A buying guide for the one-person version of competitive intelligence: why enterprise platforms like Klue and Crayon are a lot for one person, what page monitors like Visualping leave to you, an 8-point checklist, a comparison table and a weekly routine that fits one person's week. The Crayon vs Klue post links to it, and two older lines about Visualping now mention its AI summaries.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-26T23:45:00+05:30",
     title: "Fix: \"Run again now\" on AI visibility no longer breaks the page",
     body: "When Google's AI was slow, asking all your prompts could take longer than the server allows, and the page showed an error. Now each run stops a little earlier and saves what came back, and if a run is cut off you see a short message instead. Press Run again to finish the rest.",
