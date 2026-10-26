@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-26T18:25:00+05:30",
+    title: "Fix: author pages can be found in Google again",
+    body: "A rule meant to keep Google out of the login pages also matched the author pages, so Google couldn't read them. The rule now only covers the login and app pages.",
+    kind: "fix",
+  },
+  {
     at: "2026-10-24T00:40:00+05:30",
     title: "New post: Crayon vs Klue",
     body: "An honest comparison of Crayon and Klue: what each one leans toward, where they are the same, a side-by-side table checked on their own websites, and when a small marketing team needs neither. The guide to competitive intelligence tools now links to it.",
