@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-27T01:20:00+05:30",
+    title: "New post: CI software judged by the executive digest",
+    body: "A guide for product marketing teams that report to leadership: what a good weekly competitor digest looks like, a one-page template to copy, and how Crayon, Klue, Contify, RivalSense, Competely and Riposte compare on the digest they send. Every claim is checked on each vendor's own site. The solo PMM guide links to it.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-27T00:45:00+05:30",
     title: "New post: CI platforms under $15,000 a year",
     body: "A budget guide to competitive intelligence tools, with prices checked on each vendor's own site: Visualping, Prisync, Kompyte, Contify, Klue, Crayon and Riposte, what each plan allows, how each is priced, and how to choose. Tools that don't publish prices are marked as quote only. The competitive intelligence tools guide links to it.",
