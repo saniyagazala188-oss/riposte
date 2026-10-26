@@ -883,3 +883,7 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - Each prompt row shows a chip next to its time: "Brief ready" (new), "Brief · writing", "Brief · published ✓", linking to the brief.
 - Inside "Why are they winning?", the "Write a content brief" button becomes "Open the brief →" once a brief exists.
 - Writing, status changes and deletes now also refresh /app/visibility, so Mark writing / Mark published shows up there straight away.
+
+## Why are they winning: untracked products too (27 Oct, 01:55)
+- A prompt counted as a gap (and showed "Why are they winning?") only if a tracked competitor was named. Answers naming only untracked tools (Peec AI, Profound, Otterly.ai…) had no breakdown.
+- isGap and the WhyWinning list now include any product named instead of you (key other too). Recent moves still show only for tracked competitors. The "Competitors named, not you" count includes these prompts.

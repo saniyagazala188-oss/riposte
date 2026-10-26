@@ -156,7 +156,8 @@ export default async function VisibilityPage({
     Boolean(
       a &&
       !a.you_mentioned &&
-      a.mentions.some((m) => m.key !== "you" && m.key !== "other"),
+      // Any product named instead of you counts, tracked competitor or not (e.g. Peec AI, Profound).
+      a.mentions.some((m) => m.key !== "you"),
     );
   const allRows = prompts.map((p) => ({ p, a: latest.get(p.id) }));
   const gapCount = allRows.filter((r) => isGap(r.a)).length;
@@ -451,7 +452,7 @@ export default async function VisibilityPage({
                       <WhyWinning
                         answerId={a.id}
                         named={a.mentions
-                          .filter((m) => m.key !== "you" && m.key !== "other")
+                          .filter((m) => m.key !== "you")
                           .slice(0, 3)}
                         movesOf={movesOf}
                         sources={a.citations.slice(0, 3).map((c) => c.domain)}
