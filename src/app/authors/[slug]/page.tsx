@@ -298,7 +298,8 @@ export default async function AuthorPage({ params }: { params: Promise<{ slug: s
               "@type": "ProfilePage",
               url: a.url,
               name: `${a.name} · Riposte`,
-              ...(posts[0] ? { dateModified: posts[0].updated } : {}),
+              // Google's Profile page check wants a full date and time, not just a date.
+              ...(posts.length ? { dateModified: `${posts.map((p) => p.updated).sort().at(-1)}T09:00:00+05:30` } : {}),
               mainEntity: authorSchema(a),
               hasPart: posts.map((p) => ({ "@type": "BlogPosting", headline: p.title, url: `${SITE_URL}/blog/${p.slug}` })),
             },

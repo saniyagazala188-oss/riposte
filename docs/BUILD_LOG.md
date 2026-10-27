@@ -902,3 +902,7 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - actions.ts: honeypot plus 2-second bot check, 2 checks per visitor per day and 60 a day overall in tool_runs (tool = ai-check, hashed IP only). Mock mode returns a sample with made-up names.
 - Result: "named in X of 3", each question with the brands in order (yours highlighted), sites it leaned on, recommended-most and trusted-sites summaries, 3 next steps, and a waitlist CTA. GA event ai_check_run.
 - freeTools entry set to live, so the hub, footer and schema pick it up. Added to sitemap and llms.txt. Hub title, description and short answer now mention both tools.
+
+## Author page: valid dateModified (27 Oct, 23:45)
+- Search Console (Profile page report) flagged "Invalid datetime value for 'dateModified'" on /authors/saniya-gazala. The ProfilePage schema used a date only (posts[0].updated, e.g. 2026-10-27); Google wants a full ISO datetime.
+- Now uses the latest `updated` across the author's posts, formatted as YYYY-MM-DDT09:00:00+05:30.

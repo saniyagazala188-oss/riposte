@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-27T23:45:00+05:30",
+    title: "Fixed the author page's last-updated date for Google",
+    body: "Search Console flagged the author page's \"last updated\" value as invalid. It now gives a full date and time, taken from the most recently updated post.",
+    kind: "fix",
+  },
+  {
     at: "2026-10-27T23:30:00+05:30",
     title: "New free tool: Does AI recommend you?",
     body: "Enter your product, website and what it does. The checker writes 3 buyer questions with no brand names, asks each one in Gemini with Google Search, and shows which brands get recommended, whether you're named and where, and which sites the answers relied on. Free, no sign-up, 2 checks a day. It's live on the free tools page.",
