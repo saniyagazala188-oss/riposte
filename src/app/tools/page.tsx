@@ -9,9 +9,9 @@ import { CATEGORIES, FREE_TOOLS, LIVE_TOOLS, toolHref } from "@/lib/freeTools";
 export const dynamic = "force-static";
 
 const URL = `${SITE_URL}/tools`;
-const TITLE = "Free Tools for Product Marketers: Battlecards, Competitor Research, AI Search | Riposte";
+const TITLE = "Free Tools for Product Marketers: Battlecard Generator, AI Recommendation Checker | Riposte";
 const DESC =
-  "Free tools for product marketers and small marketing teams. Make a sales battlecard from any competitor's website, with more tools for competitor research and AI search on the way. No sign-up.";
+  "Free tools for product marketers and small marketing teams. Make a sales battlecard from any competitor's website, or check if AI search recommends your product. No sign-up.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -21,12 +21,12 @@ export const metadata: Metadata = {
 };
 
 const SHORT_ANSWER =
-  "Riposte's free tools help product marketers do one job well in under a minute: right now, a battlecard generator that drafts a one-page sales battlecard from any competitor's website. Every tool is free, needs no sign-up, and only uses public pages.";
+  "Riposte's free tools help product marketers do one job well in under a minute: a battlecard generator that drafts a one-page sales battlecard from any competitor's website, and an AI recommendation checker that shows whether AI search names your product for your buyers' questions. Every tool is free, needs no sign-up, and only uses public pages.";
 
 const FAQS = [
   { q: "Are these tools really free?", a: "Yes. Every tool here is free and needs no sign-up. Each one has a small daily limit so the AI costs stay manageable." },
-  { q: "Do you store what I type?", a: "Results aren't saved. To enforce the daily limit, a tool keeps a scrambled (hashed) version of your IP address, the competitor website you entered and the time of the run. Nothing else." },
-  { q: "Where does the information come from?", a: "Only from public pages, like a competitor's homepage and pricing page. The tools never guess prices, and each result lists what to check before you share it." },
+  { q: "Do you store what I type?", a: "Results aren't saved. To enforce the daily limit, a tool keeps a scrambled (hashed) version of your IP address, the website you entered and the time of the run. Nothing else." },
+  { q: "Where does the information come from?", a: "Only from public pages and live AI search answers, like a competitor's homepage and pricing page. The tools never guess prices, and each result lists what to check before you share it." },
   { q: "How is this different from Riposte itself?", a: "A free tool gives you a one-time snapshot. Riposte checks your competitors every morning, explains what changed and drafts your response, so your battlecards and pages stay current." },
   { q: "Can I suggest a tool?", a: `Yes, please. Email ${CONTACT_EMAIL} with the job you want done. The most requested ideas get built first.` },
 ];
@@ -49,7 +49,7 @@ export default function ToolsHub() {
             <Link href={`/authors/${AUTHOR.slug}`} className="font-semibold hover:underline">
               {AUTHOR.name}
             </Link>
-            , who builds Riposte · {LIVE_TOOLS.length} live, {FREE_TOOLS.length - LIVE_TOOLS.length} on the way
+            , who builds Riposte · {LIVE_TOOLS.length} live{FREE_TOOLS.length > LIVE_TOOLS.length ? `, ${FREE_TOOLS.length - LIVE_TOOLS.length} on the way` : ""}
           </p>
         </section>
 
@@ -83,7 +83,7 @@ export default function ToolsHub() {
                       ))}
                     </ul>
                     <span className={`mt-5 inline-block font-semibold ${live ? "text-accent group-hover:underline" : "text-muted"}`}>
-                      {live ? `Open the ${t.name.toLowerCase()} →` : "Join the beta to hear when it's live ↓"}
+                      {live ? `${t.cta ?? `Open the ${t.name.toLowerCase()}`} →` : "Join the beta to hear when it's live ↓"}
                     </span>
                   </>
                 );
