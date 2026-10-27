@@ -896,3 +896,9 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - Riposte facts from code: action kit drafts include battlecard updates and talk tracks with one objection and answer (src/lib/actions/prompt.ts); Slack and email alerts; Monday digest with shipped and open items.
 - Comparison table, worked example with made-up Beacon, 10 FAQs, new cover. Internal links: /blog/sales-battlecard-template, /alternatives/kompyte, /blog/riposte-action-kits, /tools/battlecard-generator. Link back from /blog/sales-battlecard-template.
 
+## Free tool: Does AI recommend you? (27 Oct, 23:30)
+- New page `/tools/ai-recommendation-checker`. Visitor enters product name, website and a one-line description.
+- src/lib/tools/aiCheck.ts: Gemini writes 3 brand-free buyer questions (filtered so they never contain the product name or domain), then each is asked in parallel with groundedAnswer (Google Search). Brands are pulled with the same BRAND_SCHEMA and findMentions as the AI visibility page; citation domains come from the grounding sources. A failed question shows "No answer this time" instead of failing the whole check.
+- actions.ts: honeypot plus 2-second bot check, 2 checks per visitor per day and 60 a day overall in tool_runs (tool = ai-check, hashed IP only). Mock mode returns a sample with made-up names.
+- Result: "named in X of 3", each question with the brands in order (yours highlighted), sites it leaned on, recommended-most and trusted-sites summaries, 3 next steps, and a waitlist CTA. GA event ai_check_run.
+- freeTools entry set to live, so the hub, footer and schema pick it up. Added to sitemap and llms.txt. Hub title, description and short answer now mention both tools.

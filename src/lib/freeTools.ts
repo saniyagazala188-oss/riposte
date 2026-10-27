@@ -10,6 +10,7 @@ export type FreeTool = {
   status: "live" | "soon";
   launched?: string; // YYYY-MM-DD, live tools only
   time: string; // how long one run takes
+  cta?: string; // link text on the hub card, when "Open the <name>" reads badly
 };
 
 export const FREE_TOOLS: FreeTool[] = [
@@ -29,8 +30,10 @@ export const FREE_TOOLS: FreeTool[] = [
     short: "See which brands AI tools recommend for your buyers' questions, and whether you're one of them.",
     gives: ["Who gets recommended for your category", "Whether your brand shows up", "Which pages the answers lean on", "What to write to close the gap"],
     category: "AI search",
-    status: "soon",
-    time: "About a minute",
+    status: "live",
+    launched: "2026-10-27",
+    time: "Under a minute",
+    cta: "Check if AI recommends you",
   },
 ];
 

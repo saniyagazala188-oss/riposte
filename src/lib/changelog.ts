@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-27T23:30:00+05:30",
+    title: "New free tool: Does AI recommend you?",
+    body: "Enter your product, website and what it does. The checker writes 3 buyer questions with no brand names, asks each one in Gemini with Google Search, and shows which brands get recommended, whether you're named and where, and which sites the answers relied on. Free, no sign-up, 2 checks a day. It's live on the free tools page.",
+    kind: "launch",
+  },
+  {
     at: "2026-10-27T22:55:00+05:30",
     title: "New post: CI software for sales playbooks",
     body: "A guide for product marketers supporting sales: how Klue, Crayon, Kompyte and Riposte keep battlecards, talk tracks and objection replies current when a competitor changes, with a worked example from a price change to an updated playbook. Every vendor claim is checked on its own site. The battlecard template post links to it.",

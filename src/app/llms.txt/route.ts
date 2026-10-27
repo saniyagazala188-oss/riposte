@@ -25,6 +25,7 @@ Made by ${AUTHOR.name}, a product marketer based in Bengaluru, India. Built in p
 - [Visualping alternatives](${SITE_URL}/alternatives/visualping)
 - [Free tools](${SITE_URL}/tools): every free Riposte tool for product marketers, no sign-up
 - [Free battlecard generator](${SITE_URL}/tools/battlecard-generator): enter a competitor's website and get a one-page sales battlecard drafted from their own pages
+- [Does AI recommend you? (free checker)](${SITE_URL}/tools/ai-recommendation-checker): asks 3 buyer questions in AI search and shows which brands get recommended, whether yours does, and which sites the answers relied on
 - [Docs](${SITE_URL}/docs): how to set up and use every Riposte feature
 - [Blog](${SITE_URL}/blog): guides on competitive intelligence, content and AI search
 - [Changelog](${SITE_URL}/changelog): every step of the build, with dates
