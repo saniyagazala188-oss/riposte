@@ -920,3 +920,6 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - Left out as unconfirmed: sentiment for Peec AI and Otterly.ai, ZipTie "mentions vs recommendations" as a separate metric, Semrush prompt search volumes. /tools/ai-recommendation-checker not linked: Saniya asked to link it only once she confirms it is live.
 - Comparison table, 10 FAQs, new cover with made-up names. Internal links: /blog/riposte-ai-visibility, /alternatives. Link back from /blog/riposte-ai-visibility.
 
+## Blog: link the AI recommendation checker (28 Oct, 01:00)
+- Saniya confirmed /tools/ai-recommendation-checker is live, so the AI chatbot recommendations post now links to it in a tip box under "How to choose". Facts from the tool's own page and code: 3 buyer questions, Gemini with Google Search, free, no sign-up, 2 checks a day (PER_VISITOR = 2).
+
