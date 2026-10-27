@@ -4,7 +4,7 @@ metaTitle: "Sales Battlecard Template: How to Build One That Stays Current"
 description: "A free sales battlecard template, what to put in each section, and a simple routine to keep it current when competitors change pricing, features or messaging."
 summary: "A sales battlecard is a one-page guide that helps reps win deals against one competitor. A good one has eight parts: who they are, who they sell to, why we win, why we lose, pricing, objections with answers, trap-setting questions and proof. Most battlecards fail because they go out of date, so give each one an owner, a 'last checked' date, and update it within a week of any competitor change."
 date: "2026-10-19"
-updated: "2026-10-19"
+updated: "2026-10-27"
 keywords: ["sales battlecard", "sales battlecard template", "competitive battlecard", "battlecard template", "how to update battlecards"]
 tags: ["Sales enablement", "Competitive intelligence"]
 faqs:
@@ -141,6 +141,8 @@ Step 2 is where most teams give up, because it's manual. That's the part I built
 :::example A price change, start to finish
 A competitor raises its Pro plan from $49 to $59. The next morning Riposte flags it as high impact. The action kit says: **Today, PMM:** update the pricing row on the battlecard. **This week, Sales:** a short talk track for "they're cheaper". You copy the drafts, edit them, and the card is right before the next call.
 :::
+
+If you're choosing software to keep battlecards, talk tracks and objection replies current for a sales team, I've compared the options in [competitive intelligence software for sales playbooks](/blog/competitive-intelligence-software-sales-playbooks).
 
 :::read how-to-track-competitors
 

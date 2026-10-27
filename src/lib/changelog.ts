@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-27T22:55:00+05:30",
+    title: "New post: CI software for sales playbooks",
+    body: "A guide for product marketers supporting sales: how Klue, Crayon, Kompyte and Riposte keep battlecards, talk tracks and objection replies current when a competitor changes, with a worked example from a price change to an updated playbook. Every vendor claim is checked on its own site. The battlecard template post links to it.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-27T01:55:00+05:30",
     title: "\"Why are they winning?\" for every product AI names",
     body: "AI visibility now explains why an answer picked a product even when it isn't one of your tracked competitors, so new rivals that AI recommends get the same breakdown and brief.",
