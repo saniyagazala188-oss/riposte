@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-28T00:25:00+05:30",
+    title: "New post: software to track AI chatbot recommendations",
+    body: "A buying guide to tools that show whether AI assistants recommend your product or a competitor: Peec AI, Otterly.ai, ZipTie.ai, Profound, Semrush's AI Visibility Toolkit and Riposte, with the AI engines each covers and prices checked on their own sites. It's clear that Riposte checks Gemini only, and that standalone tools are the better pick for many engines. The AI visibility post links to it.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-27T23:55:00+05:30",
     title: "AI recommendation checker: fewer \"busy\" errors",
     body: "If Google's AI is slow to write the buyer questions, the checker now builds 3 plain questions from your description and carries on, instead of stopping with a busy message. Checks that fail no longer count toward your 2 a day.",

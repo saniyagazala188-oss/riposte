@@ -4,7 +4,7 @@ metaTitle: "Track Who AI Recommends: Riposte Prompt Studio & Visibility"
 description: "Riposte turns your keywords into buying questions people ask AI, then checks which products the answers name, which sites they rely on and where you're missing."
 summary: "Riposte tracks AI visibility in two steps. Prompt Studio turns your keywords into commercial-intent questions buyers ask AI assistants, with no brand names. AI visibility then asks those questions in Gemini and records which products each answer names, in what order, and which sites it relied on. Gaps, where competitors are named and you aren't, show the competitors' recent moves and can become a content brief."
 date: "2026-10-05"
-updated: "2026-10-19"
+updated: "2026-10-28"
 keywords: ["AI visibility tracking", "AEO prompts", "who does ChatGPT recommend", "answer engine optimization tool"]
 tags: ["Product", "AEO"]
 faqs:
@@ -72,5 +72,7 @@ The most useful view is **Competitors named, not you**. For each gap, **Why are 
 :::note A note on accuracy
 AI answers change from run to run, so treat visibility as a trend, not an exact score. That's why Riposte asks the same questions every week.
 :::
+
+Riposte checks Gemini only. If you need ChatGPT, Perplexity and other AI assistants too, I've compared the standalone tools in [software to track AI chatbot recommendations](/blog/software-to-track-ai-chatbot-recommendations).
 
 Read more about [every Riposte feature](/blog/what-riposte-does).
