@@ -133,7 +133,13 @@ I've explained how it works in detail in [how Riposte shows who AI recommends](/
 
 **The trade-off** is breadth versus depth. A standalone tool tells you how you show up across many AI assistants. A competitive intelligence tool covers fewer engines but ties each gap to what competitors changed and what to write next. Some teams use both: a standalone tool for coverage, and a CI tool for the response.
 
-Whichever you choose, compare tools on your own buyer questions. Every vendor's sample report looks good. Your own prompts show what you'd actually learn. To compare competitor tracking tools more broadly, see the [compare hub](/alternatives).
+Whichever you choose, compare tools on your own buyer questions. Every vendor's sample report looks good. Your own prompts show what you'd actually learn.
+
+:::tip Want a quick first look?
+The free [AI recommendation checker](/tools/ai-recommendation-checker) asks 3 buyer questions about your product in Gemini with Google Search, and shows who gets recommended and which sites the answers relied on. It's free, needs no sign-up, and you can run 2 checks a day.
+:::
+
+To compare competitor tracking tools more broadly, see the [compare hub](/alternatives).
 
 ## Wrapping up
 
