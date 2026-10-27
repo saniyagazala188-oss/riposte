@@ -6,7 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { mockEnabled } from "@/lib/supabase/mock";
 import { normalizeDomain } from "@/lib/discovery/parse";
 import { geminiConfigured, Overloaded, RateLimited } from "@/lib/ai/gemini";
-import { runAiCheck, sampleCheck, type CheckResult } from "@/lib/tools/aiCheck";
+import { NoQuestions, runAiCheck, sampleCheck, type CheckResult } from "@/lib/tools/aiCheck";
 
 export type CheckState =
   | { status: "idle" }
@@ -46,7 +46,8 @@ export async function checkAi(_prev: CheckState, formData: FormData): Promise<Ch
   const ipHash = createHash("sha256").update(`${ip}|${process.env.TOOL_SALT ?? "riposte-tools"}`).digest("hex");
   const since = new Date(Date.now() - DAY).toISOString();
   const [mine, all] = await Promise.all([
-    db.from("tool_runs").select("id", { count: "exact", head: true }).eq("tool", TOOL).eq("ip_hash", ipHash).gte("created_at", since),
+    // Only checks that worked count toward a visitor's limit, so a busy moment doesn't use one up.
+    db.from("tool_runs").select("id", { count: "exact", head: true }).eq("tool", TOOL).eq("ip_hash", ipHash).eq("ok", true).gte("created_at", since),
     db.from("tool_runs").select("id", { count: "exact", head: true }).eq("tool", TOOL).gte("created_at", since),
   ]);
   if (mine.error || all.error) return fail("The checker is resting right now. Please try again later.");
@@ -61,7 +62,8 @@ export async function checkAi(_prev: CheckState, formData: FormData): Promise<Ch
     return { status: "done", left: Math.max(0, PER_VISITOR - (mine.count ?? 0) - 1), product, ...result };
   } catch (e) {
     await db.from("tool_runs").insert({ tool: TOOL, ip_hash: ipHash, target: domain, ok: false });
-    if (e instanceof RateLimited || e instanceof Overloaded) return fail("Google's AI is busy right now. Please try again in a few minutes.");
-    return fail("The AI took too long to answer. Please try again in a minute.");
+    if (e instanceof NoQuestions) return fail("Couldn't turn your description into buyer questions. Describe the job your product does in a full sentence, without your brand name.");
+    if (e instanceof RateLimited || e instanceof Overloaded) return fail("Google's AI is busy right now. Please try again in a few minutes. This didn't count toward your 2 checks.");
+    return fail("The AI took too long to answer. Please try again in a minute. This didn't count toward your 2 checks.");
   }
 }

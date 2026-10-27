@@ -85,9 +85,30 @@ async function askOne(question: string, you: Entity, deadline: number): Promise<
 
 export class NoQuestions extends Error {}
 
+// If Gemini is slow or busy writing questions, fall back to 3 plain questions built from the
+// visitor's own description, so the check still runs. They contain no brand names either.
+function fallbackQuestions(input: CheckInput): string[] {
+  let job = input.about.trim().replace(/[.!?\s]+$/, "");
+  job = job.replace(/^(it|we|our (product|tool|app|platform)|this (product|tool|app|platform))\s+(is\s+(a|an)\s+\w+\s+that\s+)?/i, "");
+  job = job.charAt(0).toLowerCase() + job.slice(1);
+  const name = input.product.toLowerCase();
+  if (!job || job.toLowerCase().includes(name)) return [];
+  return [
+    `What tool do you recommend that ${job}?`,
+    `What is the best software for a small team that needs a tool that ${job}?`,
+    `Which tool is easiest to set up if I need something that ${job}?`,
+  ].filter((q) => q.length <= 260);
+}
+
 export async function runAiCheck(input: CheckInput, budgetMs = 52000): Promise<CheckResult> {
   const deadline = Date.now() + budgetMs;
-  const questions = cleanQuestions(await generateJson(questionPrompt(input), QUESTION_SCHEMA, { timeoutMs: 12000 }), input);
+  let questions: string[] = [];
+  try {
+    questions = cleanQuestions(await generateJson(questionPrompt(input), QUESTION_SCHEMA, { timeoutMs: 16000 }), input);
+  } catch {
+    // slow or busy: use the plain questions below
+  }
+  if (questions.length < 2) questions = fallbackQuestions(input);
   if (questions.length < 2) throw new NoQuestions("Couldn't write buyer questions");
   const you = youEntity(input);
   const answers = await Promise.all(questions.map((q) => askOne(q, you, deadline)));
