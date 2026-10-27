@@ -906,3 +906,8 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 ## Author page: valid dateModified (27 Oct, 23:45)
 - Search Console (Profile page report) flagged "Invalid datetime value for 'dateModified'" on /authors/saniya-gazala. The ProfilePage schema used a date only (posts[0].updated, e.g. 2026-10-27); Google wants a full ISO datetime.
 - Now uses the latest `updated` across the author's posts, formatted as YYYY-MM-DDT09:00:00+05:30.
+
+## AI recommendation checker: sturdier question step (27 Oct, 23:55)
+- First live test showed "Google's AI is busy". The question step had a 12s budget, which is a single try in generateJson; a slow first answer timed out and was reported as Overloaded.
+- Question step now gets 16s, and if it fails or returns fewer than 2 usable questions, fallbackQuestions() builds 3 brand-free questions from the visitor's description ("What tool do you recommend that <job>?" etc.).
+- Per-visitor limit now counts only ok runs, so failed checks don't use up a visitor's 2 a day. Error messages say so. NoQuestions gets its own message.

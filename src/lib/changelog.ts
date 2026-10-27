@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-27T23:55:00+05:30",
+    title: "AI recommendation checker: fewer \"busy\" errors",
+    body: "If Google's AI is slow to write the buyer questions, the checker now builds 3 plain questions from your description and carries on, instead of stopping with a busy message. Checks that fail no longer count toward your 2 a day.",
+    kind: "fix",
+  },
+  {
     at: "2026-10-27T23:45:00+05:30",
     title: "Fixed the author page's last-updated date for Google",
     body: "Search Console flagged the author page's \"last updated\" value as invalid. It now gives a full date and time, taken from the most recently updated post.",
