@@ -923,3 +923,8 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 ## Blog: link the AI recommendation checker (28 Oct, 01:00)
 - Saniya confirmed /tools/ai-recommendation-checker is live, so the AI chatbot recommendations post now links to it in a tip box under "How to choose". Facts from the tool's own page and code: 3 buyer questions, Gemini with Google Search, free, no sign-up, 2 checks a day (PER_VISITOR = 2).
 
+
+## Feed: impact filter (28 Oct, 16:10)
+- Saniya's ask for the morning check: filter the feed by Low, Medium, High.
+- /app takes `?i=high|medium|low`. A second segmented control ("Any impact", High, Medium, Low) sits after To review / All / Noise, each impact with a count that respects the current show and competitor filters.
+- The filter is kept in every link (tabs, pager, selected signal). Empty state says "No <impact>-impact signals here."
