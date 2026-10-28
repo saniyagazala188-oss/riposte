@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-28T16:10:00+05:30",
+    title: "Filter the feed by impact",
+    body: "The feed now has High, Medium and Low filters, each with a count, next to To review, All and Noise. Your morning check can start with only what matters, and the filter stays on as you move between pages and competitors.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-28T01:00:00+05:30",
     title: "The AI chatbot tools guide links to the free checker",
     body: "The guide to software that tracks AI chatbot recommendations now points to the free AI recommendation checker, for a quick first look at who Gemini recommends for your buyers' questions.",

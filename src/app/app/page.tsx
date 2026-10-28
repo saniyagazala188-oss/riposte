@@ -20,9 +20,15 @@ const FILTERS = [
   { key: "all", label: "All" },
   { key: "noise", label: "Noise" },
 ] as const;
+const IMPACTS = [
+  { key: "high", label: "High", dot: "bg-signal" },
+  { key: "medium", label: "Medium", dot: "bg-accent" },
+  { key: "low", label: "Low", dot: "bg-line" },
+] as const;
+type Impact = (typeof IMPACTS)[number]["key"];
 const PER_PAGE = 20;
 
-type Params = { show?: string; view?: string; s?: string; page?: string; c?: string };
+type Params = { show?: string; view?: string; s?: string; page?: string; c?: string; i?: string };
 
 // The signed-in home: setup progress, then the feed in three views
 // (signals, connected moves, changes waiting to be explained).
@@ -30,18 +36,31 @@ export default async function AppHome({ searchParams }: { searchParams: Promise<
   const params = await searchParams;
   const show = FILTERS.some((f) => f.key === params.show) ? (params.show as (typeof FILTERS)[number]["key"]) : "new";
   const view = params.view === "moves" || params.view === "waiting" ? params.view : "signals";
+  const impact = IMPACTS.some((x) => x.key === params.i) ? (params.i as Impact) : null;
   const page = pageNum(params.page);
   const { supabase, user } = await requireUser();
+
+  // The same show/competitor filter, used for the list and for the impact counts.
+  const scope: [string, string | boolean][] = [];
+  if (show === "new") scope.push(["status", "new"], ["noise", false]);
+  if (show === "all") scope.push(["noise", false]);
+  if (show === "noise") scope.push(["noise", true]);
+  if (params.c) scope.push(["competitor_id", params.c]);
 
   let signalQuery = supabase
     .from("signals")
     .select(SIGNAL_SELECT, { count: "exact" })
     .order("created_at", { ascending: false })
     .range((page - 1) * PER_PAGE, page * PER_PAGE - 1);
-  if (show === "new") signalQuery = signalQuery.eq("status", "new").eq("noise", false);
-  if (show === "all") signalQuery = signalQuery.eq("noise", false);
-  if (show === "noise") signalQuery = signalQuery.eq("noise", true);
-  if (params.c) signalQuery = signalQuery.eq("competitor_id", params.c);
+  for (const [col, val] of scope) signalQuery = signalQuery.eq(col, val);
+  if (impact) signalQuery = signalQuery.eq("impact", impact);
+  const impactCounts = Promise.all(
+    IMPACTS.map((x) => {
+      let q = supabase.from("signals").select("id", { count: "exact", head: true }).eq("impact", x.key);
+      for (const [col, val] of scope) q = q.eq(col, val);
+      return q;
+    }),
+  );
 
   const [
     { data: profile },
@@ -64,6 +83,7 @@ export default async function AppHome({ searchParams }: { searchParams: Promise<
     supabase.from("signals").select("id", { count: "exact", head: true }).eq("status", "new").eq("noise", false),
     supabase.from("stories").select(STORY_SELECT).eq("status", "new").order("created_at", { ascending: false }).limit(20),
   ]);
+  const counts = Object.fromEntries((await impactCounts).map((r, n) => [IMPACTS[n].key, r.count ?? 0])) as Record<Impact, number>;
   const competitors = competitorRows ?? [];
   const competitorCount = competitors.length;
   const pending = (pendingRows ?? []) as unknown as ChangeRow[];
@@ -90,6 +110,7 @@ export default async function AppHome({ searchParams }: { searchParams: Promise<
       view: view === "signals" ? undefined : view,
       show: show === "new" ? undefined : show,
       c: params.c,
+      i: impact ?? undefined,
       ...change,
     });
 
@@ -171,6 +192,29 @@ export default async function AppHome({ searchParams }: { searchParams: Promise<
                     </Link>
                   ))}
                 </nav>
+                <nav className="inline-flex rounded-lg border border-line bg-surface p-1" aria-label="Filter by impact">
+                  <Link
+                    href={link({ i: undefined, s: undefined, page: undefined })}
+                    scroll={false}
+                    aria-current={!impact ? "page" : undefined}
+                    className={`rounded-md px-3 py-1.5 text-sm font-medium ${!impact ? "bg-accent-soft text-ink" : "text-muted hover:text-ink"}`}
+                  >
+                    Any impact
+                  </Link>
+                  {IMPACTS.map((x) => (
+                    <Link
+                      key={x.key}
+                      href={link({ i: x.key, s: undefined, page: undefined })}
+                      scroll={false}
+                      aria-current={impact === x.key ? "page" : undefined}
+                      className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium ${impact === x.key ? "bg-accent-soft text-ink" : "text-muted hover:text-ink"}`}
+                    >
+                      <span className={`h-2 w-2 rounded-full ${x.dot}`} aria-hidden />
+                      {x.label}
+                      <span className="text-xs text-muted">{counts[x.key]}</span>
+                    </Link>
+                  ))}
+                </nav>
                 {competitors.length > 1 && (
                   <ParamSelect
                     param="c"
@@ -191,12 +235,14 @@ export default async function AppHome({ searchParams }: { searchParams: Promise<
                   }
                 />
               ) : (
-                <Empty title={show === "new" ? "You're up to date." : "Nothing here."}>
-                  {show === "new"
+                <Empty title={show === "new" && !impact ? "You're up to date." : "Nothing here."}>
+                  {show === "new" && !impact
                     ? "Nothing new to review. Check All to see earlier signals."
                     : show === "noise"
                       ? "Changes the AI judges meaningless (typos, dates, reshuffles) land here."
-                      : "No signals match this filter."}
+                      : impact
+                        ? `No ${impact}-impact signals here.`
+                        : "No signals match this filter."}
                 </Empty>
               )}
             </>
