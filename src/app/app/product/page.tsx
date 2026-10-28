@@ -24,11 +24,16 @@ const USES = [
 
 export default async function ProductPage() {
   const { supabase, user } = await requireUser();
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("product_name, product_pitch, ideal_customer, differentiators")
-    .eq("id", user.id)
-    .maybeSingle();
+  const cols = "product_name, product_pitch, ideal_customer, differentiators";
+  const withSite = await supabase.from("profiles").select(`${cols}, website`).eq("id", user.id).maybeSingle();
+  // Before migration 0022 there's no website column.
+  const profile = (withSite.error ? (await supabase.from("profiles").select(cols).eq("id", user.id).maybeSingle()).data : withSite.data) as {
+    product_name: string | null;
+    product_pitch: string | null;
+    ideal_customer: string | null;
+    differentiators: string | null;
+    website?: string | null;
+  } | null;
   const { data: docRows } = await supabase
     .from("knowledge_docs")
     .select("id, created_at, file_name, file_type, pages, words, method, status, warning, doc_kind, summary, key_points, excerpt")
@@ -60,6 +65,7 @@ export default async function ProductPage() {
             product_pitch={profile?.product_pitch ?? ""}
             ideal_customer={profile?.ideal_customer ?? ""}
             differentiators={profile?.differentiators ?? ""}
+            website={profile?.website ?? ""}
           />
         </section>
         <aside className="flex min-w-0 flex-col gap-4">

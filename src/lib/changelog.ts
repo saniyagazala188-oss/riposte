@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-28T18:00:00+05:30",
+    title: "See when AI answers cite your own website",
+    body: "Add your website under Your product, and AI visibility shows how many of the latest answers used your site as a source, the first time it happened and for which questions. Most new pages aren't cited for weeks, so this shows the moment it starts.",
+    kind: "feature",
+  },
+  {
     at: "2026-10-28T16:10:00+05:30",
     title: "Filter the feed by impact",
     body: "The feed now has High, Medium and Low filters, each with a count, next to To review, All and Noise. Your morning check can start with only what matters, and the filter stays on as you move between pages and competitors.",

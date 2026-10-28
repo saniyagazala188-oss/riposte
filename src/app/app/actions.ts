@@ -36,12 +36,15 @@ export async function saveProduct(_prev: FormState, formData: FormData): Promise
   const product_pitch = String(formData.get("product_pitch") ?? "").trim().slice(0, 200);
   const ideal_customer = String(formData.get("ideal_customer") ?? "").trim().slice(0, 200);
   const differentiators = String(formData.get("differentiators") ?? "").trim().slice(0, 600);
+  const websiteRaw = String(formData.get("website") ?? "").trim();
+  const website = websiteRaw ? normalizeDomain(websiteRaw) : null;
   if (!product_name) return { status: "error", message: "Add your product's name." };
+  if (websiteRaw && !website) return { status: "error", message: "Enter your website like yourproduct.com." };
 
-  const { error } = await supabase
-    .from("profiles")
-    .update({ product_name, product_pitch, ideal_customer, differentiators: differentiators || null })
-    .eq("id", user.id);
+  const fields = { product_name, product_pitch, ideal_customer, differentiators: differentiators || null };
+  let { error } = await supabase.from("profiles").update({ ...fields, website }).eq("id", user.id);
+  // Before migration 0022 there's no website column: save the rest.
+  if (error) ({ error } = await supabase.from("profiles").update(fields).eq("id", user.id));
   if (error) return { status: "error", message: "Couldn't save. Please try again." };
 
   revalidatePath("/app", "layout");
