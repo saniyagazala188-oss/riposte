@@ -928,3 +928,12 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - Saniya's ask for the morning check: filter the feed by Low, Medium, High.
 - /app takes `?i=high|medium|low`. A second segmented control ("Any impact", High, Medium, Low) sits after To review / All / Noise, each impact with a count that respects the current show and competitor filters.
 - The filter is kept in every link (tabs, pager, selected signal). Empty state says "No <impact>-impact signals here."
+
+## AI bot visits and "your site in AI answers" (28 Oct, 18:00)
+- Idea from a Searchable study (4,000+ new pages: ChatGPT's median time to first citation 3.5 days, Claude's 9.5, only 19% cited by either within 60 days). Riposte now measures the same two things for itself.
+- Migration 0022: `profiles.website`, and `bot_visits` (bot, company, purpose, path, time; RLS on, service role only).
+- src/lib/aiBots.ts: user-agent matching for GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, Claude-SearchBot, Claude-User, PerplexityBot, Perplexity-User, GoogleOther, Googlebot, Bingbot, Applebot, Meta, Amazonbot, Bytespider, CCBot, DuckAssistBot, MistralAI-User, YouBot. Purpose: training, search, user (live read for someone's question), search-engine.
+- middleware.ts logs bot requests to Supabase REST with event.waitUntil, so pages aren't slowed; bots skip the session refresh.
+- /app/admin/ai-bots (admin only, linked from Beta access): 30-day totals, live reads, a per-blog-post table of days from publishing to first AI bot, first live read, Googlebot and Bingbot, bots in the last 90 days, latest visits. Mock mode shows sample visits.
+- Your product: new "Your website" field (saved with normalizeDomain; falls back if 0022 hasn't run). AI visibility: "Your site in AI answers" card (cited in X of the latest answers, first cited date and question, questions that cited you), or a hint to add the website. Google gives the source's domain, not the page, so it's grouped by question.
+- No TestMu: product form placeholders, docs/your-product example and two doc images (start/product, compare/write) now use made-up names (Acme Insights, Northwind).

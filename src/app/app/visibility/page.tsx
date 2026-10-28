@@ -1,3 +1,4 @@
+import { YourSiteCard } from "./YourSiteCard";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { card } from "@/components/styles";
@@ -64,6 +65,9 @@ export default async function VisibilityPage({
         .order("position"),
     ]);
   const prompts = promptRows ?? [];
+  // Your own website (added in migration 0022), to show when answers cite it.
+  const { data: siteRow } = await supabase.from("profiles").select("website").eq("id", user.id).maybeSingle();
+  const site = ((siteRow as { website?: string | null } | null)?.website ?? "").replace(/^www\./, "");
   // The latest content brief written for each prompt, so its status shows next to the prompt.
   const { data: briefRows } = prompts.length
     ? await supabase
@@ -110,6 +114,18 @@ export default async function VisibilityPage({
     shareOfVoice(before, entities).map((s) => [`${s.key}:${s.name}`, s.share]),
   );
   const cited = topCitations(now);
+  // When answers used your own site as a source.
+  const isMine = (d: string) => Boolean(site) && (d.replace(/^www\./, "") === site || d.endsWith(`.${site}`));
+  const promptText = new Map(prompts.map((p) => [p.id, p.text as string]));
+  const mine = answers
+    .flatMap((a) => a.citations.filter((c) => isMine(c.domain)).map((c) => ({ prompt: promptText.get(a.prompt_id) ?? "", title: c.title ?? "", run_at: a.run_at })))
+    .sort((a, b) => a.run_at.localeCompare(b.run_at));
+  // Google gives a source's domain, not the exact page, so group by the question instead.
+  const myPrompts = [...mine.reduce((m, c) => {
+    const x = m.get(c.prompt) ?? { prompt: c.prompt, first: c.run_at, times: 0 };
+    x.times++;
+    return m.set(c.prompt, x);
+  }, new Map<string, { prompt: string; first: string; times: number }>()).values()].slice(0, 6);
   // Recent moves by competitors that AI names: a clue to why they're winning.
   const namedIds = [
     ...new Set(
@@ -240,6 +256,27 @@ export default async function VisibilityPage({
             </div>
             <RunButton first={!lastRun} count={prompts.length} />
           </section>
+
+          {site && now.length > 0 && (
+            <YourSiteCard
+              site={site}
+              latestCited={now.filter((a) => a.citations.some((c) => isMine(c.domain))).length}
+              latestTotal={now.length}
+              first={mine[0] ?? null}
+              prompts={myPrompts}
+              runs={answers.length}
+            />
+          )}
+
+          {!site && now.length > 0 && (
+            <p className="mt-5 rounded-xl border border-dashed border-line px-4 py-3 text-sm text-muted">
+              Add your website in{" "}
+              <a href="/app/product" className="font-semibold text-accent hover:underline">
+                Your product
+              </a>{" "}
+              to see when AI answers use your own site as a source.
+            </p>
+          )}
 
           {now.length > 0 && (
             <div className="mt-5 grid items-start gap-5 lg:grid-cols-[3fr_2fr]">

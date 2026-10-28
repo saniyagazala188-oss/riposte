@@ -1,9 +1,10 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { adminEmails, isAdmin } from "@/lib/access";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { inviteMessage } from "@/lib/invite";
-import { card, inputClass, primaryButton } from "@/components/styles";
+import { card, inputClass, primaryButton, secondaryButton } from "@/components/styles";
 import { LinkTabs, PageHeader, PanelHead } from "@/components/ui";
 import { SubmitButton } from "@/components/FormButtons";
 import { nextBatchMessage, removedMessage } from "@/lib/nextBatch";
@@ -112,6 +113,11 @@ export default async function AdminPage({
         kicker="Admin · only you see this"
         title="Beta access"
         description="Approve people from the waitlist. Approved people can sign up and use Riposte, with beta limits of 5 competitors and 10 tracked prompts."
+        actions={
+          <Link href="/app/admin/ai-bots" className={secondaryButton}>
+            AI bot visits →
+          </Link>
+        }
       />
 
       {params.error && <p className="mt-4 rounded-lg bg-signal-soft px-4 py-3 text-sm">{ERRORS[params.error] ?? "Something went wrong."}</p>}
