@@ -937,3 +937,8 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - /app/admin/ai-bots (admin only, linked from Beta access): 30-day totals, live reads, a per-blog-post table of days from publishing to first AI bot, first live read, Googlebot and Bingbot, bots in the last 90 days, latest visits. Mock mode shows sample visits.
 - Your product: new "Your website" field (saved with normalizeDomain; falls back if 0022 hasn't run). AI visibility: "Your site in AI answers" card (cited in X of the latest answers, first cited date and question, questions that cited you), or a hint to add the website. Google gives the source's domain, not the page, so it's grouped by question.
 - No TestMu: product form placeholders, docs/your-product example and two doc images (start/product, compare/write) now use made-up names (Acme Insights, Northwind).
+
+## IndexNow: free tools and comparison pages (31 Oct, 01:00)
+- scripts/indexnow.mjs only sent blog posts, docs and the changelog, so the new /tools/ai-recommendation-checker page was never pinged.
+- Now also sends: live free tools launched in the last 3 days (read from src/lib/freeTools.ts) plus /tools and llms.txt; /alternatives and every comparison page when CHECKED in src/lib/alternatives.ts is recent. "[indexnow all]" now includes /competitor-tracking-tool, /tools, both tools and all comparison pages.
+- This deploy's commit carries [indexnow all], so every public page is sent once.
