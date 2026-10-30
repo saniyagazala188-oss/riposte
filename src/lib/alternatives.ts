@@ -205,10 +205,12 @@ export const ALTERNATIVES: Alt[] = [
       { q: "Does Kompyte publish its pricing?", a: `Not that we could find. As of ${CHECKED_LABEL}, Kompyte's pricing isn't published and is quote-based.` },
       { q: "What does Kompyte do that Riposte doesn't?", a: "Kompyte has ad and keyword research, custom reports, automated workflows for sharing intel and win/loss stats from your CRM. Riposte doesn't. It focuses on spotting changes, explaining them for your product and drafting the response." },
       { q: "Is there a free alternative to Kompyte?", a: "Riposte is free during its beta. Google Alerts is free for news mentions, and Visualping has a free plan for watching up to 5 pages." },
+      { q: "Is NinjaReports better than Kompyte?", a: "They do different jobs, so it depends on what you need. As of 31 October 2026, NinjaReports describes itself as SEO reporting software, powered by SE Ranking, for freelancers and agencies that build branded client reports from tools like Google Search Console, GA4 and Facebook Ads. Kompyte is competitive intelligence software for go-to-market teams that tracks competitors' websites and turns what changes into battlecards, so pick NinjaReports for client reporting and Kompyte for tracking competitors." },
     ],
     sources: [
       ["Kompyte, on the Semrush knowledge base", "https://www.semrush.com/kb/1260-kompyte"],
       ["Kompyte by Semrush and IcebergIQ (Semrush news)", "https://www.semrush.com/news/257357-kompyte-by-semrush-joins-forces-with-icebergiq-to-transform-competitive-intelligence/"],
+      ["NinjaReports, on its own site", "https://ninjareports.com/seo-reporting/"],
     ],
     img: { src: "/docs/news/tabs.jpg", alt: "Riposte's news and YouTube tabs for a competitor" },
   },

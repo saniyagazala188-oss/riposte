@@ -942,3 +942,9 @@ Two features Spyline (a similar tool a friend shared) doesn't show, both on Ripo
 - scripts/indexnow.mjs only sent blog posts, docs and the changelog, so the new /tools/ai-recommendation-checker page was never pinged.
 - Now also sends: live free tools launched in the last 3 days (read from src/lib/freeTools.ts) plus /tools and llms.txt; /alternatives and every comparison page when CHECKED in src/lib/alternatives.ts is recent. "[indexnow all]" now includes /competitor-tracking-tool, /tools, both tools and all comparison pages.
 - This deploy's commit carries [indexnow all], so every public page is sent once.
+
+## Kompyte page: NinjaReports FAQ (31 Oct)
+- Search Console: "is ninjareports better than kompyte?" had 22 impressions in 3 months, with /alternatives/kompyte showing. The page didn't answer it.
+- Checked NinjaReports on its own site (ninjareports.com/seo-reporting, 31 Oct 2026): SEO reporting software "powered by SE Ranking", for freelancers, agencies and in-house teams; pulls data from 20+ platforms (SE Ranking, Search Console, GA4, Facebook Ads); white-label, scheduled client reports. Prices are on that page but not on a dedicated pricing page, so left out per Saniya's rule.
+- New FAQ in src/lib/alternatives.ts (kompyte entry): "Is NinjaReports better than Kompyte?", saying they do different jobs and who should pick which. The date is in the answer, since the page's CHECKED date (21 Oct) covers the other facts. Riposte isn't mentioned. Source added: ["NinjaReports, on its own site", "https://ninjareports.com/seo-reporting/"]. The FAQ goes into the page's FAQPage schema like the others.
+
