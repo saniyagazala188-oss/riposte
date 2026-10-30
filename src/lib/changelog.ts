@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-31T01:15:00+05:30",
+    title: "Kompyte page answers \"Is NinjaReports better than Kompyte?\"",
+    body: "People search Google for whether NinjaReports is better than Kompyte, and Google shows our Kompyte alternatives page. The page now answers it in a new FAQ: the two tools do different jobs, with NinjaReports built for SEO client reports and Kompyte for tracking competitors.",
+    kind: "fix",
+  },
+  {
     at: "2026-10-31T01:00:00+05:30",
     title: "New free tools and comparison pages reach Bing faster",
     body: "Riposte already told Bing about new blog posts the moment they went live. Now it does the same for new free tools and updated comparison pages.",
