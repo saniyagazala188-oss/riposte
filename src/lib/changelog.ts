@@ -12,6 +12,12 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    at: "2026-10-31T01:00:00+05:30",
+    title: "New free tools and comparison pages reach Bing faster",
+    body: "Riposte already told Bing about new blog posts the moment they went live. Now it does the same for new free tools and updated comparison pages.",
+    kind: "fix",
+  },
+  {
     at: "2026-10-28T18:00:00+05:30",
     title: "See when AI answers cite your own website",
     body: "Add your website under Your product, and AI visibility shows how many of the latest answers used your site as a source, the first time it happened and for which questions. Most new pages aren't cited for weeks, so this shows the moment it starts.",

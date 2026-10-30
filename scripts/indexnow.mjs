@@ -2,8 +2,9 @@
 // pages are new or changed, so they're read within hours instead of days. Google doesn't use
 // IndexNow; it reads the sitemap.
 //
-// What gets sent: blog posts whose `updated` date is in the last 3 days, plus /blog, the RSS
-// feed and llms.txt when any post changed, and /changelog when it has a new entry.
+// What gets sent: blog posts and docs updated in the last 3 days (plus /blog, the RSS feed and
+// llms.txt), free tools launched in the last 3 days (plus /tools), comparison pages when their
+// "checked" date is recent, and /changelog when it has a new entry.
 // Put "[indexnow all]" in a commit message to send every public page once.
 // The key is public by design: the file /<key>.txt proves the site is ours.
 // This never fails the build.
@@ -40,12 +41,31 @@ async function main() {
   }
   if (docsChanged) ["/docs", "/llms.txt"].forEach((p) => urls.add(SITE + p));
 
+  // Free tools: slug and launch date, read from src/lib/freeTools.ts.
+  const tools = fs.readFileSync(path.join(process.cwd(), "src/lib/freeTools.ts"), "utf8");
+  let toolsChanged = false;
+  for (const m of tools.matchAll(/slug:\s*"([^"]+)"[\s\S]*?status:\s*"(live|soon)"(?:,\s*launched:\s*"([^"]+)")?/g)) {
+    if (m[2] === "live" && (all || recent(m[3]))) {
+      urls.add(`${SITE}/tools/${m[1]}`);
+      toolsChanged = true;
+    }
+  }
+  if (toolsChanged) ["/tools", "/llms.txt"].forEach((p) => urls.add(SITE + p));
+
+  // Comparison pages: re-sent when their "checked" date moves.
+  const alts = fs.readFileSync(path.join(process.cwd(), "src/lib/alternatives.ts"), "utf8");
+  const checked = alts.match(/CHECKED\s*=\s*"([^"]+)"/)?.[1];
+  if (all || recent(checked)) {
+    urls.add(`${SITE}/alternatives`);
+    for (const m of alts.matchAll(/^\s*slug:\s*"([^"]+)",/gm)) urls.add(`${SITE}/alternatives/${m[1]}`);
+  }
+
   const log = fs.readFileSync(path.join(process.cwd(), "src/lib/changelog.ts"), "utf8");
   const latest = log.match(/at:\s*"([^"]+)"/)?.[1];
   if (all || recent(latest)) urls.add(`${SITE}/changelog`);
 
   if (all) {
-    ["", "/privacy", "/terms", "/authors"].forEach((p) => urls.add(SITE + p));
+    ["", "/privacy", "/terms", "/authors", "/competitor-tracking-tool", "/tools"].forEach((p) => urls.add(SITE + p));
     const authorDir = path.join(process.cwd(), "content/authors");
     for (const f of fs.readdirSync(authorDir).filter((f) => f.endsWith(".md") && f !== "README.md"))
       urls.add(`${SITE}/authors/${f.replace(/\.md$/, "")}`);
